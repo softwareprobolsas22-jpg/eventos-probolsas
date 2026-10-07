@@ -33,6 +33,9 @@ $eventos_threshold = (float) $argv[2];
 $eventos_root      = str_replace( '\\', '/', dirname( __DIR__ ) ) . '/';
 $eventos_folders   = array_slice( $argv, 3 );
 $eventos_results   = [];
+$eventos_files     = [];
+// En GitHub Actions el resultado se publica también como anotaciones (visibles sin abrir el registro).
+$eventos_github = 'true' === getenv( 'GITHUB_ACTIONS' );
 
 foreach ( $eventos_folders as $eventos_folder ) {
 	$eventos_results[ $eventos_folder ] = [
@@ -46,8 +49,15 @@ foreach ( $eventos_clover->xpath( '//file' ) as $eventos_file ) {
 
 	foreach ( $eventos_folders as $eventos_folder ) {
 		if ( str_starts_with( $eventos_path, rtrim( $eventos_folder, '/' ) . '/' ) ) {
-			$eventos_results[ $eventos_folder ]['lines']   += (int) $eventos_file->metrics['statements'];
-			$eventos_results[ $eventos_folder ]['covered'] += (int) $eventos_file->metrics['coveredstatements'];
+			$eventos_lines   = (int) $eventos_file->metrics['statements'];
+			$eventos_covered = (int) $eventos_file->metrics['coveredstatements'];
+
+			$eventos_results[ $eventos_folder ]['lines']   += $eventos_lines;
+			$eventos_results[ $eventos_folder ]['covered'] += $eventos_covered;
+
+			if ( $eventos_lines > 0 ) {
+				$eventos_files[ $eventos_path ] = 100 * $eventos_covered / $eventos_lines;
+			}
 		}
 	}
 }
@@ -64,15 +74,31 @@ foreach ( $eventos_results as $eventos_folder => $eventos_result ) {
 	$eventos_ok      = $eventos_percent >= $eventos_threshold;
 	$eventos_failed  = $eventos_failed || ! $eventos_ok;
 
-	printf(
-		"%s %s: %.1f %% (%d de %d líneas; mínimo %.0f %%)\n",
-		$eventos_ok ? 'OK  ' : 'FALLA',
+	$eventos_summary = sprintf(
+		'%s: %.1f %% (%d de %d líneas; mínimo %.0f %%)',
 		$eventos_folder,
 		$eventos_percent,
 		$eventos_result['covered'],
 		$eventos_result['lines'],
 		$eventos_threshold
 	);
+
+	echo ( $eventos_ok ? 'OK    ' : 'FALLA ' ) . $eventos_summary . "\n";
+
+	if ( $eventos_github ) {
+		echo ( $eventos_ok ? '::notice title=Cobertura::' : '::error title=Cobertura::' ) . $eventos_summary . "\n";
+	}
+}
+
+// Los archivos menos cubiertos, para saber dónde faltan pruebas.
+asort( $eventos_files );
+echo "\nArchivos con menor cobertura:\n";
+foreach ( array_slice( $eventos_files, 0, 10, true ) as $eventos_path => $eventos_percent ) {
+	printf( "  %5.1f %%  %s\n", $eventos_percent, $eventos_path );
+
+	if ( $eventos_github && $eventos_percent < $eventos_threshold ) {
+		printf( "::warning file=%s,title=Cobertura %.1f %%::Por debajo del mínimo de %.0f %%\n", $eventos_path, $eventos_percent, $eventos_threshold );
+	}
 }
 
 exit( $eventos_failed ? 1 : 0 );
