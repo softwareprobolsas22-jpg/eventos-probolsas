@@ -122,7 +122,7 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 |---|---|---|---|
 | Base de componentes | SCSS propio | **Bootstrap 5.3** (importado por módulos desde SCSS y encapsulado bajo `.ep-app`) + componentes propios | Pedido del PO |
 | Calendario | — | **FullCalendar 6** (núcleo + `daygrid` + `list` + `interaction`), locale `es` | Pedido del PO |
-| Prefijos | `sgp_`, `--sgp-*`, `.sgp-*` | `ep_`, `--ep-*`, `.ep-*` · text domain `eventos-probolsas` | Evitar colisiones entre plugins |
+| Prefijos | `sgp_`, `--sgp-*`, `.sgp-*` | PHP (hooks, opciones, capabilities, códigos de error, tablas): `eventos_` (WPCS rechaza prefijos de menos de 4 caracteres como `ep_`) · CSS/JS: `--ep-*`, `.ep-*`, `epConfig` · text domain `eventos-probolsas` | Evitar colisiones entre plugins |
 | Adjuntos | `Document/Attachment` | Imagen o PDF desde la Biblioteca de Medios, sin subida propia | R-09 |
 
 ### 5.3 Estructura de carpetas
@@ -188,7 +188,7 @@ eventos-probolsas/
 
 ### 5.5 Modelo de datos (esquema nuevo)
 
-**`{prefix}ep_event_types`**
+**`{prefix}eventos_event_types`**
 
 | Columna | Tipo | Regla |
 |---|---|---|
@@ -202,7 +202,7 @@ eventos-probolsas/
 | `sort_order` | int | orden en filtros y leyenda (reordenable como en SGP) |
 | `created_at_gmt`, `updated_at_gmt` | datetime | UTC |
 
-**`{prefix}ep_events`**
+**`{prefix}eventos_events`**
 
 | Columna | Tipo | Regla |
 |---|---|---|
@@ -258,13 +258,13 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 | GET | `/events/export.csv` | `eventos_manage` | Exportar con los filtros activos (separador `;`, BOM UTF-8) |
 | GET | `/dashboard` | `eventos_manage` | Tarjetas de estadísticas |
 
-**Error estándar:** `{ code, message, data: { status, fields?: { campo: ["mensaje"] } } }`.
+**Error estándar** (igual que SGP): `{ code, message, data: { status, errors?: { campo: ["mensaje"] } } }`. Convenciones completas en [`docs/api/README.md`](../api/README.md).
 
 ### 6.2 Configuración inyectada (`window.epConfig`)
 
-`restUrl`, `nonce` (`wp_rest`), `ui` (de `config/ui.php`), `icons` (de `config/icons.php`), `media` (MIME y tamaño), `rules` (reglas de validación de cada formulario: obligatorio, longitudes, formatos; las publica el backend desde las constantes de los servicios), `today` (`Y-m-d` calculado en servidor con zona Bogotá), `firstDay` (`start_of_week`), `can.manage`, `loginUrl`.
+`restUrl`, `restNonce` (`wp_rest`), `ui` (de `config/ui.php`), `icons` (de `config/icons.php`), `media` (MIME y tamaño), `rules` (reglas de validación de cada formulario: obligatorio, longitudes, formatos; las publica el backend desde las constantes de los servicios), `today` (`Y-m-d` calculado en servidor con zona Bogotá), `firstDay` (`start_of_week`), `can.manage`, `loginUrl`.
 
-**Validación en tiempo real (R-24) sin duplicar reglas:** el frontend valida con `epConfig.rules` mientras el usuario escribe, y el backend vuelve a validar con las mismas constantes al guardar. Los mensajes del servidor (422 `fields`) tienen prioridad y se muestran en el mismo lugar.
+**Validación en tiempo real (R-24) sin duplicar reglas:** el frontend valida con `epConfig.rules` mientras el usuario escribe, y el backend vuelve a validar con las mismas constantes al guardar. Los mensajes del servidor (422 `data.errors`) tienen prioridad y se muestran en el mismo lugar.
 
 ### 6.3 Columnas de las tablas (R-19: máximo 6, Acciones primero)
 
@@ -349,8 +349,8 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
 | H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *en curso: primer commit en `main` y rama `develop` publicados; faltan plantillas de PR e issue* | SM | 2 |
-| H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas | B | 8 |
-| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1) | B | 3 |
+| H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas  — *hecho en `feature/H-002-nucleo`, pendiente de revisión de QA* | B | 8 |
+| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *hecho en `feature/H-002-nucleo` (sin CI ni pruebas de integración ejecutadas: requieren Docker), pendiente de QA* | B | 3 |
 | H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core | F | 3 |
 | H-005 | GitHub Actions (CI) | B+F | 2 |
 | H-006 | Contrato API v1 en `docs/api/` | B+F | 2 |
@@ -437,3 +437,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.2 | 2026-10-07 | Producción actualizada a PHP 8.3 (D-8); primer commit publicado en GitHub (`main` y `develop`) |
 | 2.3 | 2026-10-07 | D-6 cerrada sin supuestos (se elimina todo lo del punto, incluidos eventos relacionados); D-12 confirmada como columnas; nueva regla R-23 de paginación responsive 25/50/100 |
 | 2.4 | 2026-10-07 | D-7 pasa al roadmap v1.1 con el modelo preparado desde v1 (§5.6, EP-5); regla R-24 de validación en tiempo real con reglas publicadas por el backend (`epConfig.rules`) |
+| 2.5 | 2026-10-07 | H-002/H-003 (Backend): prefijo PHP `eventos_` por exigencia de WPCS; contrato alineado con SGP (`restNonce`, `data.errors`); convenciones de la API en `docs/api/README.md` |
