@@ -406,7 +406,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | Sprint | Meta | Historias | Pts |
 |---|---|---|---|
 | **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
-| **1** | «Los tipos de evento se gestionan y la UI tiene identidad» | H-101 … H-105 | 27 |
+| **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — 🚧 en curso ([plan](sprint-1.md)) | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
 | **4** | «Listo para producción» | H-401 … H-404 | 11 |
@@ -445,3 +445,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.10 | 2026-10-07 | Flujo: las historias aprobadas por QA se integran en `develop` sin PR; un único PR `develop` → `main` por fase |
 | 2.11 | 2026-10-07 | H-001, H-005, H-006 y H-007 aprobadas por QA e integradas; CI con integración en WordPress real en verde |
 | 2.12 | 2026-10-07 | Cierre del Sprint 0 (23/23 puntos, [informe](../qa/2026-10-07-cierre-sprint-0.md)). Decisión del PO: pruebas de integración solo en el CI (QA-020) |
+| 2.13 | 2026-10-07 | Planning del Sprint 1 ([plan](sprint-1.md)); propuesta de colores de los tipos iniciales para la Review |
