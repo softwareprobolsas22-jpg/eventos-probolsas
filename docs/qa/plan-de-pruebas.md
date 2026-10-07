@@ -10,7 +10,7 @@
 | Unitario y de componentes JS | Vitest + happy-dom | `core/` (fechas, configuración, i18n), componentes de UI, pantallas | Local y CI |
 | CSS compilado | Vitest sobre `assets/dist` | Reglas transversales que el DOM simulado no aplica: R-03, R-05, encapsulación de Bootstrap, contraste, peso | Local y CI |
 | Estático | PHPCS, PHPStan, ESLint, Stylelint | Seguridad, estilo, compatibilidad, R-01, R-03, R-08, R-14, R-15 | Local y CI |
-| Integración | PHPUnit dentro de WordPress 7.1.3 (`wp-env`, versión de producción fijada) | API REST real, permisos, migraciones, ciclo de vida | CI en cada push; en local **al cierre de cada fase** (decisión del PO) |
+| Integración | PHPUnit dentro de WordPress 7.1.3 (`wp-env`, versión de producción fijada) | API REST real, permisos, migraciones, ciclo de vida | **Solo en el CI**, en cada push (decisión del PO: Docker no es viable en el equipo local) |
 | Exploratorio y visual | Navegador real (Chrome, Edge, Firefox; Safari iOS para móvil) | Flujos completos, responsive (360/768/1024/1440 px), accesibilidad con teclado y lector, axe | En la revisión de cada historia con UI y al cierre de fase |
 | Aceptación | PO en staging (WP 7.1.3, PHP 8.3) | Criterios de aceptación de las historias | Review de cada sprint y H-404 |
 
@@ -21,8 +21,7 @@
 | Entorno | Datos | Uso |
 |---|---|---|
 | Local (Windows, PHP 8.2 con ajuste de plataforma, Node 20) | Fixtures | Desarrollo y revisión de QA por historia |
-| CI (Ubuntu 24.04, PHP 8.3/8.4, Node 20/22/24) | Fixtures + WordPress de `wp-env` | Verificación oficial de la DoD |
-| `wp-env` local (Docker, PHP 8.3) | WordPress limpio | Cierre de fase |
+| CI (Ubuntu 24.04, PHP 8.3/8.4, Node 20/22/24) | Fixtures + WordPress 7.1.3 de `wp-env` | Verificación oficial de la DoD y de las pruebas de integración |
 | Staging (Hostinger) | Copia de la intranet | Aceptación del PO |
 
 ## 3. Severidad de los hallazgos
@@ -41,7 +40,7 @@
 
 **Salida (aprobación de la historia):** criterios de aceptación verificados, reglas R-xx aplicables verificadas, sin hallazgos críticos ni altos abiertos, informe en `docs/qa/`.
 
-**Cierre de fase:** todas las historias aprobadas; pruebas de integración ejecutadas en `wp-env` local; hallazgos medios cerrados o aceptados por el PO; regresión del legado (§6) en verde para lo que ya existe; informe de fase y PR único `develop` → `main` con la plantilla.
+**Cierre de fase:** todas las historias aprobadas; ejecución del CI sobre `develop` en verde (incluidas las pruebas de integración); hallazgos medios cerrados o aceptados por el PO; regresión del legado (§6) en verde para lo que ya existe; informe de fase y PR único `develop` → `main` con la plantilla.
 
 ## 5. Matriz de trazabilidad de las reglas
 
@@ -103,4 +102,4 @@ Cada caso se automatiza en la historia indicada y se vuelve a ejecutar al cierre
 
 | Fase | Informe de cierre | PR |
 |---|---|---|
-| Sprint 0 | `docs/qa/` (al cerrar) | `develop` → `main` |
+| Sprint 0 | [`2026-10-07-cierre-sprint-0.md`](2026-10-07-cierre-sprint-0.md) | `develop` → `main` |
