@@ -1,0 +1,6 @@
+// Entrada de estilos de los shortcodes de la intranet (pages/public.js).
+// Los mismos tokens que la administración, anidados bajo .ep-public para que el tema no los afecte
+// ni sean afectados por él.
+@use "base/custom-properties";
+@use "base/app";
+@use "base/public";

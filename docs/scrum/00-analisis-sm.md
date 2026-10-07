@@ -181,7 +181,7 @@ eventos-probolsas/
 | Capa | Herramienta |
 |---|---|
 | PHP | PHP ≥ 8.3, PSR-4 `Probolsas\Eventos\`, PHPUnit 9.6 + Brain Monkey (unit), wp-phpunit (integración), PHPStan 2 nivel 6 + `phpstan-wordpress`, PHPCS WordPress-Extra + PHPCompatibilityWP |
-| JS/CSS | Node ≥ 22, Vite 8, Sass, ESLint, Stylelint (`color-no-hex` fuera de tokens), Vitest + happy-dom, axe-core |
+| JS/CSS | Node ≥ 20.19, Vite 8, Sass, ESLint (R-08, R-14, R-15), Stylelint (R-01, R-03), Vitest 4.1 + happy-dom, axe-core (ver ADR-0001) |
 | UI | Bootstrap 5.3, FullCalendar 6, Font Awesome Free 7 (npm, fuentes locales), Notyf, Tippy.js, Tom Select (filtro múltiple de tipos) |
 | Entorno | `@wordpress/env` (PHP 8.3, WP 7.1) |
 | CI | GitHub Actions: lint PHP/JS/CSS → PHPStan → PHPUnit → Vitest → build → presupuesto de tamaño |
@@ -351,7 +351,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *en curso: primer commit en `main` y rama `develop` publicados; faltan plantillas de PR e issue* | SM | 2 |
 | H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas  — *✅ aprobada por QA con observaciones ([informe](../qa/2026-10-07-H-002-H-003.md)); integrada en `develop`* | B | 8 |
 | H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *✅ aprobada por QA; pendiente QA-001 (guía de desarrollo) antes de cerrar el Sprint 0* | B | 3 |
-| H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core | F | 3 |
+| H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core  — *hecho en `feature/H-004-frontend-tooling` (ADR-0001), pendiente de QA* | F | 3 |
 | H-005 | GitHub Actions (CI) | B+F | 2 |
 | H-006 | Contrato API v1 en `docs/api/` | B+F | 2 |
 | H-007 | Plan de pruebas, matriz R-xx ↔ casos, casos de regresión de los 8 defectos del legado | Q | 3 |
@@ -439,3 +439,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.4 | 2026-10-07 | D-7 pasa al roadmap v1.1 con el modelo preparado desde v1 (§5.6, EP-5); regla R-24 de validación en tiempo real con reglas publicadas por el backend (`epConfig.rules`) |
 | 2.5 | 2026-10-07 | H-002/H-003 (Backend): prefijo PHP `eventos_` por exigencia de WPCS; contrato alineado con SGP (`restNonce`, `data.errors`); convenciones de la API en `docs/api/README.md` |
 | 2.6 | 2026-10-07 | Revisión de QA de H-002/H-003 (aprobada con 8 observaciones); pruebas de integración al cierre de cada fase (decisión del PO) |
+| 2.7 | 2026-10-07 | H-004 (Frontend): tooling, Bootstrap encapsulado y `assets/dist` versionado (ADR-0001) |

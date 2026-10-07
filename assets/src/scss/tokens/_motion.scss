@@ -1,0 +1,15 @@
+// Animaciones sutiles: 150–250 ms. Toda animación se desactiva con prefers-reduced-motion
+// (mixin reduced-motion en tools/_mixins.scss).
+$duration: (
+	"fast": 150ms,
+	"base": 200ms,
+	"slow": 250ms,
+	// Retraso entre elementos de una entrada escalonada (por ejemplo, las tarjetas del Dashboard).
+	"stagger": 40ms,
+);
+
+$easing: (
+	"standard": cubic-bezier(0.2, 0, 0, 1),
+	"enter": cubic-bezier(0, 0, 0.2, 1),
+	"exit": cubic-bezier(0.4, 0, 1, 1),
+);

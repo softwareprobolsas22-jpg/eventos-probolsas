@@ -1,0 +1,1 @@
+function e(e=globalThis.epConfig){if(typeof e!=`object`||!e||Array.isArray(e))throw Error(`epConfig no está disponible: la pantalla debe encolar sus assets con Assets.php.`);return t(structuredClone(e))}function t(e){return typeof e==`object`&&e&&(Object.values(e).forEach(t),Object.freeze(e)),e}export{e as t};

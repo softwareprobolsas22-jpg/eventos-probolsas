@@ -1,0 +1,37 @@
+// Contenedor raíz de cada widget de la intranet (shortcodes). Igual que .ep-app en administración,
+// todos los estilos se anidan bajo .ep-public para no chocar con el tema. Este reset neutraliza las
+// reglas genéricas más comunes de los temas sobre botones, campos, tablas, enlaces y títulos.
+@use "scope";
+
+.ep-public {
+	margin-block: var(--ep-space-4);
+	font-family: var(--ep-font-family-base);
+	font-size: var(--ep-font-size-md);
+	line-height: var(--ep-line-height-base);
+	color: var(--ep-color-text);
+
+	@include scope.rules;
+
+	button,
+	input,
+	select,
+	textarea {
+		font: inherit;
+		letter-spacing: normal;
+		text-transform: none;
+	}
+
+	button {
+		min-width: 0;
+		box-shadow: none;
+	}
+
+	table {
+		margin: 0;
+		border: 0;
+	}
+
+	a {
+		box-shadow: none;
+	}
+}

@@ -1,0 +1,44 @@
+{
+  "_config-2msKvsMA.js": {
+    "file": "js/chunks/config-2msKvsMA.js",
+    "name": "config",
+    "css": [
+      "css/config-BCGaaYsu.css"
+    ],
+    "assets": [
+      "fonts/fa-solid-900.woff2"
+    ]
+  },
+  "_config-BCGaaYsu.css": {
+    "file": "css/config-BCGaaYsu.css",
+    "src": "_config-BCGaaYsu.css"
+  },
+  "assets/src/js/pages/admin.js": {
+    "file": "js/admin.js",
+    "name": "admin",
+    "src": "assets/src/js/pages/admin.js",
+    "isEntry": true,
+    "imports": [
+      "_config-2msKvsMA.js"
+    ],
+    "css": [
+      "css/admin.css"
+    ]
+  },
+  "assets/src/js/pages/public.js": {
+    "file": "js/public.js",
+    "name": "public",
+    "src": "assets/src/js/pages/public.js",
+    "isEntry": true,
+    "imports": [
+      "_config-2msKvsMA.js"
+    ],
+    "css": [
+      "css/public.css"
+    ]
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
+    "file": "fonts/fa-solid-900.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+  }
+}

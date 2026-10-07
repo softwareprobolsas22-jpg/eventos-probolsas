@@ -1,0 +1,47 @@
+// Publica los tokens como custom properties (--ep-*). Los componentes usan siempre var(--ep-*),
+// lo que permite valores en tiempo de ejecución (por ejemplo, el color de cada tipo de evento).
+@use "../tokens" as t;
+
+:root {
+	@each $name, $value in t.$colors {
+		--ep-color-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$space {
+		--ep-space-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$radius {
+		--ep-radius-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$shadow {
+		--ep-shadow-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$font-size {
+		--ep-font-size-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$font-weight {
+		--ep-font-weight-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$line-height {
+		--ep-line-height-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$duration {
+		--ep-duration-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$easing {
+		--ep-easing-#{$name}: #{$value};
+	}
+
+	@each $name, $value in t.$z-index {
+		--ep-z-#{$name}: #{$value};
+	}
+
+	--ep-font-family-base: #{t.$font-family-base};
+}

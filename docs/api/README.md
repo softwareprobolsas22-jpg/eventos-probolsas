@@ -86,4 +86,6 @@ La inyecta `Core\Assets\Assets::client_config()` antes del script de cada pantal
 |---|---|---|
 | `templates/public/notice.php` | `WidgetRenderer` (visitante sin sesión o sin permiso) | `icon` (clases FA), `message`, `link?` (`url`, `label`) |
 | `templates/public/widget.php` | `WidgetRenderer` (usuario con `eventos_view`) | `widget` (`calendar` o `upcoming`), `props` (opciones ya saneadas) |
-| `templates/admin/layout.php` | Pantallas de administración de cada dominio | Se define con la primera pantalla (H-104) |
+| `templates/admin/layout.php` | Pantallas de administración de cada dominio | `screen`, `icon`, `title`, `subtitle?`, `actions?` (HTML ya escapado), `content` (HTML ya escapado) |
+| `templates/partials/mount.php` | Contenido de las pantallas con interfaz JS | `id` |
+| `templates/partials/empty-state.php` | Estados vacíos renderizados en PHP | `icon`, `title`, `message` |

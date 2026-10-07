@@ -1,0 +1,30 @@
+// Reglas comunes de los dos contenedores del plugin (.ep-app en wp-admin y .ep-public en la intranet).
+// Aquí viven las reglas transversales que QA verifica sobre el CSS compilado (tests/js/build/layout-css.test.js).
+@use "../tools/mixins" as m;
+
+@mixin rules {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	:focus-visible {
+		@include m.focus-ring;
+	}
+
+	// `hidden` debe ocultar siempre, aunque el componente o el tema declaren su propio `display`.
+	[hidden] {
+		display: none !important;
+	}
+
+	// R-03: los campos de texto largo no se redimensionan.
+	textarea {
+		resize: none;
+	}
+
+	// R-05: los encabezados de las tablas van centrados.
+	th {
+		text-align: center;
+	}
+}

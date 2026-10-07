@@ -1,0 +1,69 @@
+// Bootstrap 5.3 configurado con los tokens del plugin (R-01: ningún color fuera de tokens/).
+// Se compila como hoja independiente y vite.config.js antepone :is(.ep-app, .ep-public) a cada
+// selector: Bootstrap solo actúa dentro de la interfaz del plugin. Se incluyen únicamente los módulos
+// que usa el plugin; los componentes con capas flotantes (modal, toast, tooltip) los aporta el sistema
+// de diseño propio (H-103), porque Bootstrap los inserta en <body>, fuera de los contenedores.
+@use "sass:map";
+@use "../tokens" as t;
+
+@import "bootstrap/scss/functions";
+
+$enable-dark-mode: false;
+$enable-shadows: false;
+$enable-gradients: false;
+$enable-reduced-motion: true;
+
+$primary: t.$brand-primary;
+$secondary: t.$neutral-700;
+$success: t.$brand-primary;
+$info: t.$info;
+$warning: t.$warning;
+$danger: t.$error;
+$light: t.$neutral-100;
+$dark: t.$neutral-900;
+
+$body-color: t.$neutral-900;
+$body-bg: t.$brand-white;
+$link-color: t.$brand-primary;
+$border-color: t.$neutral-200;
+$font-family-sans-serif: t.$font-family-base;
+$font-size-base: map.get(t.$font-size, "md");
+$border-radius: map.get(t.$radius, "md");
+$border-radius-sm: map.get(t.$radius, "sm");
+$border-radius-lg: map.get(t.$radius, "lg");
+$focus-ring-color: rgba(t.$brand-secondary, 0.35);
+$input-focus-border-color: t.$brand-primary;
+$table-th-font-weight: map.get(t.$font-weight, "semibold");
+
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/helpers";
+@import "bootstrap/scss/utilities/api";
+
+// El reboot de Bootstrap declara `textarea { resize: vertical }` y `th { text-align: inherit }`.
+// Se corrigen en la misma capa para no depender del orden de carga de las hojas.
+// R-03: los campos de texto largo no se redimensionan.
+textarea {
+	resize: none;
+}
+
+// R-05: los encabezados de las tablas van centrados.
+th {
+	text-align: center;
+}
