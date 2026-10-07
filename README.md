@@ -57,6 +57,19 @@ vendor/bin/phpcs --config-set installed_paths "../../phpcsstandards/phpcsutils,.
 | `npm run env:start` / `env:stop` | Inicia o detiene WordPress en Docker (`wp-env`, PHP 8.3) |
 | `npm run test:php:integration` | Pruebas de integración dentro de WordPress (requiere `env:start`) |
 
+## Integración continua
+
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) corre en cada push a `main`, `develop` y `feature/**`, y en cada PR:
+
+| Trabajo | Qué verifica |
+|---|---|
+| PHP 8.3 / 8.4 | PHPCS, PHPStan, pruebas unitarias; en 8.3, cobertura ≥ 80 % en `src/Shared` y `src/Domains` |
+| JS (Node 20 / 22) | ESLint, Stylelint, build, `assets/dist` al día, pruebas con cobertura ≥ 80 % |
+| Fechas | Pruebas de fechas en Bogotá, UTC, Tokio y Kiritimati (R-08) |
+| Integración | Pruebas dentro de WordPress 7.1.3 con `wp-env` (Docker del runner) |
+
+Las pruebas de integración corren **en el CI en cada push**; en local solo se corren **al cierre de cada fase** (Docker Desktop consume mucha memoria). El resultado se ve en la pestaña *Actions* del repositorio: los fallos de cobertura y de integración aparecen como anotaciones en el resumen de la ejecución, sin abrir el registro.
+
 ## Reglas para contribuir
 
 1. **Una rama por historia:** `feature/H-xxx-descripcion`, creada desde `develop`.

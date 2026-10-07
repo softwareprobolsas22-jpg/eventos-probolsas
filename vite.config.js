@@ -147,6 +147,8 @@ export default defineConfig( ( { mode } ) => {
 				include: [ 'assets/src/js/**/*.js' ],
 				exclude: [ 'assets/src/js/pages/**' ],
 				reporter: [ 'text-summary', 'html' ],
+				// DoD 3 (QA-018): el CI falla si la cobertura del JS baja del 80 %.
+				thresholds: { statements: 80, branches: 80, functions: 80, lines: 80 },
 			},
 		},
 	};
