@@ -333,7 +333,7 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 **Definition of Done:**
 1. PR revisado y aprobado por QA; CI verde.
 2. PHPCS y PHPStan (nivel 6) sin errores; ESLint y Stylelint sin errores.
-3. Pruebas unitarias del dominio ≥ 80 % de cobertura; integración de los endpoints tocados; pruebas de componentes de UI tocados.
+3. Pruebas unitarias del dominio ≥ 80 % de cobertura (medida en el CI) y pruebas de componentes de UI tocados. Las **pruebas de integración** (wp-env/Docker) se escriben en cada historia pero se **ejecutan al cierre de cada fase** (decisión del PO: Docker consume mucha memoria) y siempre en el CI.
 4. Criterios de aceptación y R-xx verificados; sin bugs críticos o altos abiertos.
 5. Sin avisos PHP con `WP_DEBUG` ni errores en consola.
 6. Textos en es-CO, preparados para traducción (`eventos-probolsas.pot`).
@@ -349,8 +349,8 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
 | H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *en curso: primer commit en `main` y rama `develop` publicados; faltan plantillas de PR e issue* | SM | 2 |
-| H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas  — *hecho en `feature/H-002-nucleo`, pendiente de revisión de QA* | B | 8 |
-| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *hecho en `feature/H-002-nucleo` (sin CI ni pruebas de integración ejecutadas: requieren Docker), pendiente de QA* | B | 3 |
+| H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas  — *✅ aprobada por QA con observaciones ([informe](../qa/2026-10-07-H-002-H-003.md)); integrada en `develop`* | B | 8 |
+| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *✅ aprobada por QA; pendiente QA-001 (guía de desarrollo) antes de cerrar el Sprint 0* | B | 3 |
 | H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core | F | 3 |
 | H-005 | GitHub Actions (CI) | B+F | 2 |
 | H-006 | Contrato API v1 en `docs/api/` | B+F | 2 |
@@ -438,3 +438,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.3 | 2026-10-07 | D-6 cerrada sin supuestos (se elimina todo lo del punto, incluidos eventos relacionados); D-12 confirmada como columnas; nueva regla R-23 de paginación responsive 25/50/100 |
 | 2.4 | 2026-10-07 | D-7 pasa al roadmap v1.1 con el modelo preparado desde v1 (§5.6, EP-5); regla R-24 de validación en tiempo real con reglas publicadas por el backend (`epConfig.rules`) |
 | 2.5 | 2026-10-07 | H-002/H-003 (Backend): prefijo PHP `eventos_` por exigencia de WPCS; contrato alineado con SGP (`restNonce`, `data.errors`); convenciones de la API en `docs/api/README.md` |
+| 2.6 | 2026-10-07 | Revisión de QA de H-002/H-003 (aprobada con 8 observaciones); pruebas de integración al cierre de cada fase (decisión del PO) |
