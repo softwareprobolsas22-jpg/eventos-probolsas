@@ -17,7 +17,7 @@
 ## Definition of Done
 
 - [ ] Todas las historias tienen revisión de QA **aprobada** (informes enlazados arriba).
-- [ ] Revisión de QA de la fase aprobada, con las pruebas de integración (`wp-env`) ejecutadas.
+- [ ] Revisión de QA de la fase aprobada, con la ejecución del CI sobre `develop` en verde (las pruebas de integración corren solo en el CI).
 - [ ] CI en verde (PHP 8.3/8.4, JS Node 20/22, zonas horarias, integración).
 - [ ] Cobertura ≥ 80 % en `src/Shared` y `src/Domains`.
 - [ ] `assets/dist` corresponde a `assets/src`.

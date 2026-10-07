@@ -14,7 +14,7 @@ Plugin de WordPress con el calendario de eventos de la intranet de Probolsas: cu
 | PHP | 8.3 (producción) | Ejecutar el plugin y las herramientas de PHP |
 | Composer | 2 | Herramientas de PHP (el plugin no tiene dependencias PHP en producción) |
 | Node | 20.19 o superior (22 recomendado) | Compilar los assets y las pruebas JS |
-| Docker Desktop | — | Solo para las pruebas de integración (`wp-env`), que se corren al cierre de cada fase |
+| Docker Desktop | — | Opcional: las pruebas de integración corren en el CI. Solo se necesita para levantar WordPress en local (`npm run env:start`) |
 
 ## Instalación
 
@@ -68,7 +68,7 @@ GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) corre en
 | Fechas | Pruebas de fechas en Bogotá, UTC, Tokio y Kiritimati (R-08) |
 | Integración | Pruebas dentro de WordPress 7.1.3 con `wp-env` (Docker del runner) |
 
-Las pruebas de integración corren **en el CI en cada push**; en local solo se corren **al cierre de cada fase** (Docker Desktop consume mucha memoria). El resultado se ve en la pestaña *Actions* del repositorio: los fallos de cobertura y de integración aparecen como anotaciones en el resumen de la ejecución, sin abrir el registro.
+Las pruebas de integración corren **solo en el CI**, en cada push: el equipo de desarrollo no tiene memoria suficiente para Docker (decisión del PO). El resultado se ve en la pestaña *Actions* del repositorio: los fallos de cobertura y de integración aparecen como anotaciones en el resumen de la ejecución, sin abrir el registro.
 
 ## Reglas para contribuir
 
@@ -77,7 +77,7 @@ Las pruebas de integración corren **en el CI en cada push**; en local solo se c
 3. **`assets/dist` se versiona** ([ADR-0001](docs/adr/0001-assets-compilados-y-bootstrap-encapsulado.md)): quien cambie `assets/src` ejecuta `npm run build` y sube el resultado en el mismo commit. El CI falla si no coinciden.
 4. **Antes de pedir revisión:** `composer lint`, `composer analyse`, `composer test`, `npm run lint` y `npm test` sin errores.
 5. **Revisión de QA:** cada historia la revisa QA (informe en `docs/qa/`). Si se aprueba, se integra en `develop` sin PR.
-6. **Un PR por fase:** al cierre de cada fase, QA revisa la fase completa (incluidas las pruebas de integración) y se abre un único PR `develop` → `main`. Nunca se abre un PR sin revisión de QA aprobada.
+6. **Un PR por fase:** al cierre de cada fase, QA revisa la fase completa con la ejecución del CI sobre `develop` en verde (incluidas las pruebas de integración) y se abre un único PR `develop` → `main`. Nunca se abre un PR sin revisión de QA aprobada.
 
 ## Publicación
 

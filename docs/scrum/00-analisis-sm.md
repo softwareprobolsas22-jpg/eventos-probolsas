@@ -326,14 +326,14 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 
 **Cadencia:** sprints de 2 semanas (Sprint 0 de 1 semana). Planning, Daily asíncrona (avance / siguiente paso / impedimento), Review con demo al PO, Retrospectiva; refinamiento a mitad de sprint.
 
-**Flujo en GitHub (decisión del PO, 2026-10-07):** `main` (lo que está en producción) · `develop` (integración) · ramas `feature/H-xxx-descripcion`. Cada historia: desarrollo en su rama → revisión de QA (`docs/qa/`) → si se aprueba, se integra en `develop` **sin PR**. Al cierre de cada fase: revisión de QA de la fase (con las pruebas de integración en Docker) → **un único PR `develop` → `main`** con la plantilla (historias, reglas R-xx tocadas, informes de QA, evidencia de pruebas). Nunca se abre un PR sin revisión de QA aprobada.
+**Flujo en GitHub (decisión del PO, 2026-10-07):** `main` (lo que está en producción) · `develop` (integración) · ramas `feature/H-xxx-descripcion`. Cada historia: desarrollo en su rama → revisión de QA (`docs/qa/`) → si se aprueba, se integra en `develop` **sin PR**. Al cierre de cada fase: revisión de QA de la fase (con la ejecución del CI sobre `develop` en verde, incluidas las pruebas de integración) → **un único PR `develop` → `main`** con la plantilla (historias, reglas R-xx tocadas, informes de QA, evidencia de pruebas). Nunca se abre un PR sin revisión de QA aprobada.
 
 **Definition of Ready:** criterios de aceptación, R-xx aplicables, endpoint del contrato identificado, diseño aprobado (si es UI), estimación.
 
 **Definition of Done:**
 1. PR revisado y aprobado por QA; CI verde.
 2. PHPCS y PHPStan (nivel 6) sin errores; ESLint y Stylelint sin errores.
-3. Pruebas unitarias del dominio ≥ 80 % de cobertura (medida en el CI) y pruebas de componentes de UI tocados. Las **pruebas de integración** (wp-env/Docker) se escriben en cada historia pero se **ejecutan al cierre de cada fase** (decisión del PO: Docker consume mucha memoria) y siempre en el CI.
+3. Pruebas unitarias del dominio ≥ 80 % de cobertura (medida en el CI) y pruebas de componentes de UI tocados. Las **pruebas de integración** (WordPress 7.1.3 con `wp-env`) se escriben en cada historia y se ejecutan **solo en el CI**, en cada push (decisión del PO, 2026-10-07: el equipo de desarrollo tiene 5,9 GB de RAM y Docker no es viable en local).
 4. Criterios de aceptación y R-xx verificados; sin bugs críticos o altos abiertos.
 5. Sin avisos PHP con `WP_DEBUG` ni errores en consola.
 6. Textos en es-CO, preparados para traducción (`eventos-probolsas.pot`).
@@ -405,7 +405,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 
 | Sprint | Meta | Historias | Pts |
 |---|---|---|---|
-| **0** (1 semana) | «Podemos trabajar con seguridad» | H-001 … H-007 | 23 |
+| **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
@@ -444,3 +444,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.9 | 2026-10-07 | H-004: correcciones de QA-009, QA-010 y QA-011; aprobada por QA en la segunda revisión |
 | 2.10 | 2026-10-07 | Flujo: las historias aprobadas por QA se integran en `develop` sin PR; un único PR `develop` → `main` por fase |
 | 2.11 | 2026-10-07 | H-001, H-005, H-006 y H-007 aprobadas por QA e integradas; CI con integración en WordPress real en verde |
+| 2.12 | 2026-10-07 | Cierre del Sprint 0 (23/23 puntos, [informe](../qa/2026-10-07-cierre-sprint-0.md)). Decisión del PO: pruebas de integración solo en el CI (QA-020) |
