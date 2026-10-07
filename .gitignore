@@ -1,0 +1,22 @@
+# Dependencias
+/node_modules/
+/vendor/
+
+# Caches y reportes de herramientas
+.phpunit.result.cache
+.phpunit.cache/
+/coverage/
+*.log
+
+# Entorno local
+.env
+.wp-env.override.json
+
+# Paquetes generados
+/*.zip
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

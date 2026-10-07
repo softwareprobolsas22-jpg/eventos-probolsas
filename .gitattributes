@@ -1,0 +1,10 @@
+# Finales de línea normalizados en el repositorio.
+* text=auto eol=lf
+
+# Fuera del paquete del plugin (git archive / zip de release).
+/legacy export-ignore
+/docs export-ignore
+/tests export-ignore
+/.github export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
