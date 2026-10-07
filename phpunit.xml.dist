@@ -14,4 +14,11 @@
 			<directory>tests/php/Unit</directory>
 		</testsuite>
 	</testsuites>
+
+	<!-- Código que mide la cobertura (DoD 3). Sin este bloque PHPUnit no genera el reporte. -->
+	<coverage processUncoveredFiles="true">
+		<include>
+			<directory suffix=".php">src</directory>
+		</include>
+	</coverage>
 </phpunit>

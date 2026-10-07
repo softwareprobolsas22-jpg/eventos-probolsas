@@ -24,7 +24,7 @@ permissions:
 jobs:
   php:
     name: PHP ${{ matrix.php }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -71,7 +71,7 @@ jobs:
 
   js:
     name: JS (Node ${{ matrix.node }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -108,7 +108,7 @@ jobs:
 
   timezones:
     name: Fechas en ${{ matrix.tz }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -136,7 +136,7 @@ jobs:
 
   integration:
     name: Integración (wp-env)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [ php ]
     steps:
       - uses: actions/checkout@v7
