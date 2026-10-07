@@ -1,0 +1,162 @@
+# Integración continua del plugin (H-005). Verifica la Definition of Done en cada push y en cada PR.
+#
+# - php:          PHPCS, PHPStan y pruebas unitarias en PHP 8.3 (producción) y 8.4 (siguiente versión).
+#                 En 8.3 mide la cobertura con pcov y exige el 80 % (DoD 3, QA-002).
+# - js:           ESLint, Stylelint, build y pruebas JS en Node 20 y 22. Falla si assets/dist no
+#                 corresponde a assets/src (ADR-0001).
+# - timezones:    las pruebas de fechas en zonas con desplazamiento negativo y positivo (R-08, QA-012).
+# - integration:  pruebas de integración dentro de WordPress con wp-env (Docker del runner).
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.3', '8.4' ]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, intl
+          coverage: ${{ matrix.php == '8.3' && 'pcov' || 'none' }}
+          tools: composer:v2
+
+      - name: Caché de Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+
+      # Instalación limpia: el plugin de Composer debe registrar solo los estándares de PHPCS (QA-003).
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Estándares de PHPCS registrados
+        run: vendor/bin/phpcs -i | grep -q "WordPress-Extra" && vendor/bin/phpcs -i | grep -q "PHPCompatibilityWP"
+
+      - name: PHPCS
+        run: vendor/bin/phpcs -q
+
+      - name: PHPStan
+        run: composer analyse
+
+      - name: Pruebas unitarias
+        if: matrix.php != '8.3'
+        run: vendor/bin/phpunit -c phpunit.xml.dist
+
+      - name: Pruebas unitarias con cobertura
+        if: matrix.php == '8.3'
+        run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover build/clover.xml --coverage-text --colors=never
+
+      - name: Cobertura mínima del 80 % (DoD 3)
+        if: matrix.php == '8.3'
+        run: php tools/coverage-check.php build/clover.xml 80 src/Shared src/Domains
+
+  js:
+    name: JS (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ '20', '22' ]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: ESLint
+        run: npx eslint . --max-warnings 0
+
+      - name: Stylelint
+        run: npm run lint:css
+
+      - name: Build
+        run: npm run build
+
+      - name: assets/dist corresponde a assets/src (ADR-0001)
+        run: |
+          if [ -n "$(git status --porcelain assets/dist)" ]; then
+            git status --short assets/dist
+            echo "::error::assets/dist no está al día: ejecuta npm run build y sube el resultado en el mismo commit."
+            exit 1
+          fi
+
+      - name: Pruebas JS con cobertura
+        run: npm run test:coverage
+
+  timezones:
+    name: Fechas en ${{ matrix.tz }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Bogotá (−5), UTC (0), Tokio (+9) y Kiritimati (+14): el día y la hora del calendario no deben cambiar.
+        tz: [ 'America/Bogota', 'UTC', 'Asia/Tokyo', 'Pacific/Kiritimati' ]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Zona efectiva del proceso
+        run: node -e "console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)"
+        env:
+          TZ: ${{ matrix.tz }}
+
+      - name: Pruebas de fechas
+        run: npx vitest run tests/js/core/date.test.js
+        env:
+          TZ: ${{ matrix.tz }}
+
+  integration:
+    name: Integración (wp-env)
+    runs-on: ubuntu-latest
+    needs: [ php ]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      # Las dependencias @php-wasm de @wordpress/env piden Node 24 (QA-013).
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: npm ci --no-audit --no-fund
+
+      - name: Iniciar WordPress (wp-env)
+        run: npx wp-env start
+
+      - name: Pruebas de integración
+        run: npm run test:php:integration

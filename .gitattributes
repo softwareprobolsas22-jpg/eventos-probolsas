@@ -23,3 +23,4 @@
 /vite.config.js export-ignore
 /eslint.config.js export-ignore
 /.stylelintrc.json export-ignore
+/tools export-ignore
