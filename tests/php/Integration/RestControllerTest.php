@@ -78,7 +78,7 @@ final class RestControllerTest extends WP_UnitTestCase {
 	public function test_valid_creation_returns_201(): void {
 		$this->login_as_manager();
 
-		$response = $this->request( 'POST', '/items', [ 'name' => 'Capacitaciones' ] );
+		$response = $this->request( 'POST', '/items', [ 'name' => 'Reuniones' ] );
 
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( [ 'data' => [ 'id' => 2 ] ], $response->get_data() );
@@ -112,7 +112,7 @@ final class RestControllerTest extends WP_UnitTestCase {
 	public function test_users_without_manage_capability_get_403_and_action_is_not_run(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
 
-		$response = $this->request( 'POST', '/items', [ 'name' => 'Capacitaciones' ] );
+		$response = $this->request( 'POST', '/items', [ 'name' => 'Reuniones' ] );
 
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );

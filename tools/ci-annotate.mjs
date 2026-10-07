@@ -31,9 +31,12 @@ let annotated = 0;
 
 if ( junitFile && existsSync( junitFile ) ) {
 	const xml = readFileSync( junitFile, 'utf8' );
-	const cases = xml.matchAll( /<testcase\s+name="([^"]+)"\s+class="([^"]+)"[^>]*>([\s\S]*?)<\/testcase>/g );
+	// Las pruebas que pasan se escriben como <testcase …/>; las que fallan, con su <failure> o <error> dentro.
+	const cases = xml.matchAll( /<testcase\b([^>]*?)(?:\/>|>([\s\S]*?)<\/testcase>)/g );
 
-	for ( const [ , name, className, body ] of cases ) {
+	for ( const [ , attributes, body = '' ] of cases ) {
+		const name = /\bname="([^"]*)"/.exec( attributes )?.[ 1 ] ?? '';
+		const className = /\bclass="([^"]*)"/.exec( attributes )?.[ 1 ] ?? '';
 		const failure = /<(failure|error)[^>]*>([\s\S]*?)<\/\1>/.exec( body );
 		if ( failure && annotated < 9 ) {
 			const message = decode( failure[ 2 ] ).trim().split( '\n' ).slice( 0, 12 ).join( '\n' );
