@@ -1,1 +1,1 @@
-import{t as e}from"./chunks/config-2msKvsMA.js";var t={},n=document.querySelector(`[data-ep-screen]`),r=t[n?.dataset.epScreen];if(r){let t=e();r().then(e=>e.mount(n,t)).catch(e=>console.error(e))}
+import{t as e}from"./chunks/config-uWcC4SY3.js";var t={},n=document.querySelector(`[data-ep-screen]`),r=t[n?.dataset.epScreen];if(r){let t=e();r().then(e=>e.mount(n,t)).catch(e=>console.error(e))}

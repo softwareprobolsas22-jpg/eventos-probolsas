@@ -47,6 +47,33 @@ function scopeBootstrap( prefix, selector, prefixedSelector ) {
 	return prefixedSelector;
 }
 
+/** Hoja de Bootstrap (la única a la que se aplican los plugins de encapsulación). */
+const BOOTSTRAP_FILE = /vendor[\\/]bootstrap\.scss$/;
+
+/**
+ * El reboot de Bootstrap declara `body { margin: 0; background-color: … }`. Al encapsularlo, esa regla
+ * cae sobre el propio contenedor: en wp-admin anularía los márgenes de `.wrap` y pintaría una caja blanca
+ * sobre el panel; en la intranet anularía el margen y el fondo del tema (QA-009). Este plugin quita las
+ * declaraciones de caja (margin, padding, background) de las reglas que apuntan solo al contenedor.
+ * La tipografía y el color de texto se conservan.
+ *
+ * @type {import('postcss').Plugin}
+ */
+const keepContainerBox = {
+	postcssPlugin: 'ep-keep-container-box',
+	OnceExit( root ) {
+		if ( ! BOOTSTRAP_FILE.test( root.source?.input?.file ?? '' ) ) {
+			return;
+		}
+
+		root.walkRules( ( rule ) => {
+			if ( rule.selectors.every( ( selector ) => SCOPE === selector ) ) {
+				rule.walkDecls( /^(margin|padding|background)/, ( declaration ) => declaration.remove() );
+			}
+		} );
+	},
+};
+
 /**
  * Carpeta de destino de cada asset según su tipo.
  *
@@ -86,9 +113,10 @@ export default defineConfig( ( { mode } ) => {
 				plugins: [
 					prefixSelector( {
 						prefix: SCOPE,
-						includeFiles: [ /vendor[\\/]bootstrap\.scss$/ ],
+						includeFiles: [ BOOTSTRAP_FILE ],
 						transform: scopeBootstrap,
 					} ),
+					keepContainerBox,
 				],
 			},
 		},

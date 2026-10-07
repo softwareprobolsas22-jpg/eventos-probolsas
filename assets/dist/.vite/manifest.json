@@ -1,17 +1,17 @@
 {
-  "_config-2msKvsMA.js": {
-    "file": "js/chunks/config-2msKvsMA.js",
+  "_config-Btk8m41d.css": {
+    "file": "css/config-Btk8m41d.css",
+    "src": "_config-Btk8m41d.css"
+  },
+  "_config-uWcC4SY3.js": {
+    "file": "js/chunks/config-uWcC4SY3.js",
     "name": "config",
     "css": [
-      "css/config-BCGaaYsu.css"
+      "css/config-Btk8m41d.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
     ]
-  },
-  "_config-BCGaaYsu.css": {
-    "file": "css/config-BCGaaYsu.css",
-    "src": "_config-BCGaaYsu.css"
   },
   "assets/src/js/pages/admin.js": {
     "file": "js/admin.js",
@@ -19,7 +19,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_config-2msKvsMA.js"
+      "_config-uWcC4SY3.js"
     ],
     "css": [
       "css/admin.css"
@@ -31,7 +31,7 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_config-2msKvsMA.js"
+      "_config-uWcC4SY3.js"
     ],
     "css": [
       "css/public.css"

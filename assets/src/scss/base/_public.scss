@@ -35,3 +35,9 @@
 		box-shadow: none;
 	}
 }
+
+// Aviso cuando un widget no se puede cargar (QA-011).
+.ep-public__error {
+	margin: 0;
+	color: var(--ep-color-error);
+}

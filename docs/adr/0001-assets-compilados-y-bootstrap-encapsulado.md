@@ -23,6 +23,7 @@
 
 - Se compila en una hoja propia (`assets/src/scss/vendor/bootstrap.scss`) con las variables tomadas de los tokens (`#155728` como `primary`, sin modo oscuro, sombras ni degradados).
 - `postcss-prefix-selector` (configurado en `vite.config.js`) antepone `:is(.ep-app, .ep-public)` a cada selector de esa hoja; `:root`, `html` y `body` pasan a ser el propio contenedor. Bootstrap solo actúa dentro de la interfaz del plugin y gana a las reglas genéricas de wp-admin sin `!important`.
+- El plugin `ep-keep-container-box` (también en `vite.config.js`) quita `margin`, `padding` y `background` de las reglas que apuntan solo al contenedor: el `body` del reboot anulaba los márgenes de `.wrap` en wp-admin y el fondo del tema en la intranet (QA-009). El contenedor conserva la tipografía y el color de texto.
 - Solo se incluyen los módulos que usa el plugin: reboot, tipografía, grid, tablas, formularios, botones, tarjetas, badges, alertas, botón de cierre, helpers y utilidades.
 - Modal, toast y tooltip de Bootstrap **no** se usan: insertan elementos en `<body>`, fuera de los contenedores. Las capas flotantes las aporta el sistema de diseño propio (Notyf y Tippy, como en SGP; H-103).
 - El reboot de Bootstrap declara `textarea { resize: vertical }` y `th { text-align: inherit }`. Se corrigen en la misma hoja (R-03, R-05) para no depender del orden de carga.

@@ -84,6 +84,25 @@ describe( 'Bootstrap encapsulado en los contenedores del plugin', () => {
 		expect( isScoped( `:-webkit-any(.ep-app,.ep-public) .btn` ) ).toBe( true );
 	} );
 
+	it( 'Bootstrap no cambia la caja del contenedor: respeta los márgenes de .wrap y el fondo del entorno (QA-009)', () => {
+		const container = rules( css( 'shared' ) ).filter( ( { selector } ) => splitSelector( selector ).every( ( part ) => SCOPE === part ) );
+
+		expect( container.length ).toBeGreaterThan( 0 );
+		for ( const { body } of container ) {
+			expect( body ).not.toMatch( /(?:^|;)(margin|padding|background)[a-z-]*:/ );
+		}
+		// La tipografía del reboot sí se conserva.
+		expect( container.some( ( { body } ) => body.includes( 'font-family:var(--bs-body-font-family)' ) ) ).toBe( true );
+	} );
+
+	it( 'el plugin propio tampoco quita los márgenes de .wrap en wp-admin', () => {
+		const app = rules( css( 'admin' ) ).filter( ( { selector } ) => splitSelector( selector ).includes( '.ep-app' ) );
+
+		for ( const { body } of app ) {
+			expect( body ).not.toMatch( /(?:^|;)margin[a-z-]*:/ );
+		}
+	} );
+
 	it( 'las variables de Bootstrap se declaran en el contenedor, no en :root, y usan el color de la marca', () => {
 		const roots = rules( css( 'shared' ) ).filter( ( { body } ) => body.includes( '--bs-primary:' ) );
 
