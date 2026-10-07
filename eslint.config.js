@@ -56,6 +56,15 @@ export default [
 		},
 	},
 	{
+		// Herramientas de línea de comandos (CI): escriben en la salida estándar.
+		files: [ 'tools/**/*.mjs' ],
+		languageOptions: {
+			ecmaVersion: 2022,
+			sourceType: 'module',
+			globals: { ...globals.node },
+		},
+	},
+	{
 		files: [ '*.config.js' ],
 		languageOptions: {
 			ecmaVersion: 2022,
@@ -78,6 +87,13 @@ export default [
 			'no-var': 'error',
 			'prefer-const': 'error',
 			'no-console': [ 'error', { allow: [ 'warn', 'error' ] } ],
+		},
+	},
+	{
+		// Va al final para prevalecer sobre la regla general de no-console.
+		files: [ 'tools/**/*.mjs' ],
+		rules: {
+			'no-console': 'off',
 		},
 	},
 ];

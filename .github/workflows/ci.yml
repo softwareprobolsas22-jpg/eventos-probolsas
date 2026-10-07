@@ -159,4 +159,11 @@ jobs:
         run: npx wp-env start
 
       - name: Pruebas de integración
-        run: npm run test:php:integration
+        run: |
+          mkdir -p build
+          set -o pipefail
+          npm run test:php:integration -- --log-junit build/integration.xml 2>&1 | tee build/integration.log
+
+      - name: Publicar los fallos como anotaciones
+        if: failure()
+        run: node tools/ci-annotate.mjs build/integration.xml build/integration.log
