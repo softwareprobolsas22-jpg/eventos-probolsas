@@ -348,13 +348,13 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-0 · Fundaciones (Sprint 0)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *en curso: primer commit en `main` y rama `develop` publicados; faltan plantillas de PR e issue* | SM | 2 |
+| H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *✅ aprobada por QA ([informe](../qa/2026-10-07-H-005-H-001-H-006-H-007.md)); integrada en `develop`* | SM | 2 |
 | H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas  — *✅ aprobada por QA con observaciones ([informe](../qa/2026-10-07-H-002-H-003.md)); integrada en `develop`* | B | 8 |
-| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *✅ aprobada por QA; pendiente QA-001 (guía de desarrollo) antes de cerrar el Sprint 0* | B | 3 |
+| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *✅ aprobada por QA; QA-001 cerrado con el README* | B | 3 |
 | H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core  — *en `feature/H-004-frontend-tooling` (ADR-0001); ✅ aprobada por QA en la segunda revisión ([informe](../qa/2026-10-07-H-004.md)); integrada en `develop`* | F | 3 |
-| H-005 | GitHub Actions (CI) | B+F | 2 |
-| H-006 | Contrato API v1 en `docs/api/`  — *en `feature/H-006-contrato`, pendiente de QA* | B+F | 2 |
-| H-007 | Plan de pruebas, matriz R-xx ↔ casos, casos de regresión de los 8 defectos del legado | Q | 3 |
+| H-005 | GitHub Actions (CI) — *✅ aprobada por QA (run `37685703899` en verde, [informe](../qa/2026-10-07-H-005-H-001-H-006-H-007.md)); integrada en `develop`* | B+F | 2 |
+| H-006 | Contrato API v1 en `docs/api/` — *✅ aprobada por QA ([informe](../qa/2026-10-07-H-005-H-001-H-006-H-007.md)); integrada en `develop`. Pendiente QA-014 (permiso de `GET /events/{id}`) antes del cierre* | B+F | 2 |
+| H-007 | Plan de pruebas, matriz R-xx ↔ casos, casos de regresión de los 8 defectos del legado — *✅ [plan](../qa/plan-de-pruebas.md) aprobado; integrada en `develop`* | Q | 3 |
 
 ### EP-1 · Tipos de evento (gestionables, D-2)
 | ID | Historia | Rama | Pts |
@@ -443,3 +443,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.8 | 2026-10-07 | Revisión de QA de H-004: cambios requeridos (QA-009, alta). Regla del PO: no se crea PR sin revisión de QA aprobada |
 | 2.9 | 2026-10-07 | H-004: correcciones de QA-009, QA-010 y QA-011; aprobada por QA en la segunda revisión |
 | 2.10 | 2026-10-07 | Flujo: las historias aprobadas por QA se integran en `develop` sin PR; un único PR `develop` → `main` por fase |
+| 2.11 | 2026-10-07 | H-001, H-005, H-006 y H-007 aprobadas por QA e integradas; CI con integración en WordPress real en verde |
