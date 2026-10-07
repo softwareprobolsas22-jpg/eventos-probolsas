@@ -353,7 +353,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *✅ aprobada por QA; pendiente QA-001 (guía de desarrollo) antes de cerrar el Sprint 0* | B | 3 |
 | H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core  — *en `feature/H-004-frontend-tooling` (ADR-0001); ✅ aprobada por QA en la segunda revisión ([informe](../qa/2026-10-07-H-004.md)); integrada en `develop`* | F | 3 |
 | H-005 | GitHub Actions (CI) | B+F | 2 |
-| H-006 | Contrato API v1 en `docs/api/` | B+F | 2 |
+| H-006 | Contrato API v1 en `docs/api/`  — *en `feature/H-006-contrato`, pendiente de QA* | B+F | 2 |
 | H-007 | Plan de pruebas, matriz R-xx ↔ casos, casos de regresión de los 8 defectos del legado | Q | 3 |
 
 ### EP-1 · Tipos de evento (gestionables, D-2)

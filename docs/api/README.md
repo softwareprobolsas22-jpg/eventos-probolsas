@@ -89,3 +89,10 @@ La inyecta `Core\Assets\Assets::client_config()` antes del script de cada pantal
 | `templates/admin/layout.php` | Pantallas de administración de cada dominio | `screen`, `icon`, `title`, `subtitle?`, `actions?` (HTML ya escapado), `content` (HTML ya escapado) |
 | `templates/partials/mount.php` | Contenido de las pantallas con interfaz JS | `id` |
 | `templates/partials/empty-state.php` | Estados vacíos renderizados en PHP | `icon`, `title`, `message` |
+
+## Recursos (contrato v1)
+
+| Archivo | Recurso | Historias |
+|---|---|---|
+| [`event-types.md`](event-types.md) | Tipos de evento: catálogo gestionable, reglas de validación y tipos iniciales | H-101, H-102, H-104 |
+| [`events.md`](events.md) | Eventos: gestión, exportación, panel, calendario (FullCalendar), detalle, `.ics` y próximos | H-201 a H-206, H-301 a H-304 |
