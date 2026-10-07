@@ -48,7 +48,6 @@
 | Método | Ruta | Respuesta |
 |---|---|---|
 | GET | `/events` | `200` lista paginada (ver filtros) |
-| GET | `/events/{id}` | `200` · `404` (también para la página de detalle, H-205) |
 | POST | `/events` | `201` · `422` |
 | PUT | `/events/{id}` | `200` · `404` · `422` |
 | DELETE | `/events/{id}` | `200 { "deleted": true, "id": 42 }` · `404`. **Nunca borra el archivo de la Biblioteca de Medios** (D-4) |
@@ -109,12 +108,21 @@ Publicadas en `epConfig.rules.event`; la API las vuelve a aplicar.
 }
 ```
 
+Origen de los valores que las reglas nombran (QA-016):
+
+| Regla | Valores válidos |
+|---|---|
+| `"oneOf": "event_types"` | Los `id` de la respuesta de `GET /event-types` (la pantalla ya la carga para el selector de tipo; no viajan en `epConfig`) |
+| `"requiredWhen": "type.requires_attachment"` | `requires_attachment` del tipo elegido en el formulario |
+| `"mimes": "media.allowed_mimes"` | `epConfig.media.allowed_mimes` |
+| `"format": "date"` / `"time"` | `YYYY-MM-DD` real / `HH:MM` de 00:00 a 23:59 |
+
 ## Calendario (colaboradores con sesión, `eventos_view`)
 
 | Método | Ruta | Respuesta |
 |---|---|---|
 | GET | `/calendar?start=YYYY-MM-DD&end=YYYY-MM-DD&types[]=1&types[]=2` | `200` lista de eventos con formato `EventInput` de FullCalendar (ver abajo). `start` y `end` son los que envía FullCalendar (`end` exclusivo). Rango máximo: 62 días → 422 |
-| GET | `/events/{id}` | `200` la representación completa más `same_day: [ { "id": 41, "title": "…", "start_time": "09:00" } ]` (navegación entre eventos del mismo día, ordenados por hora) |
+| GET | `/events/{id}` | `200` la representación completa más `same_day: [ { "id": 41, "title": "…", "start_time": "09:00" } ]` (navegación entre eventos del mismo día, ordenados por hora) · `404`. **Única definición de la ruta** (QA-014): la usan el modal del calendario y la página de detalle de wp-admin (H-205) |
 | GET | `/events/{id}/ics` | `text/calendar` con `TZID=America/Bogota` y `VTIMEZONE`. Sin hora → evento de día completo (`DTSTART;VALUE=DATE`) |
 | GET | `/upcoming?limit=5&types[]=1` | `200` próximos eventos desde hoy (Colombia), `limit` de 1 a 20 (por defecto 5) |
 

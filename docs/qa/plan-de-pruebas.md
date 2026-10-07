@@ -10,7 +10,7 @@
 | Unitario y de componentes JS | Vitest + happy-dom | `core/` (fechas, configuración, i18n), componentes de UI, pantallas | Local y CI |
 | CSS compilado | Vitest sobre `assets/dist` | Reglas transversales que el DOM simulado no aplica: R-03, R-05, encapsulación de Bootstrap, contraste, peso | Local y CI |
 | Estático | PHPCS, PHPStan, ESLint, Stylelint | Seguridad, estilo, compatibilidad, R-01, R-03, R-08, R-14, R-15 | Local y CI |
-| Integración | PHPUnit dentro de WordPress (`wp-env`) | API REST real, permisos, migraciones, ciclo de vida | CI en cada push; en local **al cierre de cada fase** (decisión del PO) |
+| Integración | PHPUnit dentro de WordPress 7.1.3 (`wp-env`, versión de producción fijada) | API REST real, permisos, migraciones, ciclo de vida | CI en cada push; en local **al cierre de cada fase** (decisión del PO) |
 | Exploratorio y visual | Navegador real (Chrome, Edge, Firefox; Safari iOS para móvil) | Flujos completos, responsive (360/768/1024/1440 px), accesibilidad con teclado y lector, axe | En la revisión de cada historia con UI y al cierre de fase |
 | Aceptación | PO en staging (WP 7.1.3, PHP 8.3) | Criterios de aceptación de las historias | Review de cada sprint y H-404 |
 
