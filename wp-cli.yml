@@ -1,0 +1,8 @@
+# Opciones de `composer pot` (wp i18n make-pot). Aquí y no en composer.json para no depender de cómo
+# cada shell (cmd en Windows, sh en CI) entrecomilla el JSON de las cabeceras.
+i18n make-pot:
+  slug: eventos-probolsas
+  domain: eventos-probolsas
+  exclude: node_modules,vendor,tests,assets/dist,languages,legacy
+  package-name: Eventos Probolsas
+  headers: '{"Report-Msgid-Bugs-To":"https://github.com/softwareprobolsas22-jpg/eventos-probolsas/issues"}'

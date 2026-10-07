@@ -1,0 +1,42 @@
+@use "sass:map";
+@use "../tokens" as t;
+
+// Desde el breakpoint indicado hacia arriba (mobile first).
+@mixin up($breakpoint) {
+	@media (width >= map.get(t.$breakpoints, $breakpoint)) {
+		@content;
+	}
+}
+
+// Por debajo del breakpoint indicado.
+@mixin down($breakpoint) {
+	@media (width < map.get(t.$breakpoints, $breakpoint)) {
+		@content;
+	}
+}
+
+// Desactiva o simplifica animaciones para quien lo pide en su sistema operativo.
+@mixin reduced-motion {
+	@media (prefers-reduced-motion: reduce) {
+		@content;
+	}
+}
+
+// Anillo de foco visible y consistente (contraste ≥ 3:1 con el fondo).
+@mixin focus-ring {
+	outline: 2px solid var(--ep-color-focus);
+	outline-offset: 2px;
+}
+
+// Oculta visualmente un elemento sin ocultarlo a los lectores de pantalla.
+@mixin visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}

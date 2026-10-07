@@ -1,0 +1,62 @@
+// Paleta del sistema de diseño. Es el ÚNICO archivo donde se permiten valores de color
+// (lo exige Stylelint con color-no-hex). El resto del código usa var(--ep-color-*).
+// Contrastes medidos sobre blanco (WCAG 2.1):
+// - primary   #155728 → 8.7:1  · Texto, botones primarios y acciones.
+// - secondary #669f30 → 3.2:1  · NO cumple AA para texto normal. Solo acentos, bordes, íconos,
+//                                texto grande o en negrita (≥ 18.66 px) y anillo de foco (≥ 3:1).
+// - text-muted #69716b → 5.0:1 · error 6.6:1 · warning 5.4:1 · info 6.0:1
+
+@use "sass:color";
+
+// Colores corporativos (decisión del PO; no configurables).
+$brand-primary: #155728;
+$brand-secondary: #669f30;
+$brand-white: #fff;
+
+// Neutros con un leve matiz verde para armonizar con la marca.
+$neutral-900: #1b1f1c;
+$neutral-700: #3f4741;
+$neutral-500: #69716b;
+$neutral-300: #c9cfca;
+$neutral-200: #e3e7e4;
+$neutral-100: #f2f4f2;
+$neutral-50: #f8faf8;
+
+// Colores funcionales de estado (toasts, validación). No son de marca.
+$error: #b42318;
+$warning: #b54708;
+$info: #175cd3;
+
+// Fondo oscuro detrás de los diálogos modales.
+$overlay: rgb(0 0 0 / 45%);
+
+$colors: (
+	"primary": $brand-primary,
+	"primary-hover": color.mix(#000, $brand-primary, 18%),
+	"primary-soft": color.mix($brand-primary, $brand-white, 8%),
+	"secondary": $brand-secondary,
+	"secondary-soft": color.mix($brand-secondary, $brand-white, 14%),
+	"on-primary": $brand-white,
+	"text": $neutral-900,
+	"text-subtle": $neutral-700,
+	"text-muted": $neutral-500,
+	"border": $neutral-200,
+	"border-strong": $neutral-300,
+	"surface": $brand-white,
+	"surface-muted": $neutral-50,
+	"surface-sunken": $neutral-100,
+	"focus": $brand-secondary,
+	"success": $brand-primary,
+	"success-soft": color.mix($brand-primary, $brand-white, 10%),
+	"error": $error,
+	"error-soft": color.mix($error, $brand-white, 10%),
+	"warning": $warning,
+	"warning-soft": color.mix($warning, $brand-white, 10%),
+	"info": $info,
+	"info-soft": color.mix($info, $brand-white, 10%),
+	"overlay": $overlay,
+);
+
+// Sombra con matiz de marca, para elevaciones (ver _elevation.scss).
+$shadow-color: color.change($brand-primary, $alpha: 0.12);
+$shadow-color-strong: color.change($brand-primary, $alpha: 0.18);

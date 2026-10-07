@@ -1,0 +1,17 @@
+// Breakpoints de la matriz de QA (360 / 768 / 1024 / 1440 px). Se usan con los mixins up() y down().
+$breakpoints: (
+	"sm": 480px,
+	"md": 768px,
+	"lg": 1024px,
+	"xl": 1440px,
+);
+
+// Capas. wp-admin usa hasta 99999 (barra superior), por eso las capas flotantes del plugin van por encima.
+$z-index: (
+	"dropdown": 1000,
+	"sticky": 1010,
+	"drawer": 100010,
+	"modal": 100020,
+	"toast": 100030,
+	"tooltip": 100040,
+);

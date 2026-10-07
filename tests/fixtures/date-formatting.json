@@ -1,0 +1,116 @@
+{
+  "description": "Casos compartidos por DateFormatterTest (PHP) y date.test.js (JS). 'utc' es un momento de auditoría guardado en la base de datos; 'iso' es lo que entrega la API. Las fechas y horas de calendario (cuándo ocurre un evento) nunca se convierten de zona. Colombia no tiene horario de verano: siempre UTC-5.",
+  "ui": {
+    "timezone": "America/Bogota",
+    "date_format": "d/m/Y",
+    "time_format": "h:i",
+    "meridiem": {
+      "am": "a. m.",
+      "pm": "p. m."
+    }
+  },
+  "datetimes": [
+    {
+      "case": "23:30 en Colombia es el día siguiente en UTC",
+      "utc": "2026-10-02 04:30:00",
+      "iso": "2026-10-01T23:30:00-05:00",
+      "date": "01/10/2026",
+      "datetime": "01/10/2026 11:30 p. m."
+    },
+    {
+      "case": "mediodía",
+      "utc": "2026-10-01 17:00:00",
+      "iso": "2026-10-01T12:00:00-05:00",
+      "date": "01/10/2026",
+      "datetime": "01/10/2026 12:00 p. m."
+    },
+    {
+      "case": "medianoche",
+      "utc": "2026-10-01 05:00:00",
+      "iso": "2026-10-01T00:00:00-05:00",
+      "date": "01/10/2026",
+      "datetime": "01/10/2026 12:00 a. m."
+    },
+    {
+      "case": "mañana",
+      "utc": "2026-10-01 14:05:00",
+      "iso": "2026-10-01T09:05:00-05:00",
+      "date": "01/10/2026",
+      "datetime": "01/10/2026 09:05 a. m."
+    },
+    {
+      "case": "último segundo del año en Colombia",
+      "utc": "2027-01-01 04:59:59",
+      "iso": "2026-12-31T23:59:59-05:00",
+      "date": "31/12/2026",
+      "datetime": "31/12/2026 11:59 p. m."
+    }
+  ],
+  "calendar_dates": [
+    {
+      "value": "2026-10-01",
+      "formatted": "01/10/2026"
+    },
+    {
+      "value": "2024-02-29",
+      "formatted": "29/02/2024"
+    }
+  ],
+  "invalid_utc": [
+    "",
+    "2026-02-30 10:00:00",
+    "01/10/2026",
+    "2026-10-01T10:00:00Z"
+  ],
+  "calendar_times": [
+    {
+      "value": "15:00:00",
+      "formatted": "03:00 p. m."
+    },
+    {
+      "value": "15:00",
+      "formatted": "03:00 p. m."
+    },
+    {
+      "value": "00:00:00",
+      "formatted": "12:00 a. m."
+    },
+    {
+      "value": "12:00:00",
+      "formatted": "12:00 p. m."
+    },
+    {
+      "value": "09:05",
+      "formatted": "09:05 a. m."
+    },
+    {
+      "value": "23:59:59",
+      "formatted": "11:59 p. m."
+    }
+  ],
+  "invalid_calendar_times": [
+    "",
+    "7:00",
+    "24:00",
+    "15:60:00",
+    "15:00:00Z",
+    "3 pm"
+  ],
+  "today": [
+    {
+      "case": "8:30 p. m. en Colombia ya es el día siguiente en UTC",
+      "now_utc": "2026-10-08 01:30:00",
+      "today": "2026-10-07"
+    },
+    {
+      "case": "un segundo antes de la medianoche en Colombia",
+      "now_utc": "2026-10-08 04:59:59",
+      "today": "2026-10-07"
+    },
+    {
+      "case": "medianoche en Colombia",
+      "now_utc": "2026-10-08 05:00:00",
+      "today": "2026-10-08"
+    }
+  ]
+}

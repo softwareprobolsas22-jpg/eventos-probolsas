@@ -51,7 +51,7 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | Descarga .ics | **Se conserva y corrige** (`TZID=America/Bogota`) |
 | Exportar CSV | **Se conserva** (separador `;` como SGP, compatible con Excel es-CO) |
 | Importar CSV | **Se elimina por completo** (D-6) |
-| Autoguardado, atajos de teclado | **Se eliminan** (D-6) |
+| Autoguardado, atajos de teclado, eventos relacionados, `[eventos_widget]` | **Se eliminan por completo**, junto con su código, textos y estilos (D-6) |
 | Estadísticas | **Se conservan** en el dashboard admin |
 | SVG `assets/img/icon-*.svg` (sin uso) | **Se eliminan** → Font Awesome |
 
@@ -97,13 +97,13 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | D-3 | Se **permiten eventos con fecha pasada** (criterio operativo). | ✅ Cerrada | Validación sin fecha mínima; el formulario muestra un aviso no bloqueante «Esta fecha ya pasó». |
 | D-4 | Al borrar un evento, **el archivo se queda en la biblioteca**. | ✅ Cerrada | El plugin nunca llama a `wp_delete_attachment`; solo desvincula. |
 | D-5 | Hora en **12 h con a. m./p. m.** | ✅ Cerrada | `config/ui.php` igual que SGP: `time_format = 'h:i'`, `meridiem = ['am' => 'a. m.', 'pm' => 'p. m.']` → `03:00 p. m.` |
-| D-6 | **Importar CSV se elimina por completo**, junto con las opciones relacionadas. | ✅ Cerrada (con supuesto) | Se eliminan importación, autoguardado, atajos de teclado y `[eventos_widget]`. **Supuesto del SM:** se conservan la navegación entre eventos del mismo día y `[eventos_proximos]`. Confirmar en la Planning del Sprint 1. |
-| D-7 | ¿Eventos con hora de fin o de varios días? | ⏳ Abierta | Fuera de alcance v1; el modelo de datos deja espacio (`end_time` nullable) sin exponerlo aún. |
+| D-6 | **Se elimina por completo todo lo del punto**: importar CSV, autoguardado, eventos relacionados, atajos de teclado y `[eventos_widget]`. | ✅ Cerrada | Ni endpoints, ni UI, ni textos, ni opciones. Se conservan (no estaban en el punto): navegación entre eventos del mismo día dentro del modal y `[eventos_proximos]`. |
+| D-7 | Eventos con **hora de fin y de varios días**: buena mejora, pero **después** de que v1 esté probada en producción. | ✅ Cerrada (roadmap v1.1) | v1 se diseña pensando en ello: el modelo, el dominio (`EventSchedule`), la consulta por rango y el feed ya manejan inicio y fin; v1 solo deja el fin vacío. Plan de v1.1 en §5.6. |
 | D-8 | Producción: **PHP 8.3** (actualizado por el PO desde 8.1 el 2026-10-07) · **WordPress 7.1.3** (Hostinger). Código en **GitHub**. | ✅ Cerrada | `Requires PHP: 8.3`; PHPCompatibility `testVersion 8.3-`; Composer `platform.php 8.3`; wp-env con PHP 8.3 y WP 7.1. Repo en GitHub con CI en GitHub Actions. Diferencia con SGP (8.1) registrada en `docs/adr/`. |
 | D-9 | El plugin legado **se eliminó**: se parte en blanco. | ✅ Cerrada | Sin migración de datos; esquema nuevo con prefijo propio; sin compatibilidad de shortcodes. |
 | D-10 | El sistema **solo lo gestiona el usuario con acceso al panel de WordPress**. | ✅ Cerrada | Capacidad `eventos_manage` otorgada a `administrator` (igual que `sgp_manage`), asignable a otros roles por filtro. Toda la gestión vive en wp-admin. |
 | D-11 | **Toasts** con librería ligera y **tooltips** en botones de acción y textos largos, siguiendo SGP. | ✅ Cerrada | **Notyf** (toasts) y **Tippy.js** (tooltips, con `data-ep-tooltip` y `.ep-truncate` que muestra el texto completo solo si está cortado). |
-| D-12 | Las tablas tienen **máximo 6 columnas, contando Acciones**. Lo demás va en la página del evento o en el modal de detalle. | ✅ Cerrada | Regla R-19. Columnas definidas en §6.3. |
+| D-12 | Las tablas tienen **máximo 6 columnas, contando Acciones** (confirmado: columnas). Lo demás va en la página del evento o en el modal de detalle. | ✅ Cerrada | Regla R-19. Columnas definidas en §6.3. |
 
 ---
 
@@ -122,7 +122,7 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 |---|---|---|---|
 | Base de componentes | SCSS propio | **Bootstrap 5.3** (importado por módulos desde SCSS y encapsulado bajo `.ep-app`) + componentes propios | Pedido del PO |
 | Calendario | — | **FullCalendar 6** (núcleo + `daygrid` + `list` + `interaction`), locale `es` | Pedido del PO |
-| Prefijos | `sgp_`, `--sgp-*`, `.sgp-*` | `ep_`, `--ep-*`, `.ep-*` · text domain `eventos-probolsas` | Evitar colisiones entre plugins |
+| Prefijos | `sgp_`, `--sgp-*`, `.sgp-*` | PHP (hooks, opciones, capabilities, códigos de error, tablas): `eventos_` (WPCS rechaza prefijos de menos de 4 caracteres como `ep_`) · CSS/JS: `--ep-*`, `.ep-*`, `epConfig` · text domain `eventos-probolsas` | Evitar colisiones entre plugins |
 | Adjuntos | `Document/Attachment` | Imagen o PDF desde la Biblioteca de Medios, sin subida propia | R-09 |
 
 ### 5.3 Estructura de carpetas
@@ -132,7 +132,7 @@ eventos-probolsas/
 ├── eventos-probolsas.php            # Cabecera + Autoloader::register + Plugin::init (como SGP)
 ├── uninstall.php                    # Plugin::uninstall (borra tablas/opciones/caps; respeta "conservar datos")
 ├── config/
-│   ├── ui.php                       # timezone, locale es-CO, d/m/Y, h:i, meridiem, page_sizes, csv_separator
+│   ├── ui.php                       # timezone, locale es-CO, d/m/Y, h:i, meridiem, page_sizes [25, 50, 100], default_page_size 25, csv_separator
 │   ├── icons.php                    # Catálogo de íconos FA Free 7 permitidos para tipos de evento
 │   └── media.php                    # MIME permitidos (jpg, png, webp, gif, pdf) y tamaño máximo
 ├── src/                                                ← BACKEND
@@ -181,14 +181,14 @@ eventos-probolsas/
 | Capa | Herramienta |
 |---|---|
 | PHP | PHP ≥ 8.3, PSR-4 `Probolsas\Eventos\`, PHPUnit 9.6 + Brain Monkey (unit), wp-phpunit (integración), PHPStan 2 nivel 6 + `phpstan-wordpress`, PHPCS WordPress-Extra + PHPCompatibilityWP |
-| JS/CSS | Node ≥ 22, Vite 8, Sass, ESLint, Stylelint (`color-no-hex` fuera de tokens), Vitest + happy-dom, axe-core |
+| JS/CSS | Node ≥ 20.19, Vite 8, Sass, ESLint (R-08, R-14, R-15), Stylelint (R-01, R-03), Vitest 4.1 + happy-dom, axe-core (ver ADR-0001) |
 | UI | Bootstrap 5.3, FullCalendar 6, Font Awesome Free 7 (npm, fuentes locales), Notyf, Tippy.js, Tom Select (filtro múltiple de tipos) |
 | Entorno | `@wordpress/env` (PHP 8.3, WP 7.1) |
 | CI | GitHub Actions: lint PHP/JS/CSS → PHPStan → PHPUnit → Vitest → build → presupuesto de tamaño |
 
 ### 5.5 Modelo de datos (esquema nuevo)
 
-**`{prefix}ep_event_types`**
+**`{prefix}eventos_event_types`**
 
 | Columna | Tipo | Regla |
 |---|---|---|
@@ -202,22 +202,39 @@ eventos-probolsas/
 | `sort_order` | int | orden en filtros y leyenda (reordenable como en SGP) |
 | `created_at_gmt`, `updated_at_gmt` | datetime | UTC |
 
-**`{prefix}ep_events`**
+**`{prefix}eventos_events`**
 
 | Columna | Tipo | Regla |
 |---|---|---|
 | `id` | bigint unsigned PK | |
-| `type_id` | bigint FK lógica | tipo existente; índice `(event_date, type_id)` |
+| `type_id` | bigint FK lógica | tipo existente; índice `(type_id)` |
 | `title` | varchar(150) | obligatorio, 3–150 caracteres |
 | `description` | text | opcional, ≤ 2.000 caracteres |
-| `event_date` | date | obligatorio; se permite el pasado (D-3) |
-| `event_time` | time NULL | NULL = todo el día |
-| `end_time` | time NULL | reservado para D-7 (no se expone en v1) |
+| `start_date` | date | obligatorio; se permite el pasado (D-3) |
+| `start_time` | time NULL | NULL = todo el día |
+| `end_date` | date NULL | **D-7 (v1.1)**: en v1 siempre NULL (= mismo día) |
+| `end_time` | time NULL | **D-7 (v1.1)**: en v1 siempre NULL |
+
+Índice `(start_date, end_date)` para la consulta por rango, que **desde v1** busca eventos que se solapan con el rango pedido: `start_date <= :hasta AND COALESCE(end_date, start_date) >= :desde`. Así, cuando lleguen los eventos de varios días, aparecerán en cada día que ocupan sin cambiar la consulta.
 | `attachment_id` | bigint NULL | adjunto de la Biblioteca de Medios (imagen o PDF) |
 | `created_by`, `updated_by` | bigint | auditoría |
 | `created_at_gmt`, `updated_at_gmt` | datetime | UTC |
 
 Migraciones numeradas con `Migrator` (como SGP): 1 `CreateEventTypesTable`, 2 `CreateEventsTable`, 3 `SeedDefaultEventTypes` (Cumpleaños `cake-candles`, Capacitaciones `graduation-cap`, Reuniones especiales `star`, Reuniones laborales `briefcase`; los colores los aprueba el PO en el Sprint 1).
+
+### 5.6 Preparación para D-7 (hora de fin y varios días, v1.1)
+
+Objetivo: que v1.1 sea **solo exponer campos y ajustar la UI**, sin migraciones de datos ni cambios de consultas.
+
+| Capa | En v1 (ya preparado) | En v1.1 (por hacer) |
+|---|---|---|
+| Datos | Columnas `end_date` y `end_time` creadas, siempre NULL | Ninguna migración |
+| Dominio | `EventSchedule` (inicio obligatorio, fin opcional) con sus invariantes probadas: el fin no es anterior al inicio; con hora de fin hay hora de inicio; «todo el día» = sin horas | Quitar la restricción v1 «fin vacío» |
+| Validación | Las reglas de fin existen en el validador pero el servicio las rechaza (`end_* no soportado`) | Activarlas |
+| API | El DTO de respuesta ya incluye `end_date` y `end_time` (null); el feed calcula `end` para FullCalendar (fin exclusivo en eventos de día completo) | Aceptarlos en POST/PUT |
+| Feed | Consulta por solapamiento de rango (§5.5) | Sin cambios |
+| UI | El formulario agrupa fecha y hora en un bloque «Cuándo» con espacio para el fin; el modal y la tabla ya usan un formateador de rango (`formatSchedule`) | Mostrar los campos de fin (interruptor «Termina otro día / a otra hora») |
+| .ics | `DTEND` calculado desde `EventSchedule` | Sin cambios |
 
 ---
 
@@ -229,23 +246,25 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 
 | Método | Ruta | Permiso | Uso |
 |---|---|---|---|
-| GET | `/calendar?start=&end=&types[]=` | `eventos_view` | Feed de FullCalendar (`EventInput[]`: `id`, `title`, `start` sin zona, `allDay`, `backgroundColor`, `extendedProps.icon/typeId`) |
+| GET | `/calendar?start=&end=&types[]=` | `eventos_view` | Feed de FullCalendar (`EventInput[]`: `id`, `title`, `start` y `end` sin zona, `allDay`, `backgroundColor`, `extendedProps.icon/typeId`) |
 | GET | `/events/{id}` | `eventos_view` | Modal de detalle (incluye eventos del mismo día para navegar) |
 | GET | `/events/{id}/ics` | `eventos_view` | iCalendar con `VTIMEZONE` de `America/Bogota` |
 | GET | `/upcoming?limit=&types[]=` | `eventos_view` | `[eventos_proximos]` |
 | GET | `/event-types` | `eventos_view` | Catálogo para filtros y leyenda |
 | POST · PUT · DELETE | `/event-types[/{id}]` | `eventos_manage` | CRUD de tipos (DELETE → 409 si tiene eventos) |
 | PUT | `/event-types/order` | `eventos_manage` | Reordenar tipos |
-| GET | `/events?page=&per_page=&search=&type=&date_from=&date_to=&orderby=&order=` | `eventos_manage` | Tabla admin paginada (`X-WP-Total`, `X-WP-TotalPages`) |
+| GET | `/events?page=&per_page=(25|50|100)&search=&type=&date_from=&date_to=&orderby=&order=` | `eventos_manage` | Tabla admin paginada (`X-WP-Total`, `X-WP-TotalPages`) |
 | POST · PUT · DELETE | `/events[/{id}]` | `eventos_manage` | CRUD de eventos (DELETE no borra el archivo, D-4) |
 | GET | `/events/export.csv` | `eventos_manage` | Exportar con los filtros activos (separador `;`, BOM UTF-8) |
 | GET | `/dashboard` | `eventos_manage` | Tarjetas de estadísticas |
 
-**Error estándar:** `{ code, message, data: { status, fields?: { campo: ["mensaje"] } } }`.
+**Error estándar** (igual que SGP): `{ code, message, data: { status, errors?: { campo: ["mensaje"] } } }`. Convenciones completas en [`docs/api/README.md`](../api/README.md).
 
 ### 6.2 Configuración inyectada (`window.epConfig`)
 
-`restUrl`, `nonce` (`wp_rest`), `ui` (de `config/ui.php`), `icons` (de `config/icons.php`), `media` (MIME y tamaño), `today` (`Y-m-d` calculado en servidor con zona Bogotá), `firstDay` (`start_of_week`), `can.manage`, `loginUrl`.
+`restUrl`, `restNonce` (`wp_rest`), `ui` (de `config/ui.php`), `icons` (de `config/icons.php`), `media` (MIME y tamaño), `rules` (reglas de validación de cada formulario: obligatorio, longitudes, formatos; las publica el backend desde las constantes de los servicios), `today` (`Y-m-d` calculado en servidor con zona Bogotá), `firstDay` (`start_of_week`), `can.manage`, `loginUrl`.
+
+**Validación en tiempo real (R-24) sin duplicar reglas:** el frontend valida con `epConfig.rules` mientras el usuario escribe, y el backend vuelve a validar con las mismas constantes al guardar. Los mensajes del servidor (422 `data.errors`) tienen prioridad y se muestran en el mismo lugar.
 
 ### 6.3 Columnas de las tablas (R-19: máximo 6, Acciones primero)
 
@@ -287,9 +306,11 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 | **R-17** | Rendimiento: assets solo donde se usan; feed por rango; paginación en servidor; presupuesto de tamaño de JS/CSS en CI. | `tests/js/build/budget.test.js` |
 | **R-18** | Diseño sobrio, sin «AI slop»: sin degradados genéricos, emojis decorativos ni sombras exageradas; jerarquía tipográfica clara. | Revisión SM + PO en la Review |
 | **R-19** | Tablas con **máximo 6 columnas contando Acciones** (§6.3); el resto, en el detalle. | Prueba de componente por pantalla |
+| **R-23** | **Paginación en todas las tablas:** 25 registros por defecto y selector de 25 / 50 / 100 (valores de `config/ui.php`). Responsive: en escritorio, «Mostrando 1–25 de 240», selector y números de página con elipsis; en móvil (< 576 px), solo anterior / «Página 3 de 10» / siguiente, con botones de al menos 44 px. Cambiar el tamaño vuelve a la página 1. Eventos se pagina en servidor; tipos de evento, en cliente con el mismo componente. | Prueba de componente `pagination` + revisión por breakpoint |
 | **R-20** | Toda acción del usuario (crear, editar, eliminar, exportar, error) se confirma con **toast** (Notyf). Mensajes del servidor siempre escapados. | Prueba de pantalla |
 | **R-21** | Botones de solo ícono con **tooltip** (Tippy) y `aria-label`. Textos largos con `.ep-truncate` (`text-overflow: ellipsis`) y tooltip con el texto completo solo si está cortado. | Prueba de componente |
 | **R-22** | Acceso: anónimos no ven eventos ni reciben datos de la API; la gestión exige `eventos_manage` y ocurre solo en wp-admin. | Pruebas de integración de permisos |
+| **R-24** | **Validación en tiempo real** de los campos obligatorios y con formato (evento: título, tipo, fecha, adjunto si el tipo lo exige; tipo de evento: nombre, color, ícono). Se valida al salir del campo y, una vez marcado con error, en cada cambio, para que el error desaparezca apenas se corrige. Mensaje bajo el campo con `aria-describedby` y `aria-invalid`; el botón Guardar lleva al primer campo con error. Reglas tomadas de `epConfig.rules` (SSOT con el backend). | Pruebas de componente `form` + prueba de pantalla |
 
 ---
 
@@ -305,14 +326,14 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 
 **Cadencia:** sprints de 2 semanas (Sprint 0 de 1 semana). Planning, Daily asíncrona (avance / siguiente paso / impedimento), Review con demo al PO, Retrospectiva; refinamiento a mitad de sprint.
 
-**Flujo en GitHub:** `main` (releases) · `develop` (integración) · ramas `feature/H-xxx-descripcion` · PR a `develop` con la plantilla (historia, reglas R-xx tocadas, evidencia de pruebas) · CI verde y aprobación de QA obligatorias · *squash merge*.
+**Flujo en GitHub (decisión del PO, 2026-10-07):** `main` (lo que está en producción) · `develop` (integración) · ramas `feature/H-xxx-descripcion`. Cada historia: desarrollo en su rama → revisión de QA (`docs/qa/`) → si se aprueba, se integra en `develop` **sin PR**. Al cierre de cada fase: revisión de QA de la fase (con la ejecución del CI sobre `develop` en verde, incluidas las pruebas de integración) → **un único PR `develop` → `main`** con la plantilla (historias, reglas R-xx tocadas, informes de QA, evidencia de pruebas). Nunca se abre un PR sin revisión de QA aprobada.
 
 **Definition of Ready:** criterios de aceptación, R-xx aplicables, endpoint del contrato identificado, diseño aprobado (si es UI), estimación.
 
 **Definition of Done:**
 1. PR revisado y aprobado por QA; CI verde.
 2. PHPCS y PHPStan (nivel 6) sin errores; ESLint y Stylelint sin errores.
-3. Pruebas unitarias del dominio ≥ 80 % de cobertura; integración de los endpoints tocados; pruebas de componentes de UI tocados.
+3. Pruebas unitarias del dominio ≥ 80 % de cobertura (medida en el CI) y pruebas de componentes de UI tocados. Las **pruebas de integración** (WordPress 7.1.3 con `wp-env`) se escriben en cada historia y se ejecutan **solo en el CI**, en cada push (decisión del PO, 2026-10-07: el equipo de desarrollo tiene 5,9 GB de RAM y Docker no es viable en local).
 4. Criterios de aceptación y R-xx verificados; sin bugs críticos o altos abiertos.
 5. Sin avisos PHP con `WP_DEBUG` ni errores en consola.
 6. Textos en es-CO, preparados para traducción (`eventos-probolsas.pot`).
@@ -327,13 +348,13 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-0 · Fundaciones (Sprint 0)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *en curso: primer commit en `main` y rama `develop` publicados; faltan plantillas de PR e issue* | SM | 2 |
-| H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas | B | 8 |
-| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1) | B | 3 |
-| H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core | F | 3 |
-| H-005 | GitHub Actions (CI) | B+F | 2 |
-| H-006 | Contrato API v1 en `docs/api/` | B+F | 2 |
-| H-007 | Plan de pruebas, matriz R-xx ↔ casos, casos de regresión de los 8 defectos del legado | Q | 3 |
+| H-001 | `git init`, `.gitignore`, `.gitattributes` (excluir `legacy/`, `tests/`, `node_modules/` del paquete), ramas `main`/`develop`, plantilla de PR y de issue, repo en GitHub (`softwareprobolsas22-jpg/eventos-probolsas`) — *✅ aprobada por QA ([informe](../qa/2026-10-07-H-005-H-001-H-006-H-007.md)); integrada en `develop`* | SM | 2 |
+| H-002 | Esqueleto `Core` + `Shared` portado de SGP (Container, Config, Migrator, Assets, View, RestController, Validator, DateFormatter, Clock, Capabilities) con sus pruebas  — *✅ aprobada por QA con observaciones ([informe](../qa/2026-10-07-H-002-H-003.md)); integrada en `develop`* | B | 8 |
+| H-003 | Composer, PHPCS, PHPStan, PHPUnit (unit + integración) y wp-env (PHP 8.3, WP 7.1)  — *✅ aprobada por QA; QA-001 cerrado con el README* | B | 3 |
+| H-004 | Vite, Sass, Bootstrap encapsulado, ESLint (con R-08), Stylelint (R-01, R-03), Vitest + happy-dom, axe-core  — *en `feature/H-004-frontend-tooling` (ADR-0001); ✅ aprobada por QA en la segunda revisión ([informe](../qa/2026-10-07-H-004.md)); integrada en `develop`* | F | 3 |
+| H-005 | GitHub Actions (CI) — *✅ aprobada por QA (run `37685703899` en verde, [informe](../qa/2026-10-07-H-005-H-001-H-006-H-007.md)); integrada en `develop`* | B+F | 2 |
+| H-006 | Contrato API v1 en `docs/api/` — *✅ aprobada por QA ([informe](../qa/2026-10-07-H-005-H-001-H-006-H-007.md)); integrada en `develop`. Pendiente QA-014 (permiso de `GET /events/{id}`) antes del cierre* | B+F | 2 |
+| H-007 | Plan de pruebas, matriz R-xx ↔ casos, casos de regresión de los 8 defectos del legado — *✅ [plan](../qa/plan-de-pruebas.md) aprobado; integrada en `develop`* | Q | 3 |
 
 ### EP-1 · Tipos de evento (gestionables, D-2)
 | ID | Historia | Rama | Pts |
@@ -341,16 +362,16 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador | B | 8 |
 | H-102 | Migraciones de tablas y semilla con los 4 tipos actuales | B | 3 |
 | H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando | F | 8 |
-| H-104 | Pantalla «Tipos de evento»: tabla (R-19), formulario en drawer con `color-field` e `icon-picker` | F | 5 |
+| H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24) | F | 5 |
 | H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos | Q | 3 |
 
 ### EP-2 · Gestión de eventos (wp-admin)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-201 | Dominio y API de eventos: validación única, búsqueda/filtros/conteo compartidos, paginación, export CSV | B | 8 |
+| H-201 | Dominio y API de eventos: `EventSchedule` preparado para D-7, validación única publicada en `epConfig.rules`, búsqueda/filtros/conteo compartidos, consulta por solapamiento de rango, paginación, export CSV | B | 8 |
 | H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos | B | 3 |
-| H-203 | Pantalla «Eventos»: tabla paginada (R-04/05/06/19), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar | F | 8 |
-| H-204 | Formulario de evento (drawer o página): `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, errores por campo desde la API | F | 8 |
+| H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar | F | 8 |
+| H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla) | F | 3 |
 | H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo) | B+F | 5 |
 | H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación | Q | 5 |
@@ -360,7 +381,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 |---|---|---|---|
 | H-301 | Feed por rango, detalle con eventos del mismo día, `.ics`, próximos | B | 5 |
 | H-302 | `[eventos_calendario]` con FullCalendar: mes/lista, `es`, `firstDay` de WP, color e ícono por tipo, filtro de tipos, «hoy» desde el servidor; aviso de inicio de sesión para anónimos | F | 8 |
-| H-303 | Modal de detalle: fecha/hora es-CO, descripción, imagen ampliable o PDF (abrir/descargar), navegación entre eventos del día, «Añadir a mi calendario» | F | 5 |
+| H-303 | Modal de detalle: fecha/hora es-CO, descripción, imagen ampliable o PDF (abrir/descargar), navegación entre eventos del mismo día, «Añadir a mi calendario» (sin eventos relacionados, D-6) | F | 5 |
 | H-304 | `[eventos_proximos]` | F | 3 |
 | H-305 | Pruebas de zona horaria (3 zonas y cambio de día 23:59 → 00:00 en Bogotá), responsive y accesibilidad | Q | 5 |
 
@@ -372,13 +393,19 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-403 | Auditoría de accesibilidad y rendimiento; ajustes | F | 3 |
 | H-404 | Prueba de aceptación con el PO en staging (WP 7.1.3 / PHP 8.3) y paquete `.zip` de release | SM+Q | 3 |
 
+### EP-5 · Roadmap v1.1 (después de validar v1 en producción)
+| ID | Historia | Rama | Pts |
+|---|---|---|---|
+| H-501 | Como gestor, quiero indicar hora de fin y eventos de varios días (D-7), según §5.6 | B+F | 5 |
+| H-502 | Pruebas de eventos de varios días en el calendario (cruce de semana y de mes) y en el .ics | Q | 3 |
+
 ---
 
 ## 10. Plan de sprints
 
 | Sprint | Meta | Historias | Pts |
 |---|---|---|---|
-| **0** (1 semana) | «Podemos trabajar con seguridad» | H-001 … H-007 | 23 |
+| **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
@@ -397,7 +424,6 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | CSS de Bootstrap choca con wp-admin u otros plugins | Media | Medio | Importar solo los módulos usados, bajo `.ep-app`; sin estilos globales |
 | FullCalendar aumenta el peso de la página pública | Media | Bajo | Solo los plugins usados, cargados solo donde hay shortcode; presupuesto en CI |
 | Divergencia con SGP en piezas compartidas (`Core`, `Shared`, UI kit) | Media | Medio | Portar con pruebas; registrar diferencias en `docs/adr/`; a futuro, evaluar paquete común |
-| Interpretación de D-6 | Baja | Bajo | Confirmar en la Planning del Sprint 1 |
 
 ---
 
@@ -409,3 +435,13 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2 | 2026-10-07 | Decisiones del PO D-1…D-12; arquitectura y stack alineados con SGP; tipos de evento gestionables; inicio en blanco (sin migración); tablas ≤ 6 columnas; toasts y tooltips; reglas R-19…R-22 |
 | 2.1 | 2026-10-07 | Repositorio GitHub definido por el PO; H-001 iniciada |
 | 2.2 | 2026-10-07 | Producción actualizada a PHP 8.3 (D-8); primer commit publicado en GitHub (`main` y `develop`) |
+| 2.3 | 2026-10-07 | D-6 cerrada sin supuestos (se elimina todo lo del punto, incluidos eventos relacionados); D-12 confirmada como columnas; nueva regla R-23 de paginación responsive 25/50/100 |
+| 2.4 | 2026-10-07 | D-7 pasa al roadmap v1.1 con el modelo preparado desde v1 (§5.6, EP-5); regla R-24 de validación en tiempo real con reglas publicadas por el backend (`epConfig.rules`) |
+| 2.5 | 2026-10-07 | H-002/H-003 (Backend): prefijo PHP `eventos_` por exigencia de WPCS; contrato alineado con SGP (`restNonce`, `data.errors`); convenciones de la API en `docs/api/README.md` |
+| 2.6 | 2026-10-07 | Revisión de QA de H-002/H-003 (aprobada con 8 observaciones); pruebas de integración al cierre de cada fase (decisión del PO) |
+| 2.7 | 2026-10-07 | H-004 (Frontend): tooling, Bootstrap encapsulado y `assets/dist` versionado (ADR-0001) |
+| 2.8 | 2026-10-07 | Revisión de QA de H-004: cambios requeridos (QA-009, alta). Regla del PO: no se crea PR sin revisión de QA aprobada |
+| 2.9 | 2026-10-07 | H-004: correcciones de QA-009, QA-010 y QA-011; aprobada por QA en la segunda revisión |
+| 2.10 | 2026-10-07 | Flujo: las historias aprobadas por QA se integran en `develop` sin PR; un único PR `develop` → `main` por fase |
+| 2.11 | 2026-10-07 | H-001, H-005, H-006 y H-007 aprobadas por QA e integradas; CI con integración en WordPress real en verde |
+| 2.12 | 2026-10-07 | Cierre del Sprint 0 (23/23 puntos, [informe](../qa/2026-10-07-cierre-sprint-0.md)). Decisión del PO: pruebas de integración solo en el CI (QA-020) |

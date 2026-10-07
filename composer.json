@@ -1,0 +1,52 @@
+{
+  "name": "probolsas/eventos-probolsas",
+  "description": "Plugin de WordPress con el calendario de eventos de la intranet de Probolsas.",
+  "type": "wordpress-plugin",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.3"
+  },
+  "require-dev": {
+    "brain/monkey": "^2.6",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^9.6",
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "wp-cli/i18n-command": "^2.7",
+    "wp-coding-standards/wpcs": "^3.1",
+    "wp-phpunit/wp-phpunit": "^6.8",
+    "yoast/phpunit-polyfills": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Probolsas\\Eventos\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Probolsas\\Eventos\\Tests\\": "tests/php/"
+    }
+  },
+  "scripts": {
+    "lint": "phpcs",
+    "format": "phpcbf",
+    "analyse": [
+      "phpstan analyse --memory-limit=1G",
+      "phpstan analyse -c phpstan-tests.neon.dist --memory-limit=1G"
+    ],
+    "test": "phpunit -c phpunit.xml.dist",
+    "pot": "wp i18n make-pot . languages/eventos-probolsas.pot"
+  },
+  "config": {
+    "platform": {
+      "php": "8.3.0"
+    },
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true
+    }
+  }
+}

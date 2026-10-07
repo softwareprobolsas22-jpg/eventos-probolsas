@@ -1,0 +1,10 @@
+# Análisis estático de las pruebas de integración.
+# Esas pruebas solo se ejecutan dentro de WordPress (wp-env, en el CI). Este análisis detecta antes, en
+# local y sin Docker, los errores que impedirían cargarlas: métodos que chocan con la clase base, métodos
+# inexistentes o argumentos equivocados. Usa las clases de la suite de WordPress (wp-phpunit).
+parameters:
+	level: 2
+	paths:
+		- tests/php/Integration
+	scanDirectories:
+		- vendor/wp-phpunit/wp-phpunit/includes

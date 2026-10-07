@@ -1,0 +1,70 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss"
+  ],
+  "rules": {
+    "selector-class-pattern": [
+      "^(ep-[a-z0-9]+(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?|is-[a-z0-9]+(-[a-z0-9]+)*)$",
+      {
+        "message": "Use clases BEM con prefijo ep- (bloque__elemento--modificador) o estados is-*."
+      }
+    ],
+    "custom-property-pattern": [
+      "^ep-[a-z0-9]+(-[a-z0-9]+)*$",
+      {
+        "message": "Las custom properties llevan el prefijo --ep-."
+      }
+    ],
+    "keyframes-name-pattern": [
+      "^ep-[a-z0-9]+(-[a-z0-9]+)*$",
+      {
+        "message": "Las animaciones llevan el prefijo ep-."
+      }
+    ],
+    "color-no-hex": [
+      true,
+      {
+        "message": "R-01: los colores solo se definen en assets/src/scss/tokens/."
+      }
+    ],
+    "color-named": [
+      "never",
+      {
+        "message": "R-01: los colores solo se definen en assets/src/scss/tokens/."
+      }
+    ],
+    "declaration-property-value-allowed-list": [
+      {
+        "resize": [
+          "none"
+        ]
+      },
+      {
+        "message": "R-03: los textarea no se redimensionan (resize: none)."
+      }
+    ],
+    "scss/dollar-variable-empty-line-before": null
+  },
+  "overrides": [
+    {
+      "files": [
+        "assets/src/scss/tokens/**/*.scss"
+      ],
+      "rules": {
+        "color-no-hex": null
+      }
+    },
+    {
+      "files": [
+        "assets/src/scss/vendor/**/*.scss"
+      ],
+      "rules": {
+        "selector-class-pattern": null,
+        "scss/load-no-partial-leading-underscore": null,
+        "no-invalid-position-at-import-rule": null,
+        "scss/no-global-function-names": null,
+        "at-rule-empty-line-before": null
+      }
+    }
+  ]
+}

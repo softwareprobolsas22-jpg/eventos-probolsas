@@ -1,0 +1,34 @@
+{
+  "description": "Casos compartidos por TextNormalizerTest (PHP) y search.test.js (JS). Si se cambia una regla, ambas implementaciones deben seguir pasando.",
+  "normalize": [
+    { "input": "Gestión de Calidad", "expected": "gestion de calidad" },
+    { "input": "GESTIÓN", "expected": "gestion" },
+    { "input": "  gestión   de  calidad ", "expected": "gestion de calidad" },
+    { "input": "Gestión de\tcalidad\n", "expected": "gestion de calidad" },
+    { "input": "AÑO", "expected": "año" },
+    { "input": "Año 2026", "expected": "año 2026" },
+    { "input": "Ñandú", "expected": "ñandu" },
+    { "input": "Cámara de frío", "expected": "camara de frio" },
+    { "input": "Pingüino", "expected": "pinguino" },
+    { "input": "ÁÉÍÓÚ áéíóú àèìòù", "expected": "aeiou aeiou aeiou" },
+    { "input": "Çedilla", "expected": "cedilla" },
+    { "input": "PR-GC-001", "expected": "pr-gc-001" },
+    { "input": "", "expected": "" }
+  ],
+  "normalize_decomposed": [
+    { "input": "Año", "expected": "año" },
+    { "input": "Gestión", "expected": "gestion" }
+  ],
+  "matches": [
+    { "text": "Gestión de Calidad", "query": "gestion", "expected": true },
+    { "text": "Gestión de Calidad", "query": "GESTIÓN", "expected": true },
+    { "text": "Gestión de Calidad", "query": "calidad gestion", "expected": true },
+    { "text": "Gestión de Calidad", "query": "  gestión   calidad ", "expected": true },
+    { "text": "Gestión de Calidad", "query": "producción", "expected": false },
+    { "text": "Informe del año", "query": "ano", "expected": false },
+    { "text": "Informe del año", "query": "AÑO", "expected": true },
+    { "text": "Cámara de frío", "query": "cAmArA", "expected": true },
+    { "text": "Procedimiento de compras", "query": "compra", "expected": true },
+    { "text": "Procedimiento de compras", "query": "", "expected": true }
+  ]
+}

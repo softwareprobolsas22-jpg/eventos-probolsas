@@ -1,0 +1,68 @@
+// Contenedor raíz de la interfaz de administración. Todos los estilos de componentes se anidan bajo
+// .ep-app (ver admin.scss) para no afectar ni ser afectados por wp-admin.
+@use "../tools/mixins" as m;
+@use "scope";
+
+.ep-app {
+	font-family: var(--ep-font-family-base);
+	font-size: var(--ep-font-size-md);
+	line-height: var(--ep-line-height-base);
+	color: var(--ep-color-text);
+	animation: ep-fade-in-up var(--ep-duration-slow) var(--ep-easing-enter) both;
+
+	@include scope.rules;
+
+	@include m.reduced-motion {
+		animation: none;
+	}
+}
+
+@keyframes ep-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes ep-fade-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes ep-dialog-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes ep-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes ep-shimmer {
+	from {
+		background-position: 200% 0;
+	}
+
+	to {
+		background-position: -200% 0;
+	}
+}

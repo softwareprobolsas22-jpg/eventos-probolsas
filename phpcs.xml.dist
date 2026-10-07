@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<ruleset name="Eventos">
+	<description>Estándar de código del plugin Eventos Probolsas.</description>
+
+	<file>.</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/assets/*</exclude-pattern>
+	<exclude-pattern>*/legacy/*</exclude-pattern>
+	<!-- Plantillas mínimas usadas como datos de prueba. -->
+	<exclude-pattern>*/tests/php/fixtures/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg name="parallel" value="8"/>
+	<arg value="sp"/>
+
+	<config name="minimum_wp_version" value="6.4"/>
+	<config name="testVersion" value="8.3-"/>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress-Extra">
+		<!-- Se usa PSR-4 (Clase.php) en lugar de class-clase.php. -->
+		<exclude name="WordPress.Files.FileName"/>
+		<!-- PHP 8.1+: se permite la sintaxis corta de arreglos. -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+	</rule>
+
+	<rule ref="WordPress-Docs">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="eventos-probolsas"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="eventos_"/>
+				<element value="Probolsas\Eventos"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Las pruebas leen y crean archivos locales directamente; no se ejecutan dentro de WordPress. -->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Las tablas propias del plugin solo se consultan desde la capa de persistencia. -->
+	<rule ref="WordPress.DB.DirectDatabaseQuery">
+		<exclude-pattern>*/src/Core/Database/*</exclude-pattern>
+		<exclude-pattern>*/src/Shared/Persistence/*</exclude-pattern>
+		<exclude-pattern>*/src/Domains/*/Infrastructure/*</exclude-pattern>
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+</ruleset>
