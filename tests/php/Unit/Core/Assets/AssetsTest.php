@@ -186,6 +186,54 @@ final class AssetsTest extends UnitTestCase {
 		);
 	}
 
+	public function test_the_entry_style_goes_last_even_if_the_manifest_lists_it_first(): void {
+		mkdir( $this->plugin_dir . 'assets/dist/.vite' );
+		touch( $this->plugin_dir . 'assets/dist/css/admin.css' );
+		file_put_contents(
+			$this->plugin_dir . 'assets/dist/.vite/manifest.json',
+			(string) json_encode(
+				[
+					'_runtime.js'                  => [
+						'file' => 'js/chunks/runtime.js',
+						'css'  => [ 'css/runtime-abc.css' ],
+					],
+					'assets/src/js/pages/admin.js' => [
+						'file'    => 'js/admin.js',
+						// Así lo escribe Vite cuando una hoja la comparten las dos entradas (Bootstrap).
+						'css'     => [ 'css/admin.css', 'css/bootstrap-def.css' ],
+						'imports' => [ '_runtime.js' ],
+						'isEntry' => true,
+					],
+				]
+			)
+		);
+
+		Functions\when( 'wp_json_file_decode' )->alias( static fn( string $file ): mixed => json_decode( (string) file_get_contents( $file ), true ) );
+		Functions\when( 'sanitize_key' )->alias( static fn( string $key ): string => strtolower( (string) preg_replace( '/[^a-z0-9_\-]/i', '', $key ) ) );
+		Functions\when( 'wp_enqueue_script' )->justReturn( null );
+		Functions\when( 'wp_set_script_translations' )->justReturn( true );
+		Functions\when( 'wp_add_inline_script' )->justReturn( true );
+
+		$styles = [];
+		Functions\when( 'wp_enqueue_style' )->alias(
+			static function ( string $handle, string $src, array $deps ) use ( &$styles ): void {
+				$styles[] = [ $handle, basename( $src ), $deps ];
+			}
+		);
+
+		$this->assets()->enqueue_admin();
+
+		$this->assertSame(
+			[
+				[ 'ep-shared-runtime-abc', 'runtime-abc.css', [] ],
+				[ 'ep-shared-bootstrap-def', 'bootstrap-def.css', [] ],
+				[ 'ep-admin', 'admin.css', [ 'ep-shared-runtime-abc', 'ep-shared-bootstrap-def' ] ],
+			],
+			$styles,
+			'QA-039: el CSS del plugin depende de todas las hojas compartidas y gana en la cascada.'
+		);
+	}
+
 	public function test_enqueue_admin_skips_style_when_bundle_has_no_css(): void {
 		Functions\expect( 'wp_enqueue_style' )->never();
 		Functions\when( 'wp_enqueue_script' )->justReturn( null );

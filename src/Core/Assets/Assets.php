@@ -135,21 +135,27 @@ final class Assets {
 			return;
 		}
 
-		// Primero el CSS compartido y al final el de la entrada, que depende de él (así gana en la cascada).
-		// El compartido lleva hash en el nombre y se encola sin ?ver=: su dirección coincide con la que usa
-		// el cargador de Vite al importar una pantalla, que entonces no lo vuelve a insertar.
+		// Primero todo el CSS compartido y al final el de la entrada, que depende de todo él: así gana en la
+		// cascada aunque el manifest liste otra hoja después de la suya (por ejemplo, Bootstrap compartido
+		// por las dos entradas). El compartido lleva hash en el nombre y se encola sin ?ver=: su dirección
+		// coincide con la que usa el cargador de Vite al importar una pantalla, que entonces no lo vuelve a
+		// insertar.
 		$dependencies = [];
+		$own_style    = null;
 		foreach ( $this->styles_of( $entry ) as $file ) {
-			$style = "assets/dist/{$file}";
-			$name  = basename( $file, '.css' );
+			$name = basename( $file, '.css' );
 
 			if ( $name === $entry ) {
-				wp_enqueue_style( $handle, $this->context->url( $style ), $dependencies, $this->version_of( $style ) );
+				$own_style = "assets/dist/{$file}";
 				continue;
 			}
 
 			$dependencies[] = self::HANDLE_PREFIX . 'shared-' . sanitize_key( $name );
-			wp_enqueue_style( end( $dependencies ), $this->context->url( $style ), [], null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- El nombre lleva hash.
+			wp_enqueue_style( end( $dependencies ), $this->context->url( "assets/dist/{$file}" ), [], null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- El nombre lleva hash.
+		}
+
+		if ( null !== $own_style ) {
+			wp_enqueue_style( $handle, $this->context->url( $own_style ), $dependencies, $this->version_of( $own_style ) );
 		}
 
 		// wp-i18n expone window.wp.i18n, que usa assets/src/js/core/i18n.js para traducir los textos de la interfaz.
