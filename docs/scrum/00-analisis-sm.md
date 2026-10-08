@@ -104,6 +104,8 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | D-10 | El sistema **solo lo gestiona el usuario con acceso al panel de WordPress**. | ✅ Cerrada | Capacidad `eventos_manage` otorgada a `administrator` (igual que `sgp_manage`), asignable a otros roles por filtro. Toda la gestión vive en wp-admin. |
 | D-11 | **Toasts** con librería ligera y **tooltips** en botones de acción y textos largos, siguiendo SGP. | ✅ Cerrada | **Notyf** (toasts) y **Tippy.js** (tooltips, con `data-ep-tooltip` y `.ep-truncate` que muestra el texto completo solo si está cortado). |
 | D-12 | Las tablas tienen **máximo 6 columnas, contando Acciones** (confirmado: columnas). Lo demás va en la página del evento o en el modal de detalle. | ✅ Cerrada | Regla R-19. Columnas definidas en §6.3. |
+| D-13 | **Colores de los tipos iniciales aprobados** (Review del Sprint 1, 2026-10-08): Cumpleaños `#9D174D`, Capacitaciones `#155728`, Reuniones especiales `#B45309`, Reuniones laborales `#1D4ED8`. | ✅ Cerrada | La semilla (H-102) queda como está; se pueden cambiar desde «Tipos de evento». |
+| D-14 | **El plugin sale a producción cuando esté terminada la primera versión** (v1, Sprints 2 a 4), para verificar cualquier eventualidad en conjunto. Los PR por fase llevan el código a `main`, pero no se despliega hasta el cierre de v1. | ✅ Cerrada | El despliegue en Hostinger se hace en H-404 (prueba de aceptación en staging y paquete de release), no al cerrar cada fase. |
 
 ---
 
@@ -450,3 +452,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.15 | 2026-10-08 | H-104 aprobada por QA e integrada: pantalla «Tipos de evento» con interruptor «Requiere adjunto» (`createSwitchField`) |
 | 2.16 | 2026-10-08 | H-105 aprobada: pruebas de aceptación en WordPress real; QA-032 (la ñ se trataba como n por el collation) corregido con collation binaria en `name_key` |
 | 2.17 | 2026-10-08 | Cierre del Sprint 1 (27/27 puntos, [informe](../qa/2026-10-08-cierre-sprint-1.md)); pendiente en la Review: colores de los tipos iniciales y QA-029 |
+| 2.18 | 2026-10-08 | Review del Sprint 1 (PR #2 fusionado en `main`): D-13 colores de la semilla aprobados; D-14 producción al terminar v1. Ajustes antes del Sprint 2: QA-033 (CSS inicial 44,9 → 30,9 KB) y QA-029 (rango oculto en móvil) |

@@ -97,4 +97,4 @@ Las publica el backend en `epConfig.rules.event_type` con la forma de la tabla s
 | 3 | Reuniones especiales | `star` | Sí | `#B45309` |
 | 4 | Reuniones laborales | `briefcase` | No | `#1D4ED8` |
 
-Colores propuestos en el Planning del Sprint 1, pendientes de aprobación del PO en la Review; se pueden cambiar desde la pantalla. Todos llevan texto blanco con contraste ≥ 4,5:1.
+Colores aprobados por el PO en la Review del Sprint 1 (D-13); se pueden cambiar desde la pantalla. Todos llevan texto blanco con contraste ≥ 4,5:1.
