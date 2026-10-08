@@ -54,6 +54,36 @@ test.describe( 'Eventos', () => {
 		await expect( edited ).toHaveCount( 0 );
 	} );
 
+	test( 'el detalle muestra lo que no cabe en la tabla y lleva a editar (H-205)', async ( { page } ) => {
+		const title = unique( 'Comité E2E' );
+		await openScreen( page, 'eventos-probolsas' );
+
+		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
+		const form = drawer( page );
+		await form.getByLabel( 'Título' ).fill( title );
+		await form.getByLabel( 'Tipo' ).selectOption( { label: 'Reuniones laborales' } );
+		await form.getByLabel( 'Fecha' ).fill( '2026-10-08' );
+		await form.getByLabel( 'Descripción' ).fill( 'Revisión de indicadores.\nTraer el informe.' );
+		await form.getByRole( 'button', { name: 'Crear evento' } ).click();
+		await expect( toastWith( page, `Evento «${ title }» creado.` ) ).toBeVisible();
+
+		await page.getByLabel( 'Buscar' ).fill( title );
+		await page.locator( 'tbody tr', { hasText: title } ).getByRole( 'button', { name: 'Ver detalle' } ).click();
+
+		const detail = drawer( page );
+		await expect( detail.locator( '.ep-drawer__title' ) ).toHaveText( title );
+		const list = detail.locator( 'dl' );
+		await expect( list ).toContainText( '08/10/2026' );
+		await expect( list ).toContainText( 'Todo el día' );
+		await expect( list ).toContainText( 'Sin adjunto' );
+		await expect( list ).toContainText( 'Traer el informe.' );
+		await expect( list.locator( 'dd' ).nth( 5 ) ).toContainText( /, el \d{2}\/\d{2}\/\d{4} \d{2}:\d{2} [ap]\. m\./ );
+
+		await detail.getByRole( 'button', { name: 'Editar' } ).click();
+		await expect( drawer( page ).locator( '.ep-drawer__title' ) ).toHaveText( 'Editar evento' );
+		await expect( drawer( page ).getByLabel( 'Descripción' ) ).toHaveValue( 'Revisión de indicadores.\nTraer el informe.' );
+	} );
+
 	test( 'el adjunto se elige en la Biblioteca de Medios por encima del panel (QA-041)', async ( { page } ) => {
 		const title = unique( 'Cumpleaños E2E' );
 		await openScreen( page, 'eventos-probolsas' );
