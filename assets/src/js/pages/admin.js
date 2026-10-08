@@ -18,7 +18,9 @@ import { toast } from '../ui/toast.js';
 import { initTooltips } from '../ui/tooltip.js';
 
 /** Pantallas con interfaz JS, por slug (`data-ep-screen`). */
-export const SCREENS = {};
+export const SCREENS = {
+	'eventos-probolsas-tipos': () => import( '../screens/event-types.js' ),
+};
 
 initTooltips( document.body );
 

@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { characterCount, createField, createForm, ruleOptions } from '../../../assets/src/js/ui/form.js';
+import { characterCount, createField, createForm, createSwitchField, ruleOptions } from '../../../assets/src/js/ui/form.js';
 
 beforeEach( () => {
 	document.body.innerHTML = '';
@@ -124,6 +124,49 @@ describe( 'createField', () => {
 
 	it( 'cuenta caracteres, no unidades UTF-16 (igual que mb_strlen)', () => {
 		expect( characterCount( 'ñ📄' ) ).toBe( 2 );
+	} );
+} );
+
+describe( 'createSwitchField', () => {
+	it( 'es una casilla con role="switch", etiqueta y ayuda asociadas, y valor booleano', () => {
+		const field = createSwitchField( { name: 'requires_attachment', label: 'Requiere adjunto', hint: 'Imagen o PDF.', value: true } );
+		document.body.append( field.element );
+
+		expect( field.control.type ).toBe( 'checkbox' );
+		expect( field.control.getAttribute( 'role' ) ).toBe( 'switch' );
+		expect( field.element.querySelector( 'label' ).htmlFor ).toBe( field.control.id );
+		field.control.getAttribute( 'aria-describedby' ).split( ' ' ).forEach( ( id ) => expect( document.getElementById( id ) ).not.toBeNull() );
+		expect( field.getValue() ).toBe( true );
+
+		field.control.click();
+		expect( field.getValue() ).toBe( false );
+
+		field.setValue( 1 );
+		expect( field.control.checked ).toBe( true );
+		expect( field.validate() ).toBeNull();
+	} );
+
+	it( 'muestra el error de la API hasta que cambia el valor', () => {
+		const field = createSwitchField( { name: 'requires_attachment', label: 'Requiere adjunto' } );
+		document.body.append( field.element );
+		const error = field.element.querySelector( '.ep-field__error' );
+
+		field.setError( 'El campo «Requiere adjunto» no es válido.' );
+		field.validate();
+		expect( error.hidden ).toBe( false );
+		expect( field.control.getAttribute( 'aria-invalid' ) ).toBe( 'true' );
+
+		field.control.click();
+		expect( error.hidden ).toBe( true );
+	} );
+
+	it( 'el formulario envía su valor como booleano', () => {
+		const onSubmit = vi.fn();
+		const form = createForm( { fields: [ createSwitchField( { name: 'requires_attachment', label: 'Requiere adjunto' } ) ], onSubmit } );
+
+		submit( form );
+
+		expect( onSubmit ).toHaveBeenCalledWith( { requires_attachment: false } );
 	} );
 } );
 

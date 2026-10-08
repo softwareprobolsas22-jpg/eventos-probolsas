@@ -75,6 +75,8 @@
 
 	&__note {
 		margin-top: var(--ep-space-5);
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
 
 		code {
 			padding: 0 var(--ep-space-1);
@@ -99,6 +101,11 @@
 			animation: none;
 		}
 	}
+}
+
+// Más específico que el reboot de Bootstrap (`:is(.ep-app, .ep-public) p`), que se carga después.
+.ep-drawer .ep-drawer__note p {
+	margin: 0 0 var(--ep-space-1);
 }
 
 @keyframes ep-drawer-in {
