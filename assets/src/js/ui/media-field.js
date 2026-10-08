@@ -59,12 +59,10 @@ export function openMediaLibrary( { title, buttonText, libraryTypes, anchor } ) 
 		() =>
 			new Promise( ( resolve ) => {
 				const frame = media( { title, button: { text: buttonText }, library: { type: libraryTypes }, multiple: false } );
-				let chosen = null;
-				frame.on( 'select', () => {
-					chosen = fromWpAttachment( frame.state().get( 'selection' ).first().toJSON() );
-				} );
-				// «close» llega también después de «select».
-				frame.on( 'close', () => resolve( chosen ) );
+				frame.on( 'select', () => resolve( fromWpAttachment( frame.state().get( 'selection' ).first().toJSON() ) ) );
+				// Al elegir, WordPress cierra el selector y después emite «select» (QA-043): se espera un turno
+				// antes de dar por hecho que se cerró sin elegir. La promesa solo se resuelve una vez.
+				frame.on( 'close', () => setTimeout( () => resolve( null ) ) );
 				frame.open();
 			} )
 	);
