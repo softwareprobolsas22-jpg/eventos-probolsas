@@ -373,10 +373,10 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-201 | Dominio y API de eventos: `EventSchedule` preparado para D-7, validación única publicada en `epConfig.rules`, búsqueda/filtros/conteo compartidos, consulta por solapamiento de rango, paginación, export CSV  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-201.md)); integrada en `develop`* | B | 8 |
 | H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-202.md)); integrada en `develop`* | B | 3 |
 | H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-203.md)); corrigió QA-038 (doble carga de `admin.js` en WordPress), QA-039 y QA-040; integrada en `develop`* | F | 8 |
-| H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-204.md)); integrada en `develop`. Pendiente QA-041: probar `wp.media` en WordPress real* | F | 8 |
+| H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-204.md)); integrada en `develop`. QA-041 cubierta por las pruebas en el navegador de H-207* | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla) | F | 3 |
 | H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
-| H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación | Q | 5 |
+| H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-207.md)); agrega pruebas en el navegador sobre WordPress real en el CI; detectó QA-043; integrada en `develop`* | Q | 5 |
 
 ### EP-3 · Calendario para colaboradores
 | ID | Historia | Rama | Pts |
