@@ -1,0 +1,114 @@
+// Barra de filtros (ui/filter-bar.js) con título y botón «Limpiar filtros».
+@use "../tools/mixins" as m;
+
+.ep-filter-bar {
+	padding: var(--ep-space-4);
+	margin-bottom: var(--ep-space-4);
+	user-select: none;
+	background: var(--ep-color-surface);
+	border: 1px solid var(--ep-color-border);
+	border-radius: var(--ep-radius-lg);
+
+	// Lo que se escribe en los campos sí se puede seleccionar (para corregirlo o copiarlo).
+	input {
+		user-select: text;
+	}
+
+	&__header {
+		display: flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: var(--ep-space-3);
+	}
+
+	&__title {
+		display: flex;
+		gap: var(--ep-space-2);
+		align-items: center;
+		margin: 0;
+		font-size: var(--ep-font-size-lg);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+
+		i {
+			color: var(--ep-color-secondary);
+		}
+	}
+
+	// Una columna en móvil, dos en tablet y tres en escritorio. En Eventos: Buscar y Tipo en la primera
+	// fila de tablet; el rango de fechas ocupa dos columnas. Un campo único ocupa todo el ancho.
+	&__fields {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--ep-space-3) var(--ep-space-4);
+
+		@include m.up(md) {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		@include m.up(lg) {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	&__field:only-child {
+		grid-column: 1 / -1;
+	}
+
+	// Rango de fechas: grupo con leyenda y dos campos «Desde» / «Hasta».
+	&__field--range {
+		min-width: 0;
+		padding: 0;
+		margin: 0;
+		border: 0;
+
+		legend {
+			padding: 0;
+			margin-bottom: var(--ep-space-1);
+		}
+
+		@include m.up(md) {
+			grid-column: span 2;
+		}
+	}
+
+	&__range {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: var(--ep-space-2);
+		align-items: center;
+
+		@include m.up(sm) {
+			grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+		}
+	}
+
+	&__range-label {
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__count {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.25rem;
+		height: 1.25rem;
+		padding: 0 var(--ep-space-1);
+		font-size: var(--ep-font-size-xs);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-on-primary);
+		background: var(--ep-color-primary);
+		border-radius: var(--ep-radius-pill);
+		animation: ep-fade-in var(--ep-duration-base) var(--ep-easing-enter);
+
+		&[hidden] {
+			display: none;
+		}
+
+		@include m.reduced-motion {
+			animation: none;
+		}
+	}
+}

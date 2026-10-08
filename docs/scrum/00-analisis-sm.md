@@ -372,7 +372,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 |---|---|---|---|
 | H-201 | Dominio y API de eventos: `EventSchedule` preparado para D-7, validación única publicada en `epConfig.rules`, búsqueda/filtros/conteo compartidos, consulta por solapamiento de rango, paginación, export CSV  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-201.md)); integrada en `develop`* | B | 8 |
 | H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-202.md)); integrada en `develop`* | B | 3 |
-| H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar | F | 8 |
+| H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-203.md)); corrigió QA-038 (doble carga de `admin.js` en WordPress), QA-039 y QA-040; integrada en `develop`* | F | 8 |
 | H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla) | F | 3 |
 | H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
@@ -454,3 +454,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.17 | 2026-10-08 | Cierre del Sprint 1 (27/27 puntos, [informe](../qa/2026-10-08-cierre-sprint-1.md)); pendiente en la Review: colores de los tipos iniciales y QA-029 |
 | 2.18 | 2026-10-08 | Review del Sprint 1 (PR #2 fusionado en `main`): D-13 colores de la semilla aprobados; D-14 producción al terminar v1. Ajustes antes del Sprint 2: QA-033 (CSS inicial 44,9 → 30,9 KB) y QA-029 (rango oculto en móvil) |
 | 2.19 | 2026-10-08 | Planning del Sprint 2 ([plan](sprint-2.md)): H-206 al Sprint 4; H-205 de reserva |
+| 2.20 | 2026-10-08 | H-202, H-201 y H-203 aprobadas e integradas. QA-038 (alta): las pantallas importaban la entrada `admin.js`, que WordPress encola con `?ver=`, y no montaban; corregido con el chunk `runtime`. Regla: si Backend agrega un ícono en PHP, Frontend regenera el `dist` en la misma rama (QA-036) |

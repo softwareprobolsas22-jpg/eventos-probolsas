@@ -19,6 +19,7 @@ import { initTooltips } from '../ui/tooltip.js';
 
 /** Pantallas con interfaz JS, por slug (`data-ep-screen`). */
 export const SCREENS = {
+	'eventos-probolsas': () => import( '../screens/events.js' ),
 	'eventos-probolsas-tipos': () => import( '../screens/event-types.js' ),
 };
 
