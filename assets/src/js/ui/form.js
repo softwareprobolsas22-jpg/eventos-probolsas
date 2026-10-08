@@ -61,7 +61,7 @@ export function revalidateIfInvalid( element, validate ) {
  * cambie: salir del campo sin editarlo no lo borra (§6.2, R-24, QA-025). Cuando el valor cambia,
  * vuelve a mandar la validación local. Al enviar, el servidor vuelve a decidir.
  *
- * @param {() => string} readValue Valor actual del campo.
+ * @param {() => string|boolean} readValue Valor actual del campo.
  * @param {(message: string|null) => void} show Muestra u oculta el mensaje.
  * @returns {{ fromServer: (message: string|null) => void, fromValidation: (message: string|null) => void }} Estado.
  */
@@ -105,7 +105,7 @@ export function createFieldError( readValue, show ) {
  * @typedef {Object} FormField
  * @property {string} name Nombre del campo.
  * @property {HTMLElement} element Elemento a insertar en el formulario.
- * @property {() => string} getValue Valor actual.
+ * @property {() => string|boolean} getValue Valor actual (booleano en los interruptores).
  * @property {(value: string|number) => void} setValue Cambia el valor.
  * @property {() => string|null} validate Valida y muestra el error; devuelve el mensaje o null.
  * @property {(message: string|null) => void} setError Muestra (o quita, con null) el error de la API; se mantiene hasta que cambie el valor.
@@ -265,10 +265,66 @@ function isIntegerInRange( value, min, max ) {
 }
 
 /**
+ * Interruptor de sí/no (casilla nativa con role="switch"): se activa con clic, Espacio o tocando la
+ * etiqueta. Cumple la interfaz FormField; su valor es booleano.
+ *
+ * @param {{ name: string, label: string, hint?: string, value?: boolean }} options Opciones.
+ * @returns {FormField & { control: HTMLInputElement }} Campo.
+ */
+export function createSwitchField( { name, label, hint, value = false } ) {
+	const id = uid( `ep-field-${ name }` );
+	const hintId = `${ id }-hint`;
+	const errorId = `${ id }-error`;
+	const errorText = h( 'span' );
+	const error = h( 'p', { class: 'ep-field__error', id: errorId, hidden: true }, icon( 'fa-solid fa-circle-exclamation' ), errorText );
+
+	const control = h( 'input', {
+		type: 'checkbox',
+		id,
+		name,
+		class: 'ep-switch__input',
+		checked: Boolean( value ),
+		attrs: { role: 'switch', 'aria-describedby': [ hint !== undefined && hintId, errorId ].filter( Boolean ).join( ' ' ) },
+		on: { change: () => fieldError.fromValidation( null ) },
+	} );
+
+	const element = h(
+		'div',
+		{ class: 'ep-field ep-switch' },
+		h( 'label', { class: 'ep-switch__label', htmlFor: id }, control, h( 'span', { class: 'ep-switch__track', attrs: { 'aria-hidden': 'true' } } ), h( 'span', { text: label } ) ),
+		undefined !== hint && h( 'p', { class: 'ep-field__hint', id: hintId, text: hint } ),
+		error
+	);
+
+	const fieldError = createFieldError( () => control.checked, ( message ) => {
+		errorText.textContent = message ?? '';
+		error.hidden = ! message;
+		element.classList.toggle( 'is-invalid', Boolean( message ) );
+		control.setAttribute( 'aria-invalid', String( Boolean( message ) ) );
+	} );
+
+	return {
+		name,
+		element,
+		control,
+		getValue: () => control.checked,
+		setValue: ( newValue ) => {
+			control.checked = Boolean( newValue );
+		},
+		validate: () => {
+			fieldError.fromValidation( null );
+			return null;
+		},
+		setError: fieldError.fromServer,
+		focus: () => control.focus(),
+	};
+}
+
+/**
  * Crea un formulario a partir de campos.
  *
- * @param {{ fields: FormField[], onSubmit: (values: Record<string, string>) => Promise<void>|void }} options Opciones.
- * @returns {{ element: HTMLFormElement, getValues: () => Record<string, string>, setErrors: (errors: Record<string, string[]>) => void, isDirty: () => boolean, submitButton: (label: string) => HTMLButtonElement, focusFirst: () => void }} Formulario.
+ * @param {{ fields: FormField[], onSubmit: (values: Record<string, string|boolean>) => Promise<void>|void }} options Opciones.
+ * @returns {{ element: HTMLFormElement, getValues: () => Record<string, string|boolean>, setErrors: (errors: Record<string, string[]>) => void, isDirty: () => boolean, submitButton: (label: string) => HTMLButtonElement, focusFirst: () => void }} Formulario.
  */
 export function createForm( { fields, onSubmit } ) {
 	const id = uid( 'ep-form' );

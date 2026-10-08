@@ -61,7 +61,8 @@
 		}
 	}
 
-	&.is-invalid .ep-input {
+	// Solo el control propio del campo: el buscador del selector de íconos no se marca como erróneo.
+	&.is-invalid > .ep-input {
 		border-color: var(--ep-color-error);
 
 		&:focus {
@@ -147,5 +148,71 @@
 
 	.ep-input {
 		padding-left: var(--ep-space-8);
+	}
+}
+
+// Interruptor de sí/no (ui/form.js createSwitchField): casilla nativa oculta a la vista, con pista
+// y perilla dibujadas. La perilla se mueve con transform (R-12).
+.ep-switch {
+	&__label {
+		display: inline-flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		align-self: flex-start;
+		min-height: 2.5rem;
+		font-size: var(--ep-font-size-md);
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-text);
+		cursor: pointer;
+	}
+
+	&__input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: 0;
+		opacity: 0;
+	}
+
+	&__track {
+		position: relative;
+		flex-shrink: 0;
+		width: 2.75rem;
+		height: 1.5rem;
+
+		// Apagado: gris medio, con contraste ≥ 3:1 sobre el fondo (WCAG 1.4.11).
+		background: var(--ep-color-text-muted);
+		border-radius: var(--ep-radius-pill);
+
+		&::after {
+			position: absolute;
+			top: 0.1875rem;
+			left: 0.1875rem;
+			width: 1.125rem;
+			height: 1.125rem;
+			content: "";
+			background: var(--ep-color-surface);
+			border-radius: 50%;
+			box-shadow: var(--ep-shadow-sm);
+			transition: transform var(--ep-duration-fast) var(--ep-easing-standard);
+		}
+	}
+
+	&__input:checked + &__track {
+		background: var(--ep-color-primary);
+
+		&::after {
+			transform: translateX(1.25rem);
+		}
+	}
+
+	&__input:focus-visible + &__track {
+		@include m.focus-ring;
+	}
+
+	@include m.reduced-motion {
+		&__track::after {
+			transition: none;
+		}
 	}
 }

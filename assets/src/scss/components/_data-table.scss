@@ -170,3 +170,19 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+// Valor sí/no en una celda: ícono y texto, para no depender solo del color.
+.ep-flag {
+	display: inline-flex;
+	gap: var(--ep-space-1);
+	align-items: center;
+
+	&.is-on {
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-primary);
+	}
+
+	&.is-off {
+		color: var(--ep-color-text-muted);
+	}
+}
