@@ -193,7 +193,7 @@ eventos-probolsas/
 | Columna | Tipo | Regla |
 |---|---|---|
 | `id` | bigint unsigned PK | |
-| `name` / `name_key` | varchar(100) | obligatorio, único sin distinguir mayúsculas ni tildes |
+| `name` / `name_key` | varchar(100) | obligatorio, único sin distinguir mayúsculas ni tildes; la ñ es letra propia (`name_key` normalizado con collation binaria, QA-032) |
 | `slug` | varchar(100) único | generado al crear, no cambia al renombrar |
 | `color` | char(7) | `#RRGGBB` obligatorio (con colores sugeridos derivados de la paleta) |
 | `icon` | varchar(64) | clave de `config/icons.php` |
@@ -363,7 +363,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-102 | Migraciones de tablas y semilla con los 4 tipos actuales  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 3 |
 | H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando  — *✅ aprobada por QA en la segunda revisión ([informe](../qa/2026-10-08-H-103.md)); integrada en `develop`* | F | 8 |
 | H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24)  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-104.md)); integrada en `develop`* | F | 5 |
-| H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos | Q | 3 |
+| H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-105.md)); detectó QA-032 (la ñ), corregido; integrada en `develop`* | Q | 3 |
 
 ### EP-2 · Gestión de eventos (wp-admin)
 | ID | Historia | Rama | Pts |
@@ -448,3 +448,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.13 | 2026-10-07 | Planning del Sprint 1 ([plan](sprint-1.md)); propuesta de colores de los tipos iniciales para la Review |
 | 2.14 | 2026-10-08 | H-101/H-102 integradas. H-103 aprobada por QA en la segunda revisión (QA-024: toasts y tooltips dentro de drawers y diálogos; QA-025: errores de la API persistentes); breakpoint `sm` = 576 px, igual que R-23 |
 | 2.15 | 2026-10-08 | H-104 aprobada por QA e integrada: pantalla «Tipos de evento» con interruptor «Requiere adjunto» (`createSwitchField`) |
+| 2.16 | 2026-10-08 | H-105 aprobada: pruebas de aceptación en WordPress real; QA-032 (la ñ se trataba como n por el collation) corregido con collation binaria en `name_key` |
