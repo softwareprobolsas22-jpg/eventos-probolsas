@@ -359,8 +359,8 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-1 · Tipos de evento (gestionables, D-2)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador  — *en `feature/H-101-H-102-tipos-backend`, pendiente de QA* | B | 8 |
-| H-102 | Migraciones de tablas y semilla con los 4 tipos actuales  — *en `feature/H-101-H-102-tipos-backend`, pendiente de QA* | B | 3 |
+| H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 8 |
+| H-102 | Migraciones de tablas y semilla con los 4 tipos actuales  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 3 |
 | H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando | F | 8 |
 | H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24) | F | 5 |
 | H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos | Q | 3 |
