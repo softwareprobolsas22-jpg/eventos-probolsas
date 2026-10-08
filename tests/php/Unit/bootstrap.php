@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 require_once dirname( __DIR__, 3 ) . '/vendor/autoload.php';
 require_once __DIR__ . '/Support/wp-rest-doubles.php';
+require_once __DIR__ . '/Support/wp-post-double.php';
 
 // Formato de resultado de $wpdb (mismo valor que en WordPress).
 if ( ! defined( 'ARRAY_A' ) ) {
