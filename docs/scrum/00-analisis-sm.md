@@ -104,6 +104,8 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | D-10 | El sistema **solo lo gestiona el usuario con acceso al panel de WordPress**. | ✅ Cerrada | Capacidad `eventos_manage` otorgada a `administrator` (igual que `sgp_manage`), asignable a otros roles por filtro. Toda la gestión vive en wp-admin. |
 | D-11 | **Toasts** con librería ligera y **tooltips** en botones de acción y textos largos, siguiendo SGP. | ✅ Cerrada | **Notyf** (toasts) y **Tippy.js** (tooltips, con `data-ep-tooltip` y `.ep-truncate` que muestra el texto completo solo si está cortado). |
 | D-12 | Las tablas tienen **máximo 6 columnas, contando Acciones** (confirmado: columnas). Lo demás va en la página del evento o en el modal de detalle. | ✅ Cerrada | Regla R-19. Columnas definidas en §6.3. |
+| D-13 | **Colores de los tipos iniciales aprobados** (Review del Sprint 1, 2026-10-08): Cumpleaños `#9D174D`, Capacitaciones `#155728`, Reuniones especiales `#B45309`, Reuniones laborales `#1D4ED8`. | ✅ Cerrada | La semilla (H-102) queda como está; se pueden cambiar desde «Tipos de evento». |
+| D-14 | **El plugin sale a producción cuando esté terminada la primera versión** (v1, Sprints 2 a 4), para verificar cualquier eventualidad en conjunto. Los PR por fase llevan el código a `main`, pero no se despliega hasta el cierre de v1. | ✅ Cerrada | El despliegue en Hostinger se hace en H-404 (prueba de aceptación en staging y paquete de release), no al cerrar cada fase. |
 
 ---
 
@@ -368,13 +370,13 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-2 · Gestión de eventos (wp-admin)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-201 | Dominio y API de eventos: `EventSchedule` preparado para D-7, validación única publicada en `epConfig.rules`, búsqueda/filtros/conteo compartidos, consulta por solapamiento de rango, paginación, export CSV | B | 8 |
-| H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos | B | 3 |
-| H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar | F | 8 |
-| H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API | F | 8 |
-| H-205 | Detalle del evento (todo lo que no cabe en la tabla) | F | 3 |
-| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo) | B+F | 5 |
-| H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación | Q | 5 |
+| H-201 | Dominio y API de eventos: `EventSchedule` preparado para D-7, validación única publicada en `epConfig.rules`, búsqueda/filtros/conteo compartidos, consulta por solapamiento de rango, paginación, export CSV  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-201.md)); integrada en `develop`* | B | 8 |
+| H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-202.md)); integrada en `develop`* | B | 3 |
+| H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-203.md)); corrigió QA-038 (doble carga de `admin.js` en WordPress), QA-039 y QA-040; integrada en `develop`* | F | 8 |
+| H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-204.md)); integrada en `develop`. QA-041 cubierta por las pruebas en el navegador de H-207* | F | 8 |
+| H-205 | Detalle del evento (todo lo que no cabe en la tabla)  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-205.md)); integrada en `develop`* | F | 3 |
+| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
+| H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-207.md)); agrega pruebas en el navegador sobre WordPress real en el CI; detectó QA-043; integrada en `develop`* | Q | 5 |
 
 ### EP-3 · Calendario para colaboradores
 | ID | Historia | Rama | Pts |
@@ -407,11 +409,11 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 |---|---|---|---|
 | **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
-| **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
+| **2** | «El gestor administra eventos sin errores» — ✅ cerrado, 35/35 ([plan](sprint-2.md), [cierre](../qa/2026-10-08-cierre-sprint-2.md)) | H-201 … H-205, H-207 | 35 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
-| **4** | «Listo para producción» | H-401 … H-404 | 11 |
+| **4** | «Listo para producción» | H-401 … H-404, H-206 | 16 |
 
-El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la velocidad del Sprint 1 no lo respalda, H-206 (dashboard) pasa al Sprint 4.
+Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Sprint 4 (Review del Sprint 1, 2026-10-08).
 
 ---
 
@@ -450,3 +452,7 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.15 | 2026-10-08 | H-104 aprobada por QA e integrada: pantalla «Tipos de evento» con interruptor «Requiere adjunto» (`createSwitchField`) |
 | 2.16 | 2026-10-08 | H-105 aprobada: pruebas de aceptación en WordPress real; QA-032 (la ñ se trataba como n por el collation) corregido con collation binaria en `name_key` |
 | 2.17 | 2026-10-08 | Cierre del Sprint 1 (27/27 puntos, [informe](../qa/2026-10-08-cierre-sprint-1.md)); pendiente en la Review: colores de los tipos iniciales y QA-029 |
+| 2.18 | 2026-10-08 | Review del Sprint 1 (PR #2 fusionado en `main`): D-13 colores de la semilla aprobados; D-14 producción al terminar v1. Ajustes antes del Sprint 2: QA-033 (CSS inicial 44,9 → 30,9 KB) y QA-029 (rango oculto en móvil) |
+| 2.19 | 2026-10-08 | Planning del Sprint 2 ([plan](sprint-2.md)): H-206 al Sprint 4; H-205 de reserva |
+| 2.20 | 2026-10-08 | H-202, H-201 y H-203 aprobadas e integradas. QA-038 (alta): las pantallas importaban la entrada `admin.js`, que WordPress encola con `?ver=`, y no montaban; corregido con el chunk `runtime`. Regla: si Backend agrega un ícono en PHP, Frontend regenera el `dist` en la misma rama (QA-036) |
+| 2.21 | 2026-10-08 | H-204, H-207 y H-205 aprobadas. Pruebas en el navegador sobre WordPress real en el CI (H-207), que detectaron QA-043. Cierre del Sprint 2 (35/35 puntos, [informe](../qa/2026-10-08-cierre-sprint-2.md)) |

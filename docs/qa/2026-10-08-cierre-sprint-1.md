@@ -56,11 +56,11 @@
 | QA-026 `icon-picker.setValue()` aceptaba íconos fuera del catálogo | Baja | ✅ Cerrado (H-103) |
 | QA-027 Tooltip de textos truncados solo con mouse | Info | ⏳ H-403 (auditoría de accesibilidad) |
 | QA-028 Exclusión de Tippy y Notyf por prefijo | Info | ✅ Cerrado (H-103) |
-| QA-029 En móvil el pie de la tabla muestra también el selector y el rango | Info | ⏳ Validar con el PO en la Review |
+| QA-029 En móvil el pie de la tabla muestra también el selector y el rango | Info | ✅ Cerrado después de la Review ([ajustes](2026-10-08-ajustes-sprint-1.md)) |
 | QA-030 Vista previa del badge con un color incompleto | Info | ✅ Cerrado (H-104) |
 | QA-031 Sin `epConfig.rules` la validación local se reduce | Info | Aceptado (el backend siempre publica las reglas) |
 | **QA-032** La ñ se trataba como n en la unicidad del nombre (collation) | **Alta** | ✅ Cerrado en H-105 (`93ba95f`) |
-| QA-033 El CSS inicial de wp-admin usa 44,9 de 45 KB del presupuesto | Baja | ⏳ Antes de agregar estilos en el Sprint 2 (H-203/H-204): reducir el CSS de Font Awesome a los íconos usados o revisar el presupuesto con el SM. El CI fallará si se supera |
+| QA-033 El CSS inicial de wp-admin usa 44,9 de 45 KB del presupuesto | Baja | ✅ Cerrado después de la Review: 30,9 KB ([ajustes](2026-10-08-ajustes-sprint-1.md)) |
 | QA-004 Mensaje «Fecha no válida» para horas inválidas | Baja | ⏳ H-201 (Sprint 2) |
 | QA-005 «Hoy» fijo si la página queda abierta después de medianoche | Baja | ⏳ H-302 (Sprint 3): recalcularlo con `Intl` en la zona de Bogotá |
 | QA-019 Detalle técnico escapado en el log | Info | Aceptado |

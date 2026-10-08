@@ -26,7 +26,7 @@ export class ApiError extends Error {
  * @param {{ restUrl: string, restNonce: string }} config Configuración (de epConfig).
  * @param {{ notify?: (type: string, message: string) => void, fetch?: typeof fetch }} options
  *   notify: muestra los errores (normalmente toast). fetch: inyectable en pruebas.
- * @returns {{ get: Function, post: Function, put: Function, del: Function, upload: Function }} Cliente.
+ * @returns {{ get: Function, getPage: Function, post: Function, put: Function, del: Function, upload: Function }} Cliente.
  */
 export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = globalThis.fetch?.bind( globalThis ) } = {} ) {
 	/**
@@ -35,7 +35,7 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 	 * @param {string} method Método HTTP.
 	 * @param {string} path Ruta relativa al namespace, por ejemplo `event-types/7`.
 	 * @param {{ body?: unknown, silent?: boolean }} options Opciones.
-	 * @returns {Promise<unknown>} Valor de `data` de la respuesta.
+	 * @returns {Promise<{ data: unknown, headers: Headers }>} Valor de `data` y cabeceras de la respuesta.
 	 */
 	async function request( method, path, { body, silent = false } = {} ) {
 		try {
@@ -55,7 +55,7 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 	 * @param {string} method Método HTTP.
 	 * @param {string} path Ruta.
 	 * @param {unknown} body Cuerpo.
-	 * @returns {Promise<unknown>} Datos.
+	 * @returns {Promise<{ data: unknown, headers: Headers }>} Datos y cabeceras.
 	 */
 	async function send( method, path, body ) {
 		const response = await fetchImpl( restUrl + path.replace( /^\//, '' ), {
@@ -75,7 +75,7 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 			throw toApiError( response.status, payload );
 		}
 
-		return payload?.data;
+		return { data: payload?.data, headers: response.headers };
 	}
 
 	/**
@@ -121,11 +121,25 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 		} );
 	}
 
+	const data = async ( promise ) => ( await promise ).data;
+
 	return {
-		get: ( path, options ) => request( 'GET', path, options ),
-		post: ( path, body, options ) => request( 'POST', path, { ...options, body } ),
-		put: ( path, body, options ) => request( 'PUT', path, { ...options, body } ),
-		del: ( path, options ) => request( 'DELETE', path, options ),
+		get: ( path, options ) => data( request( 'GET', path, options ) ),
+		/**
+		 * Listado paginado en el servidor: registros y totales de `X-WP-Total` y `X-WP-TotalPages`.
+		 *
+		 * @param {string} path Ruta con los filtros en la consulta.
+		 * @param {{ silent?: boolean }} [options] Opciones.
+		 * @returns {Promise<{ items: Object[], total: number, totalPages: number }>} Página.
+		 */
+		getPage: async ( path, options ) => {
+			const response = await request( 'GET', path, options );
+			const header = ( name ) => Number( response.headers?.get?.( name ) ?? 0 ) || 0;
+			return { items: Array.isArray( response.data ) ? response.data : [], total: header( 'X-WP-Total' ), totalPages: header( 'X-WP-TotalPages' ) };
+		},
+		post: ( path, body, options ) => data( request( 'POST', path, { ...options, body } ) ),
+		put: ( path, body, options ) => data( request( 'PUT', path, { ...options, body } ) ),
+		del: ( path, options ) => data( request( 'DELETE', path, options ) ),
 		upload,
 	};
 }

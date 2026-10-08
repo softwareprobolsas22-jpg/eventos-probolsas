@@ -73,7 +73,7 @@ final class DateFormatterTest extends UnitTestCase {
 				$this->formatter()->format_calendar_time( $value );
 				$this->fail( "Se aceptó una hora no válida: {$value}" );
 			} catch ( InvalidArgumentException $error ) {
-				$this->assertSame( 'Fecha no válida.', $error->getMessage() );
+				$this->assertSame( 'Hora no válida.', $error->getMessage(), 'QA-004: el mensaje habla de la hora.' );
 			}
 		}
 	}

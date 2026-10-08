@@ -1,5 +1,7 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import prefixSelector from 'postcss-prefix-selector';
+import { usedIcons } from './tools/used-icons.mjs';
 
 /**
  * Entradas de Vite. Cada una genera `dist/js/<entrada>.js` (módulo ES) y, si importa estilos,
@@ -15,6 +17,12 @@ const ENTRIES = {
 };
 
 const ENTRY_STYLES = new Set( Object.keys( ENTRIES ).map( ( entry ) => `${ entry }.css` ) );
+
+/**
+ * Módulos que importan las entradas (pages/*.js) y también las pantallas: forman el chunk `runtime`
+ * (ver codeSplitting). tests/js/build/chunks.test.js verifica que ningún chunk importe una entrada.
+ */
+const ENTRY_RUNTIME = /[\\/](assets[\\/]src[\\/]js[\\/](core[\\/](config|dom|i18n|timing)|ui[\\/](toast|tooltip))\.js$|node_modules[\\/](notyf|tippy\.js|@popperjs)[\\/])/;
 
 const FONT_FILE = /\.(woff2?|ttf|otf|eot)$/;
 
@@ -74,6 +82,53 @@ const keepContainerBox = {
 	},
 };
 
+/** Hoja de Font Awesome con la tabla de íconos. */
+const FONT_AWESOME_FILE = /@fortawesome[\\/]fontawesome-free[\\/]css[\\/]fontawesome\.css$/;
+
+/**
+ * Regla de un ícono: `.fa-cake-candles { --fa: "\f1fd"; }`. Solo la propiedad `--fa` exacta: las utilidades
+ * que declaran otras variables (`.fa-fw { --fa-width: … }`, `.fa-spin-reverse { --fa-animation-direction: … }`)
+ * se conservan.
+ *
+ * @param {import('postcss').Rule} rule Regla.
+ * @returns {boolean} Si declara un ícono.
+ */
+const isIconRule = ( rule ) =>
+	rule.nodes.length > 0 &&
+	rule.nodes.every( ( node ) => 'decl' === node.type && '--fa' === node.prop ) &&
+	rule.selectors.every( ( selector ) => /^\.fa-[a-z0-9-]+$/.test( selector ) );
+
+/**
+ * Font Awesome declara una regla por cada uno de sus ~2.000 íconos (≈ 15 KB con gzip) y el plugin usa
+ * alrededor de cien: el CSS inicial de wp-admin agotaba el presupuesto de 45 KB (QA-033). Este plugin
+ * conserva solo los íconos que aparecen en el código o en config/icons.php (tools/used-icons.mjs); las
+ * clases de estilo y utilidad (`fa-solid`, `fa-spin`, tamaños…) no se tocan. Un ícono nuevo exige volver
+ * a compilar, y el CI lo detecta porque compara assets/dist con un build limpio.
+ *
+ * @type {import('postcss').Plugin}
+ */
+const keepUsedIcons = {
+	postcssPlugin: 'ep-keep-used-icons',
+	OnceExit( root ) {
+		if ( ! FONT_AWESOME_FILE.test( root.source?.input?.file ?? '' ) ) {
+			return;
+		}
+
+		const used = usedIcons( fileURLToPath( new URL( '.', import.meta.url ) ) );
+		root.walkRules( ( rule ) => {
+			if ( ! isIconRule( rule ) ) {
+				return;
+			}
+			const kept = rule.selectors.filter( ( selector ) => used.has( selector.replace( /^\.fa-/, '' ) ) );
+			if ( 0 === kept.length ) {
+				rule.remove();
+			} else {
+				rule.selectors = kept;
+			}
+		} );
+	},
+};
+
 /**
  * Carpeta de destino de cada asset según su tipo.
  *
@@ -117,6 +172,7 @@ export default defineConfig( ( { mode } ) => {
 						transform: scopeBootstrap,
 					} ),
 					keepContainerBox,
+					keepUsedIcons,
 				],
 			},
 		},
@@ -136,6 +192,14 @@ export default defineConfig( ( { mode } ) => {
 					entryFileNames: 'js/[name].js',
 					chunkFileNames: 'js/chunks/[name]-[hash].js',
 					assetFileNames: assetFileName,
+					// Lo que usan a la vez las entradas y las pantallas (toasts, tooltips, i18n, DOM y sus librerías)
+					// va a su propio chunk. Sin esto, Rolldown lo deja dentro de la entrada y las pantallas importan
+					// `../admin.js`: WordPress encola la entrada con `?ver=…`, así que el navegador la cargaría dos
+					// veces (tooltips y pantalla montados dos veces). El resto del kit se reparte entre los chunks de
+					// cada pantalla y solo se descarga al abrirla (R-17).
+					codeSplitting: {
+						groups: [ { name: 'runtime', test: ENTRY_RUNTIME } ],
+					},
 				},
 			},
 		},

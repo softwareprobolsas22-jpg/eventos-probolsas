@@ -127,6 +127,78 @@ describe( 'createField', () => {
 	} );
 } );
 
+describe( 'createField: tipos de H-204', () => {
+	it( 'longitud mínima con el mensaje del servidor; no aplica al campo vacío', () => {
+		const field = createField( { name: 'title', label: 'Título', minLength: 3 } );
+
+		field.setValue( 'Ab' );
+		expect( field.validate() ).toBe( 'El campo «Título» debe tener al menos 3 caracteres.' );
+		field.setValue( '  Ana  ' );
+		expect( field.validate() ).toBeNull();
+		field.setValue( '' );
+		expect( field.validate() ).toBeNull();
+	} );
+
+	it( 'fecha y hora: el navegador vacía un valor imposible y el campo obligatorio lo marca', () => {
+		const date = createField( { name: 'start_date', label: 'Fecha', type: 'date', required: true } );
+		const time = createField( { name: 'start_time', label: 'Hora', type: 'time' } );
+		expect( date.control.type ).toBe( 'date' );
+		expect( time.control.type ).toBe( 'time' );
+
+		date.control.value = '2026-02-30';
+		expect( date.getValue() ).toBe( '' );
+		expect( date.validate() ).toBe( 'El campo «Fecha» es obligatorio.' );
+		date.control.value = '2024-02-29';
+		expect( date.validate() ).toBeNull();
+
+		time.control.value = '15:30';
+		expect( time.validate() ).toBeNull();
+	} );
+
+	it( 'sin selector nativo (el campo cae a texto) valida la fecha real y la hora con los mensajes del servidor', () => {
+		const date = createField( { name: 'start_date', label: 'Fecha', type: 'date' } );
+		const time = createField( { name: 'start_time', label: 'Hora', type: 'time' } );
+		date.control.type = 'text';
+		time.control.type = 'text';
+
+		date.control.value = '2026-02-30';
+		expect( date.validate() ).toBe( 'El campo «Fecha» debe ser una fecha válida.' );
+		date.control.value = '07/10/2026';
+		expect( date.validate() ).toBe( 'El campo «Fecha» debe ser una fecha válida.' );
+		date.control.value = '2026-10-07';
+		expect( date.validate() ).toBeNull();
+
+		time.control.value = '24:00';
+		expect( time.validate() ).toBe( 'El campo «Hora» debe ser una hora válida.' );
+		time.control.value = '09:05:00';
+		expect( time.validate() ).toBeNull();
+	} );
+
+	it( 'lista con opción vacía, obligatoria y con opciones que se pueden reemplazar', () => {
+		const onInput = vi.fn();
+		const field = createField( { name: 'type_id', label: 'Tipo', type: 'select', required: true, placeholder: 'Selecciona un tipo', options: [ { value: 1, label: 'Cumpleaños' } ], onInput } );
+		document.body.append( field.element );
+
+		expect( [ ...field.control.options ].map( ( option ) => option.textContent ) ).toEqual( [ 'Selecciona un tipo', 'Cumpleaños' ] );
+		expect( field.validate() ).toBe( 'El campo «Tipo» es obligatorio.' );
+
+		field.control.value = '1';
+		field.control.dispatchEvent( new Event( 'change' ) );
+		expect( onInput ).toHaveBeenCalledWith( '1' );
+		expect( field.getValue() ).toBe( '1' );
+
+		field.setOptions( [ { value: 1, label: 'Cumpleaños' }, { value: 2, label: 'Reuniones' } ] );
+		expect( field.getValue() ).toBe( '1' );
+		expect( field.control.options ).toHaveLength( 3 );
+	} );
+} );
+
+describe( 'ruleOptions con minLength', () => {
+	it( 'incluye la longitud mínima del servidor', () => {
+		expect( ruleOptions( { required: true, minLength: 3, maxLength: 150 } ) ).toEqual( { required: true, minLength: 3, maxLength: 150 } );
+	} );
+} );
+
 describe( 'createSwitchField', () => {
 	it( 'es una casilla con role="switch", etiqueta y ayuda asociadas, y valor booleano', () => {
 		const field = createSwitchField( { name: 'requires_attachment', label: 'Requiere adjunto', hint: 'Imagen o PDF.', value: true } );

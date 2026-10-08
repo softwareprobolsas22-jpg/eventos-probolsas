@@ -31,12 +31,12 @@ export function characterCount( value ) {
  * Opciones de campo a partir de las reglas que publica el backend (epConfig.rules.<formulario>.<campo>).
  * Así el navegador y la API validan con las mismas constantes (SSOT).
  *
- * @param {{ required?: boolean, maxLength?: number, min?: number, max?: number }|undefined} rules Reglas del campo.
- * @returns {{ required: boolean, maxLength?: number, min?: number, max?: number }} Opciones para createField.
+ * @param {{ required?: boolean, minLength?: number, maxLength?: number, min?: number, max?: number }|undefined} rules Reglas del campo.
+ * @returns {{ required: boolean, minLength?: number, maxLength?: number, min?: number, max?: number }} Opciones para createField.
  */
 export function ruleOptions( rules = {} ) {
 	const options = { required: true === rules.required };
-	for ( const key of [ 'maxLength', 'min', 'max' ] ) {
+	for ( const key of [ 'minLength', 'maxLength', 'min', 'max' ] ) {
 		if ( Number.isInteger( rules[ key ] ) ) {
 			options[ key ] = rules[ key ];
 		}
@@ -85,9 +85,11 @@ export function createFieldError( readValue, show ) {
  * @typedef {Object} FieldOptions
  * @property {string} name Nombre del campo (clave en los datos y en los errores de la API).
  * @property {string} label Etiqueta visible.
- * @property {'text'|'textarea'|'number'|'date'|'url'} [type] Tipo de control.
+ * @property {'text'|'textarea'|'number'|'date'|'time'|'url'|'select'} [type] Tipo de control.
  * @property {boolean} [required] Obligatorio.
+ * @property {number} [minLength] Mínimo de caracteres, sin contar los espacios de los extremos.
  * @property {number} [maxLength] Máximo de caracteres (muestra contador).
+ * @property {Array<{ value: string|number, label: string }>} [options] Opciones (select). Se cambian con setOptions().
  * @property {number} [min] Mínimo (número).
  * @property {number} [max] Máximo (número).
  * @property {string} [hint] Texto de ayuda.
@@ -116,9 +118,9 @@ export function createFieldError( readValue, show ) {
  * Crea un campo de formulario.
  *
  * @param {FieldOptions} options Opciones.
- * @returns {FormField & { control: HTMLInputElement|HTMLTextAreaElement, setHint: (text: string) => void }} Campo.
+ * @returns {FormField & { control: HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement, setHint: (text: string) => void, setOptions: (options: Array<{ value: string|number, label: string }>) => void }} Campo.
  */
-export function createField( { name, label, type = 'text', required = false, maxLength, min, max, hint, placeholder = '', value = '', disabled = false, normalize, rule, onInput: onInputCallback } ) {
+export function createField( { name, label, type = 'text', required = false, minLength, maxLength, min, max, hint, placeholder = '', value = '', options = [], disabled = false, normalize, rule, onInput: onInputCallback } ) {
 	const id = uid( `ep-field-${ name }` );
 	const hintId = `${ id }-hint`;
 	const counterId = `${ id }-counter`;
@@ -128,23 +130,31 @@ export function createField( { name, label, type = 'text', required = false, max
 	const common = {
 		id,
 		name,
-		placeholder,
 		disabled,
 		attrs: { 'aria-describedby': describedBy, 'aria-required': required ? 'true' : null, 'aria-invalid': 'false' },
-		on: { input: onInput, blur: () => validate() },
+		on: { input: onInput, change: onInput, blur: () => validate() },
 	};
 
-	const control =
-		'textarea' === type
-			? h( 'textarea', { ...common, class: 'ep-input ep-textarea', rows: 4, ...( maxLength ? { maxLength } : {} ) } )
-			: h( 'input', {
-				...common,
-				type: [ 'number', 'date', 'url' ].includes( type ) ? type : 'text',
-				class: 'ep-input',
-				autocomplete: 'off',
-				...( 'number' === type ? { min: String( min ?? '' ), max: String( max ?? '' ), step: '1', inputMode: 'numeric' } : {} ),
-				...( maxLength ? { maxLength } : {} ),
-			} );
+	// La opción vacía de una lista: el campo queda sin elegir.
+	const emptyOption = () => h( 'option', { value: '', text: placeholder || __( 'Selecciona una opción', 'eventos-probolsas' ) } );
+	const toOption = ( option ) => h( 'option', { value: String( option.value ), text: option.label } );
+
+	let control;
+	if ( 'textarea' === type ) {
+		control = h( 'textarea', { ...common, placeholder, class: 'ep-input ep-textarea', rows: 4, ...( maxLength ? { maxLength } : {} ) } );
+	} else if ( 'select' === type ) {
+		control = h( 'select', { ...common, class: 'ep-select' }, emptyOption(), options.map( toOption ) );
+	} else {
+		control = h( 'input', {
+			...common,
+			placeholder,
+			type: [ 'number', 'date', 'time', 'url' ].includes( type ) ? type : 'text',
+			class: 'ep-input',
+			autocomplete: 'off',
+			...( 'number' === type ? { min: String( min ?? '' ), max: String( max ?? '' ), step: '1', inputMode: 'numeric' } : {} ),
+			...( maxLength ? { maxLength } : {} ),
+		} );
+	}
 
 	const counter = maxLength ? h( 'span', { class: 'ep-field__counter', id: counterId } ) : null;
 	const hintElement = undefined !== hint ? h( 'p', { class: 'ep-field__hint', id: hintId, text: hint } ) : null;
@@ -217,12 +227,21 @@ export function createField( { name, label, type = 'text', required = false, max
 		if ( required && '' === current ) {
 			/* translators: %s: nombre del campo. */
 			message = sprintf( __( 'El campo «%s» es obligatorio.', 'eventos-probolsas' ), label );
+		} else if ( minLength && '' !== current && characterCount( current ) < minLength ) {
+			/* translators: 1: nombre del campo, 2: número mínimo de caracteres. */
+			message = sprintf( __( 'El campo «%1$s» debe tener al menos %2$d caracteres.', 'eventos-probolsas' ), label, minLength );
 		} else if ( maxLength && characterCount( current ) > maxLength ) {
 			/* translators: 1: nombre del campo, 2: número máximo de caracteres. */
 			message = sprintf( __( 'El campo «%1$s» admite máximo %2$d caracteres.', 'eventos-probolsas' ), label, maxLength );
 		} else if ( 'number' === type && '' !== current && ! isIntegerInRange( current, min, max ) ) {
 			/* translators: 1: nombre del campo, 2: valor mínimo, 3: valor máximo. */
 			message = sprintf( __( 'El campo «%1$s» debe ser un número entre %2$d y %3$d.', 'eventos-probolsas' ), label, min, max );
+		} else if ( 'date' === type && '' !== current && ! isCalendarDate( current ) ) {
+			/* translators: %s: nombre del campo. */
+			message = sprintf( __( 'El campo «%s» debe ser una fecha válida.', 'eventos-probolsas' ), label );
+		} else if ( 'time' === type && '' !== current && ! /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test( current ) ) {
+			/* translators: %s: nombre del campo. */
+			message = sprintf( __( 'El campo «%s» debe ser una hora válida.', 'eventos-probolsas' ), label );
 		} else if ( rule && '' !== current ) {
 			message = rule( current );
 		}
@@ -245,7 +264,30 @@ export function createField( { name, label, type = 'text', required = false, max
 				hintElement.textContent = text;
 			}
 		},
+		/** Reemplaza las opciones de una lista y conserva la elegida si sigue existiendo. */
+		setOptions( newOptions ) {
+			const current = control.value;
+			control.replaceChildren( emptyOption(), ...newOptions.map( toOption ) );
+			control.value = current;
+		},
 	};
+}
+
+/**
+ * Indica si un texto es una fecha de calendario real `YYYY-MM-DD` (rechaza el 30 de febrero). No usa
+ * Date con la fecha como texto, que la interpreta en UTC (R-08).
+ *
+ * @param {string} value Texto.
+ * @returns {boolean} Si es válida.
+ */
+function isCalendarDate( value ) {
+	const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec( value );
+	if ( ! match ) {
+		return false;
+	}
+	const [ year, month, day ] = match.slice( 1 ).map( Number );
+	const days = new Date( Date.UTC( year, month, 0 ) ).getUTCDate();
+	return month >= 1 && month <= 12 && day >= 1 && day <= days;
 }
 
 /**

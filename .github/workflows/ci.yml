@@ -167,3 +167,38 @@ jobs:
       - name: Publicar los fallos como anotaciones
         if: failure()
         run: node tools/ci-annotate.mjs build/integration.xml build/integration.log
+
+  e2e:
+    name: Navegador (Playwright)
+    runs-on: ubuntu-24.04
+    needs: [ js ]
+    steps:
+      - uses: actions/checkout@v7
+
+      # Las dependencias @php-wasm de @wordpress/env piden Node 24 (QA-013).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Iniciar WordPress (wp-env)
+        run: npx wp-env start
+
+      # Pruebas de extremo a extremo en el sitio de desarrollo de wp-env (http://localhost:8888).
+      - name: Pruebas en el navegador
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Reporte de Playwright (fallos con captura y traza)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: build/playwright-report
+          retention-days: 7

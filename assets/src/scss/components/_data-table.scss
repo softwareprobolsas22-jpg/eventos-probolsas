@@ -4,6 +4,9 @@
 // Sin selección de texto (decisión del PO del 2026-10-06): arrastrar sobre la tabla la desplaza
 // (drag to scroll) en lugar de seleccionar celdas, y los clics no dejan texto resaltado.
 .ep-data-table {
+	// Contiene los elementos ocultos a la vista con posición absoluta (rango del pie, textos para
+	// lectores de pantalla): sin posición, escapan del recorte y ensanchan la página en móvil (QA-040).
+	position: relative;
 	overflow: hidden;
 	user-select: none;
 	background: var(--ep-color-surface);
@@ -12,6 +15,7 @@
 	box-shadow: var(--ep-shadow-sm);
 
 	&__scroll {
+		position: relative;
 		overflow-x: auto;
 		overscroll-behavior-x: contain;
 
@@ -155,6 +159,14 @@
 		}
 	}
 
+	// En móvil «Página x de y» reemplaza al rango (R-23, QA-029). Se oculta solo a la vista: sigue siendo
+	// la región aria-live que anuncia el cambio de página a los lectores de pantalla.
+	@include m.down(sm) {
+		&__range {
+			@include m.visually-hidden;
+		}
+	}
+
 	@include m.reduced-motion {
 		&__table tbody tr {
 			transition: none;
@@ -185,4 +197,11 @@
 	&.is-off {
 		color: var(--ep-color-text-muted);
 	}
+}
+
+// Tipo de adjunto en una celda (imagen o PDF): ícono con tooltip y nombre para lectores de pantalla.
+.ep-attachment-kind {
+	display: inline-flex;
+	font-size: var(--ep-font-size-lg);
+	color: var(--ep-color-primary);
 }

@@ -30,7 +30,9 @@ Backend (1 y 2) y Frontend (3) trabajan en paralelo: su único punto de contacto
 8. El badge de cada tipo es legible sobre cualquier color: el backend elige texto blanco o negro (`text_tone`) y con ese par todo color alcanza al menos 4,58:1 (R-02). Se descartó el aviso de contraste del formulario porque nunca se activaría.
 9. Todo con la paleta de la marca, responsive y con animaciones ligeras que respetan «reducir movimiento» (R-01, R-12, R-13).
 
-## Decisión pendiente del PO (en la Review)
+## Decisión del PO en la Review
+
+✅ **Aprobada** (2026-10-08, D-13): se mantienen los colores propuestos.
 
 Colores de los tipos iniciales. **Propuesta del SM** (todos con texto blanco legible, contraste ≥ 4,5:1, y distinguibles entre sí; el PO los puede cambiar desde la pantalla):
 

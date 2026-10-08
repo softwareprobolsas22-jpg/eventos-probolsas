@@ -1,0 +1,61 @@
+// Detalle de un evento (screens/event-detail.js): lista de datos y vista previa del adjunto.
+@use "../tools/mixins" as m;
+
+.ep-event-detail {
+	display: grid;
+	gap: var(--ep-space-4);
+}
+
+.ep-detail-list {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--ep-space-1) var(--ep-space-4);
+	margin: 0;
+
+	@include m.up(sm) {
+		grid-template-columns: 9rem minmax(0, 1fr);
+	}
+
+	dt {
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text-subtle);
+	}
+
+	dd {
+		margin: 0 0 var(--ep-space-3);
+		color: var(--ep-color-text);
+		overflow-wrap: anywhere;
+	}
+
+	// Respeta los saltos de línea que escribió quien creó el evento.
+	&__text {
+		white-space: pre-line;
+	}
+
+	&__empty {
+		color: var(--ep-color-text-muted);
+	}
+}
+
+.ep-detail-attachment {
+	display: grid;
+	gap: var(--ep-space-2);
+	margin: 0;
+
+	&__image {
+		max-width: 100%;
+		max-height: 16rem;
+		object-fit: contain;
+		background: var(--ep-color-surface-muted);
+		border: 1px solid var(--ep-color-border);
+		border-radius: var(--ep-radius-md);
+	}
+
+	&__caption {
+		display: grid;
+		gap: var(--ep-space-1);
+		min-width: 0;
+		font-size: var(--ep-font-size-sm);
+	}
+}

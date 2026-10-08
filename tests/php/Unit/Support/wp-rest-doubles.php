@@ -1,6 +1,6 @@
 <?php
 /**
- * Dobles mínimos de WP_Error y WP_REST_Response para las pruebas unitarias (sin WordPress).
+ * Dobles mínimos de WP_Error, WP_REST_Request y WP_REST_Response para las pruebas unitarias (sin WordPress).
  *
  * Reproducen solo la parte de la API pública que usa el plugin. Las pruebas de integración usan las
  * clases reales de WordPress, por eso estos dobles se cargan únicamente desde tests/php/Unit/bootstrap.php.
@@ -73,8 +73,16 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 		 * Crea la petición.
 		 *
 		 * @param array<string, mixed> $params Parámetros (ruta, consulta y cuerpo).
+		 * @param string               $route  Ruta pedida, por ejemplo `/eventos/v1/events/export.csv`.
 		 */
-		public function __construct( private array $params = [] ) {}
+		public function __construct( private array $params = [], private string $route = '' ) {}
+
+		/**
+		 * Ruta pedida.
+		 */
+		public function get_route(): string {
+			return $this->route;
+		}
 
 		/**
 		 * Todos los parámetros.
@@ -133,11 +141,18 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 	}
 }
 
+if ( ! class_exists( 'WP_HTTP_Response' ) ) {
+	/**
+	 * Doble de WP_HTTP_Response (base de WP_REST_Response en WordPress).
+	 */
+	class WP_HTTP_Response {}
+}
+
 if ( ! class_exists( 'WP_REST_Response' ) ) {
 	/**
 	 * Doble de WP_REST_Response.
 	 */
-	class WP_REST_Response {
+	class WP_REST_Response extends WP_HTTP_Response {
 
 		/**
 		 * Cabeceras de la respuesta.
