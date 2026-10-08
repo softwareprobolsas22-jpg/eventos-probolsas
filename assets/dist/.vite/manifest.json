@@ -1,7 +1,7 @@
 {
-  "_bootstrap-CUcyV1ZI.css": {
-    "file": "css/bootstrap-CUcyV1ZI.css",
-    "src": "_bootstrap-CUcyV1ZI.css"
+  "_bootstrap-B5KRnI0P.css": {
+    "file": "css/bootstrap-B5KRnI0P.css",
+    "src": "_bootstrap-B5KRnI0P.css"
   },
   "_date-edoDXXf3.js": {
     "file": "js/chunks/date-edoDXXf3.js",
@@ -39,7 +39,7 @@
     ],
     "css": [
       "css/admin.css",
-      "css/bootstrap-CUcyV1ZI.css"
+      "css/bootstrap-B5KRnI0P.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -56,7 +56,7 @@
     ],
     "css": [
       "css/public.css",
-      "css/bootstrap-CUcyV1ZI.css"
+      "css/bootstrap-B5KRnI0P.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -74,7 +74,7 @@
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-CkN7_HT4.js",
+    "file": "js/chunks/events-BhSpq6mK.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,

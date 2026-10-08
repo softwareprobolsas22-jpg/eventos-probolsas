@@ -11,6 +11,7 @@ vi.mock( '../../../assets/src/js/ui/toast.js', () => ( {
 
 const { toast } = await import( '../../../assets/src/js/ui/toast.js' );
 const { filterParams, mount } = await import( '../../../assets/src/js/screens/events.js' );
+const { formatFileSize } = await import( '../../../assets/src/js/screens/event-detail.js' );
 
 const config = {
 	restUrl: 'https://intranet.test/wp-json/eventos/v1/',
@@ -79,7 +80,26 @@ const buttonIn = ( container, text ) => [ ...container.querySelectorAll( 'button
 function fakeApi( events ) {
 	store = [ ...events ];
 	return {
-		get: vi.fn( async () => TYPES ),
+		get: vi.fn( async ( path ) => {
+			const match = /^events\/(\d+)$/.exec( path );
+			if ( ! match ) {
+				return TYPES;
+			}
+			const found = store.find( ( item ) => String( item.id ) === match[ 1 ] );
+			if ( ! found ) {
+				throw new ApiError( 'El evento no existe o fue eliminado.', { status: 404 } );
+			}
+			return {
+				is_past: false,
+				created_by: { id: 3, name: 'Talento Humano' },
+				updated_by: null,
+				created_at: '2026-10-01T08:30:00-05:00',
+				updated_at: '2026-10-02T15:45:00-05:00',
+				same_day: [],
+				...found,
+				description: found.description || 'Celebración en la sala de juntas.\nTraer torta.',
+			};
+		} ),
 		getPage: vi.fn( async ( path ) => {
 			const params = new URLSearchParams( path.split( '?' )[ 1 ] );
 			const page = Number( params.get( 'page' ) );
@@ -401,6 +421,66 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 		buttonIn( dialog(), 'Descartar' ).click();
 		await flush();
 		expect( drawer() ).toBeNull();
+	} );
+} );
+
+describe( 'pantalla Eventos: detalle (H-205)', () => {
+	const panel = () => document.querySelector( 'dialog.ep-drawer' );
+	const terms = () => [ ...panel().querySelectorAll( 'dt' ) ].map( ( dt ) => [ dt.textContent, dt.nextElementSibling.textContent ] );
+
+	it( 'muestra lo que no cabe en la tabla: descripción, adjunto y quién lo creó o modificó (§6.3)', async () => {
+		rows()[ 0 ].querySelector( 'button[aria-label="Ver detalle"]' ).click();
+		await flush();
+
+		expect( api.get ).toHaveBeenCalledWith( 'events/42', { silent: true } );
+		expect( panel().querySelector( '.ep-drawer__title' ).textContent ).toBe( 'Cumpleaños de Ana María' );
+		expect( terms() ).toEqual( [
+			[ 'Tipo', 'Cumpleaños' ],
+			[ 'Fecha', '07/10/2026' ],
+			[ 'Hora', '03:00 p. m.' ],
+			[ 'Descripción', 'Celebración en la sala de juntas.\nTraer torta.' ],
+			[ 'Adjunto', expect.stringContaining( 'ana.jpg' ) ],
+			[ 'Creado por', 'Talento Humano, el 01/10/2026 08:30 a. m.' ],
+			[ 'Modificado por', 'Usuario eliminado, el 02/10/2026 03:45 p. m.' ],
+		] );
+		expect( panel().querySelector( '.ep-detail-attachment__image' ).getAttribute( 'src' ) ).toBe( 'https://intranet.test/uploads/ana.jpg' );
+		expect( panel().querySelector( '.ep-notice' ) ).toBeNull();
+	} );
+
+	it( 'un evento sin hora, sin adjunto y pasado lo dice', async () => {
+		store[ 1 ] = { ...store[ 1 ], is_past: true };
+		rows()[ 1 ].querySelector( 'button[aria-label="Ver detalle"]' ).click();
+		await flush();
+
+		expect( terms() ).toContainEqual( [ 'Hora', 'Todo el día' ] );
+		expect( terms() ).toContainEqual( [ 'Adjunto', 'Sin adjunto' ] );
+		expect( panel().querySelector( '.ep-notice' ).textContent ).toBe( 'Este evento ya pasó.' );
+	} );
+
+	it( '«Editar» desde el detalle abre el formulario con el evento completo', async () => {
+		rows()[ 0 ].querySelector( 'button[aria-label="Ver detalle"]' ).click();
+		await flush();
+		buttonIn( panel(), 'Editar' ).click();
+
+		expect( panel().querySelector( '.ep-drawer__title' ).textContent ).toBe( 'Editar evento' );
+		expect( panel().querySelector( '[name="description"]' ).value ).toBe( 'Celebración en la sala de juntas.\nTraer torta.' );
+	} );
+
+	it( 'si el evento ya no existe, avisa, cierra el panel y recarga', async () => {
+		store = store.filter( ( item ) => 42 !== item.id );
+		const calls = api.getPage.mock.calls.length;
+		rows()[ 0 ].querySelector( 'button[aria-label="Ver detalle"]' ).click();
+		await flush();
+
+		expect( toast.error ).toHaveBeenCalledWith( 'El evento no existe o fue eliminado.' );
+		expect( panel() ).toBeNull();
+		expect( api.getPage.mock.calls.length ).toBe( calls + 1 );
+	} );
+
+	it( 'el tamaño del archivo se muestra en KB o MB con formato es-CO', () => {
+		expect( formatFileSize( 182044 ) ).toBe( '178 KB' );
+		expect( formatFileSize( 2516582 ) ).toBe( '2,4 MB' );
+		expect( formatFileSize( 10 ) ).toBe( '1 KB' );
 	} );
 } );
 
