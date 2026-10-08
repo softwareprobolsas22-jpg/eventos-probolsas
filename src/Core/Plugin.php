@@ -11,6 +11,7 @@ namespace Probolsas\Eventos\Core;
 
 use Probolsas\Eventos\Core\Lifecycle\Activator;
 use Probolsas\Eventos\Core\Lifecycle\Uninstaller;
+use Probolsas\Eventos\Domains\EventType\EventTypeServiceProvider;
 use Probolsas\Eventos\Shared\SharedServiceProvider;
 
 /**
@@ -58,10 +59,11 @@ final class Plugin {
 			static fn(): PluginContext => PluginContext::from_plugin_file( $plugin_file, self::VERSION )
 		);
 
-		// Los dominios (tipos de evento, eventos, medios, panel) se agregan aquí a medida que se construyen.
+		// Los dominios (eventos, medios, panel) se agregan aquí a medida que se construyen.
 		$this->providers = [
 			new CoreServiceProvider(),
 			new SharedServiceProvider(),
+			new EventTypeServiceProvider(),
 		];
 
 		foreach ( $this->providers as $provider ) {

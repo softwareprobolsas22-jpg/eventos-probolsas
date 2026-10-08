@@ -29,7 +29,7 @@ Catálogo gestionable de tipos (D-2): cada evento pertenece a un tipo, que defin
 | `name` | texto (≤ 100) | Único sin distinguir mayúsculas ni tildes |
 | `slug` | texto | Se genera al crear y **no cambia** al renombrar (lo usan los atributos de los shortcodes) |
 | `color` | `#RRGGBB` | Lo elige el usuario (excepción de R-01). Se guarda en mayúsculas |
-| `text_tone` | `light` \| `dark` | Calculado por el backend: el tono de texto con mejor contraste sobre `color` (R-02). La interfaz no lo recalcula |
+| `text_tone` | `light` \| `dark` | Calculado por el backend (`Shared/Ui/ColorContrast`): `light` = texto blanco `#FFFFFF`, `dark` = texto negro `#000000`, el de mejor contraste sobre `color`. Con ese par, **cualquier** color alcanza al menos 4,58:1, así que el badge siempre cumple AA (R-02) y no hace falta avisar. La interfaz usa este valor; para la vista previa del formulario aplica la misma fórmula (`core/color.js`, casos en `tests/fixtures/color-contrast.json`) |
 | `icon` | texto | Clave de `config/icons.php` (`fa-solid fa-<icon>`) |
 | `requires_attachment` | booleano | Si los eventos de este tipo exigen imagen o PDF |
 | `description` | texto (≤ 500) | Opcional |
@@ -92,7 +92,9 @@ Las publica el backend en `epConfig.rules.event_type` con la forma de la tabla s
 
 | Orden | Nombre | Ícono | Requiere adjunto | Color |
 |---|---|---|---|---|
-| 1 | Cumpleaños | `cake-candles` | Sí | A definir por el PO en la Review del Sprint 1 |
-| 2 | Capacitaciones | `graduation-cap` | Sí | ″ |
-| 3 | Reuniones especiales | `star` | Sí | ″ |
-| 4 | Reuniones laborales | `briefcase` | No | ″ |
+| 1 | Cumpleaños | `cake-candles` | Sí | `#9D174D` |
+| 2 | Capacitaciones | `graduation-cap` | Sí | `#155728` |
+| 3 | Reuniones especiales | `star` | Sí | `#B45309` |
+| 4 | Reuniones laborales | `briefcase` | No | `#1D4ED8` |
+
+Colores propuestos en el Planning del Sprint 1, pendientes de aprobación del PO en la Review; se pueden cambiar desde la pantalla. Todos llevan texto blanco con contraste ≥ 4,5:1.

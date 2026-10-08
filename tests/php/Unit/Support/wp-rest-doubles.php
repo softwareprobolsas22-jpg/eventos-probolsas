@@ -50,6 +50,89 @@ if ( ! class_exists( 'WP_Error' ) ) {
 	}
 }
 
+if ( ! class_exists( 'WP_REST_Server' ) ) {
+	/**
+	 * Doble de WP_REST_Server: solo las constantes de métodos.
+	 */
+	class WP_REST_Server {
+		public const READABLE  = 'GET';
+		public const CREATABLE = 'POST';
+		public const DELETABLE = 'DELETE';
+	}
+}
+
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+	/**
+	 * Doble de WP_REST_Request: parámetros de la ruta y del cuerpo, con acceso como arreglo.
+	 *
+	 * @implements ArrayAccess<string, mixed>
+	 */
+	class WP_REST_Request implements ArrayAccess {
+
+		/**
+		 * Crea la petición.
+		 *
+		 * @param array<string, mixed> $params Parámetros (ruta, consulta y cuerpo).
+		 */
+		public function __construct( private array $params = [] ) {}
+
+		/**
+		 * Todos los parámetros.
+		 *
+		 * @return array<string, mixed>
+		 */
+		public function get_params(): array {
+			return $this->params;
+		}
+
+		/**
+		 * Un parámetro.
+		 *
+		 * @param string $key Nombre.
+		 */
+		public function get_param( string $key ): mixed {
+			return $this->params[ $key ] ?? null;
+		}
+
+		/**
+		 * Indica si existe un parámetro.
+		 *
+		 * @param mixed $offset Nombre.
+		 */
+		public function offsetExists( mixed $offset ): bool {
+			return isset( $this->params[ $offset ] );
+		}
+
+		/**
+		 * Un parámetro.
+		 *
+		 * @param mixed $offset Nombre.
+		 */
+		public function offsetGet( mixed $offset ): mixed {
+			return $this->params[ $offset ] ?? null;
+		}
+
+		/**
+		 * Cambia un parámetro.
+		 *
+		 * @param mixed $offset Nombre.
+		 * @param mixed $value  Valor.
+		 */
+		public function offsetSet( mixed $offset, mixed $value ): void {
+			$this->params[ (string) $offset ] = $value;
+		}
+
+		/**
+		 * Quita un parámetro.
+		 *
+		 * @param mixed $offset Nombre.
+		 */
+		public function offsetUnset( mixed $offset ): void {
+			unset( $this->params[ $offset ] );
+		}
+	}
+}
+
 if ( ! class_exists( 'WP_REST_Response' ) ) {
 	/**
 	 * Doble de WP_REST_Response.

@@ -1,0 +1,68 @@
+{
+    "description": "Casos compartidos por ColorContrastTest (PHP) y color.test.js (JS). tone: light = texto blanco (#FFFFFF), dark = texto negro (#000000). Con esos dos tonos cualquier fondo alcanza al menos 4,58:1 (peor caso: un gris medio), así que el badge de un tipo siempre cumple AA (R-02).",
+    "minimum_best_ratio": 4.5,
+    "cases": [
+        {
+            "case": "verde de la marca",
+            "color": "#155728",
+            "tone": "light",
+            "best_ratio": 8.66
+        },
+        {
+            "case": "verde secundario: el texto blanco no cumple AA",
+            "color": "#669F30",
+            "tone": "dark",
+            "best_ratio": 6.57
+        },
+        {
+            "case": "blanco",
+            "color": "#FFFFFF",
+            "tone": "dark",
+            "best_ratio": 21
+        },
+        {
+            "case": "negro",
+            "color": "#000000",
+            "tone": "light",
+            "best_ratio": 21
+        },
+        {
+            "case": "Cumpleaños (propuesta)",
+            "color": "#9D174D",
+            "tone": "light",
+            "best_ratio": 7.88
+        },
+        {
+            "case": "Reuniones especiales (propuesta)",
+            "color": "#B45309",
+            "tone": "light",
+            "best_ratio": 5.02
+        },
+        {
+            "case": "Reuniones laborales (propuesta)",
+            "color": "#1D4ED8",
+            "tone": "light",
+            "best_ratio": 6.7
+        },
+        {
+            "case": "amarillo pastel del legado",
+            "color": "#FFE082",
+            "tone": "dark",
+            "best_ratio": 16.24
+        },
+        {
+            "case": "gris medio: el peor caso posible",
+            "color": "#757575",
+            "tone": "light",
+            "best_ratio": 4.61
+        }
+    ],
+    "invalid": [
+        "",
+        "155728",
+        "#15572",
+        "#GGGGGG",
+        "#1557280",
+        "red"
+    ]
+}

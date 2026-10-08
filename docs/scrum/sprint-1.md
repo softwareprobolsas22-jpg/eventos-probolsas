@@ -13,7 +13,7 @@ Al terminar el sprint, un administrador entra a **wp-admin → Eventos → Tipos
 | 1 | **H-102** Migraciones y semilla (B, 3) | `feature/H-101-H-102-tipos-backend` | Migración 1: tabla `eventos_event_types` · Migración 2: semilla de los 4 tipos con el servicio (mismas reglas que el usuario) · `LifecycleTest` vuelve a verificar que la activación crea las tablas (pendiente desde H-002) | — |
 | 2 | **H-101** Dominio y API de tipos (B, 8) | (misma rama) | `EventType`, `EventTypeRepository`, `EventTypeService` (unicidad por nombre normalizado, slug fijo, color en mayúsculas, ícono del catálogo, `text_tone` calculado con WCAG, conflicto al eliminar con eventos) · `WpdbEventTypeRepository` · `EventTypeRestController` según [`docs/api/event-types.md`](../api/event-types.md) · reglas publicadas en `epConfig.rules.event_type` · pantalla `EventTypesPage` · el menú de administración usa la primera pantalla como raíz mientras no exista la de eventos | H-102 |
 | 3 | **H-103** Sistema de diseño (F, 8) | `feature/H-103-sistema-diseno` | Port del kit de SGP con prefijo `ep-`: `core/dom`, `core/api`, `core/color`, `core/pagination`, `core/search`; `ui/` button, badge (con `text_tone`), toast (Notyf), tooltip (Tippy), confirm-dialog, drawer, form (validación en tiempo real R-24 a partir de `epConfig.rules`), color-field, icon-picker, data-table (Acciones primero, fija, `th` centrados, truncado con tooltip, drag to scroll), pagination responsive 25/50/100 (R-23), load-state, empty-state · estilos de cada componente | Contrato (ya aprobado) |
-| 4 | **H-104** Pantalla «Tipos de evento» (F, 5) | `feature/H-104-pantalla-tipos` | Tabla de 5 columnas (Acciones, Tipo, Requiere adjunto, Eventos, Orden) · formulario en drawer · reordenar · eliminar con confirmación · toasts en cada acción · aviso de contraste del color | H-101, H-103 |
+| 4 | **H-104** Pantalla «Tipos de evento» (F, 5) | `feature/H-104-pantalla-tipos` | Tabla de 5 columnas (Acciones, Tipo, Requiere adjunto, Eventos, Orden) · formulario en drawer · reordenar · eliminar con confirmación · toasts en cada acción · vista previa del badge con el tono legible (`text_tone`) | H-101, H-103 |
 | 5 | **H-105** Pruebas de tipos (Q, 3) | revisión de QA de cada rama | Integración de la API (unicidad, 409 al eliminar con eventos, permisos 401/403, reordenar) · componentes · exploratorio en 360/768/1024/1440 px, teclado y lector | H-101 a H-104 |
 
 Backend (1 y 2) y Frontend (3) trabajan en paralelo: su único punto de contacto es el contrato ya aprobado.
@@ -22,12 +22,12 @@ Backend (1 y 2) y Frontend (3) trabajan en paralelo: su único punto de contacto
 
 1. Al activar el plugin en un WordPress limpio se crean las tablas y los 4 tipos iniciales (RL-05).
 2. Un administrador gestiona los tipos; un editor sin `eventos_manage` no ve el menú y la API le responde 403; un visitante recibe 401 (R-22).
-3. No se puede crear un tipo con un nombre repetido, aunque cambien las mayúsculas o las tildes («cumpleaños» = «Cumpleaños» = «CUMPLEANOS»).
+3. No se puede crear un tipo con un nombre repetido, aunque cambien las mayúsculas o las tildes («Capacitación» = «CAPACITACION», «Cumpleaños» = «CUMPLEAÑOS»). La ñ es una letra propia, como en el resto de la intranet: «Cumpleanos» sería otro nombre.
 4. No se puede eliminar un tipo que tenga eventos (409); el mensaje dice cuántos.
 5. Los campos obligatorios se validan mientras se escribe y el servidor confirma con las mismas reglas (R-24).
 6. Cada acción muestra un toast (R-20); los botones de solo ícono tienen tooltip y nombre accesible (R-21).
 7. La tabla tiene Acciones como primera columna fija, `th` centrados, arrastre para desplazar y paginación 25/50/100 (R-04, R-05, R-06, R-19, R-23).
-8. El badge de cada tipo es legible sobre su color; si el color elegido no permite contraste AA con ningún tono de texto, el formulario lo avisa (R-02).
+8. El badge de cada tipo es legible sobre cualquier color: el backend elige texto blanco o negro (`text_tone`) y con ese par todo color alcanza al menos 4,58:1 (R-02). Se descartó el aviso de contraste del formulario porque nunca se activaría.
 9. Todo con la paleta de la marca, responsive y con animaciones ligeras que respetan «reducir movimiento» (R-01, R-12, R-13).
 
 ## Decisión pendiente del PO (en la Review)

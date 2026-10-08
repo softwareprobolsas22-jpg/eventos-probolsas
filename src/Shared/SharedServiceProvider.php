@@ -17,6 +17,7 @@ use Probolsas\Eventos\Shared\Text\TextNormalizer;
 use Probolsas\Eventos\Shared\Time\Clock;
 use Probolsas\Eventos\Shared\Time\DateFormatter;
 use Probolsas\Eventos\Shared\Time\SystemClock;
+use Probolsas\Eventos\Shared\Ui\ColorContrast;
 use Probolsas\Eventos\Shared\Ui\IconCatalog;
 
 /**
@@ -45,5 +46,7 @@ final class SharedServiceProvider implements ServiceProvider {
 		);
 
 		$container->set( IconCatalog::class, static fn( Container $c ): IconCatalog => new IconCatalog( $c->get( Config::class ) ) );
+
+		$container->set( ColorContrast::class, static fn(): ColorContrast => new ColorContrast() );
 	}
 }

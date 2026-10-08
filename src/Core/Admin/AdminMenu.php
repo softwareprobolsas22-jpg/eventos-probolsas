@@ -55,7 +55,8 @@ final class AdminMenu {
 	}
 
 	/**
-	 * Registra el menú principal (con la pantalla `ROOT_SLUG`) y un submenú por pantalla.
+	 * Registra el menú principal y un submenú por pantalla. La pantalla principal es la de `ROOT_SLUG`; mientras
+	 * esa pantalla no exista (por ejemplo, antes de construir la de eventos), lo es la primera por posición.
 	 */
 	public function add_pages(): void {
 		$root = $this->find_root_page();
@@ -68,7 +69,7 @@ final class AdminMenu {
 			$root->page_title(),
 			__( 'Eventos', 'eventos-probolsas' ),
 			$root->capability(),
-			self::ROOT_SLUG,
+			$root->slug(),
 			[ $root, 'render' ],
 			self::MENU_ICON,
 			self::MENU_POSITION
@@ -76,7 +77,7 @@ final class AdminMenu {
 
 		foreach ( $this->sorted_pages() as $page ) {
 			$hook_suffix = add_submenu_page(
-				self::ROOT_SLUG,
+				$root->slug(),
 				$page->page_title(),
 				$page->menu_title(),
 				$page->capability(),
@@ -109,7 +110,7 @@ final class AdminMenu {
 	}
 
 	/**
-	 * Pantalla principal del menú.
+	 * Pantalla principal del menú: la de `ROOT_SLUG` o, si no existe, la primera por posición.
 	 */
 	private function find_root_page(): ?AdminPage {
 		foreach ( $this->pages as $page ) {
@@ -118,7 +119,7 @@ final class AdminMenu {
 			}
 		}
 
-		return null;
+		return $this->sorted_pages()[0] ?? null;
 	}
 
 	/**
