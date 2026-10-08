@@ -371,7 +371,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
 | H-201 | Dominio y API de eventos: `EventSchedule` preparado para D-7, validación única publicada en `epConfig.rules`, búsqueda/filtros/conteo compartidos, consulta por solapamiento de rango, paginación, export CSV | B | 8 |
-| H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos | B | 3 |
+| H-202 | Gateway de Medios: valida imagen/PDF, entrega URL, miniatura y tipo; nunca borra archivos  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-202.md)); integrada en `develop`* | B | 3 |
 | H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar | F | 8 |
 | H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla) | F | 3 |
