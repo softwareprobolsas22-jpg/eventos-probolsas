@@ -46,6 +46,13 @@ describe( 'reglas transversales en el CSS compilado', () => {
 		expect( mobile[ 1 ] ).toContain( '.ep-app .ep-pagination [data-ep-page-edge]{display:none}' );
 		expect( mobile[ 1 ] ).toContain( '.ep-app .ep-pagination .ep-icon-button{width:var(--ep-touch-target);height:var(--ep-touch-target)}' );
 		expect( source ).toContain( '--ep-touch-target:2.75rem' );
+
+		// «Mostrando x–y de z» se oculta a la vista, no a los lectores de pantalla (QA-029).
+		const range = /@media not \(min-width:576px\)\{\.ep-app \.ep-data-table__range\{([^}]*)\}/.exec( source );
+		expect( range ).not.toBeNull();
+		expect( range[ 1 ] ).toContain( 'position:absolute' );
+		expect( range[ 1 ] ).toContain( 'clip-path:inset(50%)' );
+		expect( range[ 1 ] ).not.toContain( 'display:none' );
 	} );
 
 	it( 'Bootstrap también deja los textarea sin redimensionar y los th centrados (no depende del orden de carga)', () => {
