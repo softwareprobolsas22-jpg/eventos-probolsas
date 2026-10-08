@@ -173,4 +173,15 @@ describe( 'createApi().upload', () => {
 		expect( notify ).toHaveBeenCalledWith( 'error', 'Ocurrió un error inesperado. Inténtalo de nuevo.' );
 		vi.unstubAllGlobals();
 	} );
+
+	it( 'getPage devuelve los registros y los totales de las cabeceras X-WP-Total y X-WP-TotalPages', async () => {
+		const headers = { get: ( name ) => ( { 'X-WP-Total': '76', 'X-WP-TotalPages': '4' } )[ name ] ?? null };
+		const fetch = vi.fn( async () => ( { ok: true, status: 200, headers, json: async () => ( { data: [ { id: 1 } ] } ) } ) );
+
+		await expect( createApi( config, { fetch } ).getPage( 'events?page=2' ) ).resolves.toEqual( { items: [ { id: 1 } ], total: 76, totalPages: 4 } );
+
+		const empty = vi.fn( async () => ( { ok: true, status: 200, json: async () => ( { data: null } ) } ) );
+		await expect( createApi( config, { fetch: empty } ).getPage( 'events' ) ).resolves.toEqual( { items: [], total: 0, totalPages: 0 } );
+	} );
 } );
+

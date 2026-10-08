@@ -135,3 +135,87 @@ describe( 'createDataTable', () => {
 		expect( container.querySelector( 'tbody img, tbody b' ) ).toBeNull();
 	} );
 } );
+
+describe( 'createDataTable en modo servidor (H-203)', () => {
+	/**
+	 * Tabla que pide sus páginas al «servidor» simulado.
+	 *
+	 * @returns {{ table: ReturnType<typeof createDataTable>, requests: Array<{ page: number, pageSize: number }> }} Tabla y pedidos.
+	 */
+	function serverTable() {
+		const requests = [];
+		const table = createDataTable( container, {
+			caption: 'Eventos',
+			pageSizes: [ 25, 50, 100 ],
+			pageSize: 25,
+			columns: [ { key: 'name', label: 'Nombre' } ],
+			server: { onChange: ( request ) => requests.push( request ) },
+		} );
+		return { table, requests };
+	}
+
+	const page = ( from, count ) => Array.from( { length: count }, ( _, index ) => ( { id: from + index, name: `Evento ${ from + index }` } ) );
+
+	it( 'muestra las filas recibidas tal cual, con el total del servidor', () => {
+		const { table, requests } = serverTable();
+		table.refresh();
+		expect( requests ).toEqual( [ { page: 1, pageSize: 25 } ] );
+		expect( container.querySelector( 'table' ).getAttribute( 'aria-busy' ) ).toBe( 'true' );
+
+		table.setServerData( { rows: page( 1, 25 ), total: 76 } );
+
+		expect( bodyRows() ).toHaveLength( 25 );
+		expect( range() ).toBe( 'Mostrando 1–25 de 76' );
+		expect( container.querySelector( '.ep-pagination__compact' ).textContent ).toBe( 'Página 1 de 4' );
+	} );
+
+	it( 'navegar o cambiar el tamaño pide la página al servidor', () => {
+		const { table, requests } = serverTable();
+		table.setServerData( { rows: page( 1, 25 ), total: 76 } );
+
+		container.querySelector( '[aria-label="Página siguiente"]' ).click();
+		expect( requests.at( -1 ) ).toEqual( { page: 2, pageSize: 25 } );
+		table.setServerData( { rows: page( 26, 25 ), total: 76 } );
+		expect( range() ).toBe( 'Mostrando 26–50 de 76' );
+
+		const select = container.querySelector( 'select' );
+		select.value = '50';
+		select.dispatchEvent( new Event( 'change' ) );
+		expect( requests.at( -1 ) ).toEqual( { page: 1, pageSize: 50 } );
+		expect( table.getQuery() ).toEqual( { page: 1, pageSize: 50 } );
+	} );
+
+	it( 'si la página ya no existe (se eliminó el último registro), pide la última', () => {
+		const { table, requests } = serverTable();
+		table.setServerData( { rows: page( 1, 25 ), total: 51 } );
+		container.querySelector( '[aria-label="Última página"]' ).click();
+		expect( requests.at( -1 ) ).toEqual( { page: 3, pageSize: 25 } );
+
+		table.setServerData( { rows: [], total: 50 } );
+
+		expect( requests.at( -1 ) ).toEqual( { page: 2, pageSize: 25 } );
+	} );
+
+	it( 'refresh con firstPage vuelve a la primera (filtros nuevos)', () => {
+		const { table, requests } = serverTable();
+		table.setServerData( { rows: page( 1, 25 ), total: 76 } );
+		container.querySelector( '[aria-label="Página siguiente"]' ).click();
+
+		table.refresh( { firstPage: true } );
+
+		expect( requests.at( -1 ) ).toEqual( { page: 1, pageSize: 25 } );
+	} );
+
+	it( 'distingue «sin registros» de «sin resultados» según los filtros activos', () => {
+		const { table } = serverTable();
+
+		table.setServerData( { rows: [], total: 0 } );
+		expect( container.querySelector( '.ep-empty-state__title' ).textContent ).toBe( 'Todavía no hay registros' );
+
+		table.setServerData( { rows: [], total: 0, filtered: true } );
+		expect( container.querySelector( '.ep-empty-state__title' ).textContent ).toBe( 'Ningún registro coincide con los filtros' );
+		expect( container.querySelector( '.ep-data-table__footer' ).hidden ).toBe( true );
+		expect( table.getVisibleRows() ).toEqual( [] );
+	} );
+} );
+

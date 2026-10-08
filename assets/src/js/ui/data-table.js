@@ -3,8 +3,10 @@
  *
  * - La columna de acciones es la primera y queda fija al desplazarse en horizontal.
  * - Acciones como íconos con tooltip y nombre accesible.
- * - Paginación local: 25 por defecto y selector 25/50/100 (valores de epConfig.ui); en móvil,
- *   anterior / «Página x de y» / siguiente con botones de 44 px (R-23).
+ * - Paginación 25 por defecto y selector 25/50/100 (valores de epConfig.ui); en móvil, anterior /
+ *   «Página x de y» / siguiente con botones de 44 px (R-23). Dos modos con el mismo componente:
+ *   en el cliente (setRows, setFilter) o en el servidor (`server.onChange` pide la página y la pantalla
+ *   la entrega con setServerData).
  * - Drag to scroll con mouse; desplazamiento nativo en pantallas táctiles.
  * - Textos largos truncados con «…» y tooltip con el texto completo.
  * - Estados de carga (skeleton), sin registros y sin resultados para los filtros.
@@ -41,11 +43,17 @@ import { enableDragScroll } from './drag-scroll.js';
  */
 
 /**
+ * @typedef {Object} ServerPaging
+ * @property {(request: { page: number, pageSize: number }) => void} onChange Pide una página al servidor;
+ *   la pantalla responde con setServerData().
+ */
+
+/**
  * Crea la tabla.
  *
  * @param {HTMLElement} container Contenedor.
- * @param {{ caption: string, columns: Column[], actions?: (row: Object) => RowAction[], rowKey?: string, pageSizes: number[], pageSize: number, emptyState?: EmptyState, noResultsState?: EmptyState, skeletonRows?: number }} options Opciones.
- * @returns {{ element: HTMLElement, setRows: (rows: Object[]) => void, setFilter: (predicate: ((row: Object) => boolean)|null) => void, setLoading: (loading: boolean) => void, getVisibleRows: () => Object[], destroy: () => void }} API.
+ * @param {{ caption: string, columns: Column[], actions?: (row: Object) => RowAction[], rowKey?: string, pageSizes: number[], pageSize: number, emptyState?: EmptyState, noResultsState?: EmptyState, skeletonRows?: number, server?: ServerPaging }} options Opciones.
+ * @returns {{ element: HTMLElement, setRows: (rows: Object[]) => void, setFilter: (predicate: ((row: Object) => boolean)|null) => void, setServerData: (data: { rows: Object[], total: number, filtered?: boolean }) => void, refresh: (options?: { firstPage?: boolean }) => void, getQuery: () => { page: number, pageSize: number }, setLoading: (loading: boolean) => void, getVisibleRows: () => Object[], destroy: () => void }} API.
  */
 export function createDataTable( container, options ) {
 	const {
@@ -66,6 +74,7 @@ export function createDataTable( container, options ) {
 			message: __( 'Prueba con otras palabras o limpia los filtros.', 'eventos-probolsas' ),
 		},
 		skeletonRows = 5,
+		server = null,
 	} = options;
 
 	const state = {
@@ -75,6 +84,9 @@ export function createDataTable( container, options ) {
 		page: 1,
 		pageSize: initialPageSize,
 		loading: false,
+		// Modo servidor: total de registros y si la respuesta corresponde a filtros activos.
+		total: 0,
+		hasFilters: false,
 	};
 
 	const columnCount = columns.length + ( actions ? 1 : 0 );
@@ -146,10 +158,11 @@ export function createDataTable( container, options ) {
 			return;
 		}
 
-		const page = paginate( state.filtered.length, state.page, state.pageSize );
+		const page = paginate( server ? state.total : state.filtered.length, state.page, state.pageSize );
 		state.page = page.page;
 
-		tbody.replaceChildren( ...state.filtered.slice( page.startIndex, page.endIndex ).map( renderRow ) );
+		const visible = server ? state.rows : state.filtered.slice( page.startIndex, page.endIndex );
+		tbody.replaceChildren( ...visible.map( renderRow ) );
 		renderState();
 		renderFooter( page );
 	}
@@ -195,8 +208,8 @@ export function createDataTable( container, options ) {
 	}
 
 	function renderState() {
-		const isEmpty = 0 === state.rows.length;
-		const noResults = ! isEmpty && 0 === state.filtered.length;
+		const isEmpty = server ? 0 === state.total && ! state.hasFilters : 0 === state.rows.length;
+		const noResults = server ? 0 === state.total && state.hasFilters : ! isEmpty && 0 === state.filtered.length;
 		scroll.hidden = isEmpty || noResults;
 
 		if ( ! isEmpty && ! noResults ) {
@@ -217,7 +230,7 @@ export function createDataTable( container, options ) {
 	}
 
 	function renderFooter( page ) {
-		footer.hidden = 0 === state.filtered.length;
+		footer.hidden = 0 === page.total;
 		/* translators: 1: primer registro visible, 2: último registro visible, 3: total de registros. */
 		range.textContent = sprintf( __( 'Mostrando %1$d–%2$d de %3$d', 'eventos-probolsas' ), page.from, page.to, page.total );
 
@@ -262,14 +275,25 @@ export function createDataTable( container, options ) {
 
 	function setPage( page ) {
 		state.page = page;
-		render();
 		scroll.scrollTop = 0;
+		requestOrRender();
 	}
 
 	function setPageSize( size ) {
 		state.pageSize = size;
 		state.page = 1;
+		requestOrRender();
+	}
+
+	/** En modo servidor pide la página (con el skeleton mientras llega); en el cliente, la muestra. */
+	function requestOrRender() {
+		if ( ! server ) {
+			render();
+			return;
+		}
+		state.loading = true;
 		render();
+		server.onChange( { page: state.page, pageSize: state.pageSize } );
 	}
 
 	return {
@@ -292,7 +316,33 @@ export function createDataTable( container, options ) {
 			state.loading = Boolean( loading );
 			render();
 		},
-		getVisibleRows: () => [ ...state.filtered ],
+		/**
+		 * Modo servidor: muestra la página recibida. Si la página pedida ya no existe (por ejemplo, después
+		 * de eliminar el último registro de la última página), pide la última que sí existe.
+		 */
+		setServerData( { rows, total, filtered = false } ) {
+			state.rows = Array.isArray( rows ) ? rows : [];
+			state.total = Math.max( 0, Number( total ) || 0 );
+			state.hasFilters = filtered;
+			state.loading = false;
+
+			const pageCount = Math.max( 1, Math.ceil( state.total / state.pageSize ) );
+			if ( 0 === state.rows.length && state.total > 0 && state.page > pageCount ) {
+				state.page = pageCount;
+				requestOrRender();
+				return;
+			}
+			render();
+		},
+		/** Modo servidor: vuelve a pedir la página actual o, si cambiaron los filtros, la primera. */
+		refresh( { firstPage = false } = {} ) {
+			if ( firstPage ) {
+				state.page = 1;
+			}
+			requestOrRender();
+		},
+		getQuery: () => ( { page: state.page, pageSize: state.pageSize } ),
+		getVisibleRows: () => ( server ? [ ...state.rows ] : [ ...state.filtered ] ),
 		destroy() {
 			disableDragScroll();
 			element.remove();

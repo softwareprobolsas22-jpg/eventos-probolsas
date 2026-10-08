@@ -194,3 +194,10 @@
 		color: var(--ep-color-text-muted);
 	}
 }
+
+// Tipo de adjunto en una celda (imagen o PDF): ícono con tooltip y nombre para lectores de pantalla.
+.ep-attachment-kind {
+	display: inline-flex;
+	font-size: var(--ep-font-size-lg);
+	color: var(--ep-color-primary);
+}

@@ -18,6 +18,12 @@ const ENTRIES = {
 
 const ENTRY_STYLES = new Set( Object.keys( ENTRIES ).map( ( entry ) => `${ entry }.css` ) );
 
+/**
+ * Módulos que importan las entradas (pages/*.js) y también las pantallas: forman el chunk `runtime`
+ * (ver codeSplitting). tests/js/build/chunks.test.js verifica que ningún chunk importe una entrada.
+ */
+const ENTRY_RUNTIME = /[\\/](assets[\\/]src[\\/]js[\\/](core[\\/](config|dom|i18n|timing)|ui[\\/](toast|tooltip))\.js$|node_modules[\\/](notyf|tippy\.js|@popperjs)[\\/])/;
+
 const FONT_FILE = /\.(woff2?|ttf|otf|eot)$/;
 
 /**
@@ -186,6 +192,14 @@ export default defineConfig( ( { mode } ) => {
 					entryFileNames: 'js/[name].js',
 					chunkFileNames: 'js/chunks/[name]-[hash].js',
 					assetFileNames: assetFileName,
+					// Lo que usan a la vez las entradas y las pantallas (toasts, tooltips, i18n, DOM y sus librerías)
+					// va a su propio chunk. Sin esto, Rolldown lo deja dentro de la entrada y las pantallas importan
+					// `../admin.js`: WordPress encola la entrada con `?ver=…`, así que el navegador la cargaría dos
+					// veces (tooltips y pantalla montados dos veces). El resto del kit se reparte entre los chunks de
+					// cada pantalla y solo se descarga al abrirla (R-17).
+					codeSplitting: {
+						groups: [ { name: 'runtime', test: ENTRY_RUNTIME } ],
+					},
 				},
 			},
 		},
