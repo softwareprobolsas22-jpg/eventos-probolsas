@@ -375,7 +375,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar | F | 8 |
 | H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla) | F | 3 |
-| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo) | B+F | 5 |
+| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
 | H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación | Q | 5 |
 
 ### EP-3 · Calendario para colaboradores
@@ -409,11 +409,11 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 |---|---|---|---|
 | **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
-| **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
+| **2** | «El gestor administra eventos sin errores» — 🚧 en curso ([plan](sprint-2.md)) | H-201 … H-205, H-207 (H-205 de reserva) | 35 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
-| **4** | «Listo para producción» | H-401 … H-404 | 11 |
+| **4** | «Listo para producción» | H-401 … H-404, H-206 | 16 |
 
-El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la velocidad del Sprint 1 no lo respalda, H-206 (dashboard) pasa al Sprint 4.
+Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Sprint 4 (Review del Sprint 1, 2026-10-08).
 
 ---
 
@@ -453,3 +453,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.16 | 2026-10-08 | H-105 aprobada: pruebas de aceptación en WordPress real; QA-032 (la ñ se trataba como n por el collation) corregido con collation binaria en `name_key` |
 | 2.17 | 2026-10-08 | Cierre del Sprint 1 (27/27 puntos, [informe](../qa/2026-10-08-cierre-sprint-1.md)); pendiente en la Review: colores de los tipos iniciales y QA-029 |
 | 2.18 | 2026-10-08 | Review del Sprint 1 (PR #2 fusionado en `main`): D-13 colores de la semilla aprobados; D-14 producción al terminar v1. Ajustes antes del Sprint 2: QA-033 (CSS inicial 44,9 → 30,9 KB) y QA-029 (rango oculto en móvil) |
+| 2.19 | 2026-10-08 | Planning del Sprint 2 ([plan](sprint-2.md)): H-206 al Sprint 4; H-205 de reserva |
