@@ -193,7 +193,7 @@ eventos-probolsas/
 | Columna | Tipo | Regla |
 |---|---|---|
 | `id` | bigint unsigned PK | |
-| `name` / `name_key` | varchar(100) | obligatorio, único sin distinguir mayúsculas ni tildes |
+| `name` / `name_key` | varchar(100) | obligatorio, único sin distinguir mayúsculas ni tildes; la ñ es letra propia (`name_key` normalizado con collation binaria, QA-032) |
 | `slug` | varchar(100) único | generado al crear, no cambia al renombrar |
 | `color` | char(7) | `#RRGGBB` obligatorio (con colores sugeridos derivados de la paleta) |
 | `icon` | varchar(64) | clave de `config/icons.php` |
@@ -288,7 +288,7 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 | ID | Regla | Cómo se verifica |
 |---|---|---|
 | **R-01** | Paleta de la interfaz: `#155728` (primario), `#669F30` (secundario), `#FFFFFF`; neutros con matiz verde y estados como en `tokens/_colors.scss` de SGP. Ningún hex fuera de `assets/src/scss/tokens/`. **Excepción:** el color de cada tipo de evento es un dato que elige el usuario (D-2). | Stylelint `color-no-hex` |
-| **R-02** | Contraste AA: `#669F30` solo para acentos, bordes, íconos, foco y texto ≥ 18,66 px en negrita. En badges y eventos con el color del tipo, el texto se calcula automáticamente (blanco u oscuro) para lograr ≥ 4,5:1; el formulario de tipos avisa si el color elegido no lo permite. | `tests/js/a11y/contrast.test.js` + axe-core |
+| **R-02** | Contraste AA: `#669F30` solo para acentos, bordes, íconos, foco y texto ≥ 18,66 px en negrita. En badges y eventos con el color del tipo, el texto es blanco o negro según `text_tone` (lo calcula el backend): con ese par cualquier color alcanza al menos 4,58:1. | `tests/js/a11y/contrast.test.js`, `ColorContrastTest.php` + axe-core |
 | **R-03** | `textarea { resize: none; }` en todo el plugin. | Stylelint + prueba de componente |
 | **R-04** | Las tablas se desplazan arrastrando con el mouse (*drag to scroll*): umbral de 5 px, cancela el clic tras arrastrar, no actúa sobre campos. En pantallas táctiles se usa el desplazamiento nativo. | `drag-scroll.test.js` |
 | **R-05** | `th` con texto centrado. | Prueba de componente `data-table` |
@@ -359,11 +359,11 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-1 · Tipos de evento (gestionables, D-2)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador | B | 8 |
-| H-102 | Migraciones de tablas y semilla con los 4 tipos actuales | B | 3 |
-| H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando | F | 8 |
-| H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24) | F | 5 |
-| H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos | Q | 3 |
+| H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 8 |
+| H-102 | Migraciones de tablas y semilla con los 4 tipos actuales  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 3 |
+| H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando  — *✅ aprobada por QA en la segunda revisión ([informe](../qa/2026-10-08-H-103.md)); integrada en `develop`* | F | 8 |
+| H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24)  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-104.md)); integrada en `develop`* | F | 5 |
+| H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-105.md)); detectó QA-032 (la ñ), corregido; integrada en `develop`* | Q | 3 |
 
 ### EP-2 · Gestión de eventos (wp-admin)
 | ID | Historia | Rama | Pts |
@@ -406,7 +406,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | Sprint | Meta | Historias | Pts |
 |---|---|---|---|
 | **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
-| **1** | «Los tipos de evento se gestionan y la UI tiene identidad» | H-101 … H-105 | 27 |
+| **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
 | **4** | «Listo para producción» | H-401 … H-404 | 11 |
@@ -445,3 +445,8 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.10 | 2026-10-07 | Flujo: las historias aprobadas por QA se integran en `develop` sin PR; un único PR `develop` → `main` por fase |
 | 2.11 | 2026-10-07 | H-001, H-005, H-006 y H-007 aprobadas por QA e integradas; CI con integración en WordPress real en verde |
 | 2.12 | 2026-10-07 | Cierre del Sprint 0 (23/23 puntos, [informe](../qa/2026-10-07-cierre-sprint-0.md)). Decisión del PO: pruebas de integración solo en el CI (QA-020) |
+| 2.13 | 2026-10-07 | Planning del Sprint 1 ([plan](sprint-1.md)); propuesta de colores de los tipos iniciales para la Review |
+| 2.14 | 2026-10-08 | H-101/H-102 integradas. H-103 aprobada por QA en la segunda revisión (QA-024: toasts y tooltips dentro de drawers y diálogos; QA-025: errores de la API persistentes); breakpoint `sm` = 576 px, igual que R-23 |
+| 2.15 | 2026-10-08 | H-104 aprobada por QA e integrada: pantalla «Tipos de evento» con interruptor «Requiere adjunto» (`createSwitchField`) |
+| 2.16 | 2026-10-08 | H-105 aprobada: pruebas de aceptación en WordPress real; QA-032 (la ñ se trataba como n por el collation) corregido con collation binaria en `name_key` |
+| 2.17 | 2026-10-08 | Cierre del Sprint 1 (27/27 puntos, [informe](../qa/2026-10-08-cierre-sprint-1.md)); pendiente en la Review: colores de los tipos iniciales y QA-029 |

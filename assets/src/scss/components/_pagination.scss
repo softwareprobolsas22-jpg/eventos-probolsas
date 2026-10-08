@@ -1,0 +1,84 @@
+// Paginación: números de página en escritorio; en móvil, anterior / «Página x de y» / siguiente con
+// botones de 44 px (R-23).
+@use "../tools/mixins" as m;
+
+.ep-pagination {
+	display: flex;
+	gap: var(--ep-space-1);
+	align-items: center;
+
+	&__pages {
+		display: flex;
+		gap: var(--ep-space-1);
+		align-items: center;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+
+		li {
+			margin: 0;
+		}
+	}
+
+	&__page {
+		min-width: 2.25rem;
+		height: 2.25rem;
+		padding: 0 var(--ep-space-2);
+		font-family: inherit;
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-text-subtle);
+		cursor: pointer;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: var(--ep-radius-md);
+		transition: background-color var(--ep-duration-fast) var(--ep-easing-standard);
+
+		&:hover:not(.is-current) {
+			color: var(--ep-color-primary);
+			background: var(--ep-color-primary-soft);
+		}
+
+		&.is-current {
+			color: var(--ep-color-on-primary);
+			cursor: default;
+			background: var(--ep-color-primary);
+		}
+	}
+
+	&__gap {
+		padding: 0 var(--ep-space-1);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__compact {
+		display: none;
+		padding: 0 var(--ep-space-2);
+		white-space: nowrap;
+	}
+
+	@include m.down(sm) {
+		&__pages {
+			display: none;
+		}
+
+		&__compact {
+			display: inline;
+		}
+
+		[data-ep-page-edge] {
+			display: none;
+		}
+
+		.ep-icon-button {
+			width: var(--ep-touch-target);
+			height: var(--ep-touch-target);
+		}
+	}
+
+	@include m.reduced-motion {
+		&__page {
+			transition: none;
+		}
+	}
+}

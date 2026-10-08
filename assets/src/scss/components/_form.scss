@@ -1,0 +1,218 @@
+// Controles de formulario: etiquetas, campos de texto, selects y campo con ícono.
+@use "../tools/mixins" as m;
+
+.ep-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ep-space-1);
+	min-width: 0;
+
+	&__label {
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-text-subtle);
+	}
+
+	&__required {
+		color: var(--ep-color-error);
+	}
+
+	&__meta {
+		display: flex;
+		gap: var(--ep-space-3);
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+
+	&__hint {
+		margin: 0;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__counter {
+		flex-shrink: 0;
+		margin-left: auto;
+		font-size: var(--ep-font-size-xs);
+		font-variant-numeric: tabular-nums;
+		color: var(--ep-color-text-muted);
+
+		&.is-near-limit {
+			font-weight: var(--ep-font-weight-semibold);
+			color: var(--ep-color-warning);
+		}
+	}
+
+	&__error {
+		display: flex;
+		gap: var(--ep-space-1);
+		align-items: baseline;
+		margin: 0;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-error);
+		animation: ep-fade-in var(--ep-duration-base) var(--ep-easing-enter);
+
+		&[hidden] {
+			display: none;
+		}
+
+		@include m.reduced-motion {
+			animation: none;
+		}
+	}
+
+	// Solo el control propio del campo: el buscador del selector de íconos no se marca como erróneo.
+	&.is-invalid > .ep-input {
+		border-color: var(--ep-color-error);
+
+		&:focus {
+			box-shadow: 0 0 0 3px var(--ep-color-error-soft);
+		}
+	}
+}
+
+.ep-form {
+	display: grid;
+	gap: var(--ep-space-5);
+}
+
+.ep-input,
+.ep-select {
+	width: 100%;
+	min-height: 2.5rem;
+	padding: var(--ep-space-2) var(--ep-space-3);
+	margin: 0;
+	font-family: inherit;
+	font-size: var(--ep-font-size-md);
+	line-height: var(--ep-line-height-tight);
+	color: var(--ep-color-text);
+	background-color: var(--ep-color-surface);
+	border: 1px solid var(--ep-color-border-strong);
+	border-radius: var(--ep-radius-md);
+	box-shadow: none;
+	transition:
+		border-color var(--ep-duration-fast) var(--ep-easing-standard),
+		box-shadow var(--ep-duration-fast) var(--ep-easing-standard);
+
+	&:hover {
+		border-color: var(--ep-color-secondary);
+	}
+
+	&:focus {
+		border-color: var(--ep-color-primary);
+		outline: none;
+		box-shadow: 0 0 0 3px var(--ep-color-secondary-soft);
+	}
+
+	&::placeholder {
+		color: var(--ep-color-text-muted);
+	}
+
+	@include m.reduced-motion {
+		transition: none;
+	}
+}
+
+.ep-select {
+	max-width: none;
+	padding-right: var(--ep-space-8);
+	cursor: pointer;
+
+	&--sm {
+		width: auto;
+		min-height: 2rem;
+		padding-top: var(--ep-space-1);
+		padding-bottom: var(--ep-space-1);
+		font-size: var(--ep-font-size-sm);
+	}
+}
+
+// Textarea de altura fija: el tamaño no lo cambia el usuario (requisito del PO).
+.ep-textarea {
+	min-height: 7rem;
+	line-height: var(--ep-line-height-base);
+	resize: none;
+}
+
+.ep-input-group {
+	position: relative;
+
+	&__icon {
+		position: absolute;
+		top: 50%;
+		left: var(--ep-space-3);
+		color: var(--ep-color-text-muted);
+		pointer-events: none;
+		transform: translateY(-50%);
+	}
+
+	.ep-input {
+		padding-left: var(--ep-space-8);
+	}
+}
+
+// Interruptor de sí/no (ui/form.js createSwitchField): casilla nativa oculta a la vista, con pista
+// y perilla dibujadas. La perilla se mueve con transform (R-12).
+.ep-switch {
+	&__label {
+		display: inline-flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		align-self: flex-start;
+		min-height: 2.5rem;
+		font-size: var(--ep-font-size-md);
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-text);
+		cursor: pointer;
+	}
+
+	&__input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: 0;
+		opacity: 0;
+	}
+
+	&__track {
+		position: relative;
+		flex-shrink: 0;
+		width: 2.75rem;
+		height: 1.5rem;
+
+		// Apagado: gris medio, con contraste ≥ 3:1 sobre el fondo (WCAG 1.4.11).
+		background: var(--ep-color-text-muted);
+		border-radius: var(--ep-radius-pill);
+
+		&::after {
+			position: absolute;
+			top: 0.1875rem;
+			left: 0.1875rem;
+			width: 1.125rem;
+			height: 1.125rem;
+			content: "";
+			background: var(--ep-color-surface);
+			border-radius: 50%;
+			box-shadow: var(--ep-shadow-sm);
+			transition: transform var(--ep-duration-fast) var(--ep-easing-standard);
+		}
+	}
+
+	&__input:checked + &__track {
+		background: var(--ep-color-primary);
+
+		&::after {
+			transform: translateX(1.25rem);
+		}
+	}
+
+	&__input:focus-visible + &__track {
+		@include m.focus-ring;
+	}
+
+	@include m.reduced-motion {
+		&__track::after {
+			transition: none;
+		}
+	}
+}

@@ -55,6 +55,17 @@ final class Tables {
 	}
 
 	/**
+	 * Collation binaria del juego de caracteres de la instalación (por ejemplo `utf8mb4_bin`), para las
+	 * columnas que guardan un valor ya normalizado y deben compararse letra por letra. Las collation
+	 * `*_ci` tratan la ñ como n («cumpleanos» = «cumpleaños»).
+	 */
+	public function binary_collation(): string {
+		$charset = '' !== (string) $this->wpdb->charset ? (string) $this->wpdb->charset : 'utf8mb4';
+
+		return $charset . '_bin';
+	}
+
+	/**
 	 * Elimina todas las tablas del plugin.
 	 */
 	public function drop_all(): void {

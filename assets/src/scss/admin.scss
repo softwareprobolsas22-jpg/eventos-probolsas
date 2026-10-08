@@ -1,6 +1,30 @@
 // Entrada de estilos de las pantallas de administración.
-// Los estilos de componentes se cargan anidados bajo .ep-app (los agrega el sistema de diseño, H-103):
-// así ganan especificidad frente a las reglas genéricas de wp-admin sin recurrir a !important.
+// Los estilos de layout y componentes se cargan anidados bajo .ep-app: así ganan especificidad
+// frente a las reglas genéricas de wp-admin (por ejemplo `.wrap h1`) sin recurrir a !important.
+// Las capas flotantes (diálogo, drawer, toasts, tooltips) se insertan en <body>, fuera de .ep-app,
+// por eso se cargan en la raíz con nombres de clase propios.
 // Bootstrap se compila aparte (vendor/bootstrap.scss) y queda encapsulado por vite.config.js.
+@use "sass:meta";
 @use "base/custom-properties";
 @use "base/app";
+@use "layers/dialog";
+@use "layers/drawer";
+@use "layers/toast";
+@use "layers/tooltip";
+
+.ep-app {
+	@include meta.load-css("layout/page-header");
+	@include meta.load-css("components/button");
+	@include meta.load-css("components/icon-button");
+	@include meta.load-css("components/form");
+	@include meta.load-css("components/card");
+	@include meta.load-css("components/empty-state");
+	@include meta.load-css("components/badge");
+	@include meta.load-css("components/pickers");
+	@include meta.load-css("components/skeleton");
+	@include meta.load-css("components/table-toolbar");
+	@include meta.load-css("components/data-table");
+	@include meta.load-css("components/pagination");
+	@include meta.load-css("components/utilities");
+	@include meta.load-css("components/sortable");
+}

@@ -1,0 +1,149 @@
+// Selectores de color (ui/color-field.js) e ícono (ui/icon-picker.js) y vista previa del badge.
+@use "../tools/mixins" as m;
+
+.ep-color-field {
+	&__controls {
+		display: flex;
+		gap: var(--ep-space-2);
+		align-items: center;
+	}
+
+	&__picker {
+		flex-shrink: 0;
+		width: 2.75rem;
+		height: 2.5rem;
+		padding: 0.125rem;
+		cursor: pointer;
+		background: var(--ep-color-surface);
+		border: 1px solid var(--ep-color-border-strong);
+		border-radius: var(--ep-radius-md);
+	}
+
+	&__hex {
+		max-width: 9rem;
+		font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+		text-transform: uppercase;
+	}
+
+	&__presets {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+		margin-top: var(--ep-space-1);
+	}
+
+	&__swatch {
+		width: 1.75rem;
+		height: 1.75rem;
+		padding: 0;
+		cursor: pointer;
+		background: var(--ep-swatch-color);
+		border: 2px solid var(--ep-color-surface);
+		border-radius: var(--ep-radius-pill);
+		box-shadow: 0 0 0 1px var(--ep-color-border-strong);
+		transition: transform var(--ep-duration-fast) var(--ep-easing-standard);
+
+		&:hover {
+			transform: scale(1.1);
+		}
+
+		&[aria-pressed="true"] {
+			box-shadow: 0 0 0 2px var(--ep-color-primary);
+		}
+
+		@include m.reduced-motion {
+			transition: none;
+
+			&:hover {
+				transform: none;
+			}
+		}
+	}
+}
+
+.ep-icon-picker {
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+		gap: var(--ep-space-1);
+		max-height: 12rem;
+		padding: var(--ep-space-2);
+		overflow-y: auto;
+		background: var(--ep-color-surface-muted);
+		border: 1px solid var(--ep-color-border);
+		border-radius: var(--ep-radius-md);
+	}
+
+	&__option {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		aspect-ratio: 1;
+		font-size: var(--ep-font-size-lg);
+		color: var(--ep-color-text-subtle);
+		cursor: pointer;
+		background: var(--ep-color-surface);
+		border: 1px solid transparent;
+		border-radius: var(--ep-radius-md);
+		transition:
+			background-color var(--ep-duration-fast) var(--ep-easing-standard),
+			color var(--ep-duration-fast) var(--ep-easing-standard);
+
+		&:hover {
+			color: var(--ep-color-primary);
+			background: var(--ep-color-primary-soft);
+		}
+
+		&.is-selected {
+			color: var(--ep-color-on-primary);
+			background: var(--ep-color-primary);
+		}
+
+		&[hidden] {
+			display: none;
+		}
+
+		@include m.reduced-motion {
+			transition: none;
+		}
+	}
+
+	&__empty {
+		margin: 0;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	&.is-invalid .ep-icon-picker__grid {
+		border-color: var(--ep-color-error);
+	}
+}
+
+.ep-color-field.is-invalid .ep-input {
+	border-color: var(--ep-color-error);
+}
+
+.ep-badge-preview {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ep-space-3);
+	align-items: center;
+	padding: var(--ep-space-4);
+	margin-bottom: var(--ep-space-5);
+	background: var(--ep-color-surface-muted);
+	border: 1px dashed var(--ep-color-border-strong);
+	border-radius: var(--ep-radius-lg);
+
+	&__label {
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__badge {
+		min-width: 0;
+	}
+}

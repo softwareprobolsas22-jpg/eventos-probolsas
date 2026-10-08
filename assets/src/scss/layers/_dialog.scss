@@ -1,0 +1,74 @@
+// Diálogo modal (ui/confirm-dialog.js). Se inserta en <body>, en la capa superior del navegador.
+@use "../tokens" as t;
+@use "../tools/mixins" as m;
+
+.ep-dialog {
+	width: min(28rem, calc(100vw - 2 * var(--ep-space-4)));
+	max-width: none;
+	padding: var(--ep-space-6);
+	margin: auto;
+	text-align: center;
+	background: var(--ep-color-surface);
+	border: 0;
+	border-radius: var(--ep-radius-xl);
+	box-shadow: var(--ep-shadow-lg);
+	animation: ep-dialog-in var(--ep-duration-slow) var(--ep-easing-enter);
+
+	&::backdrop {
+		// Respaldo con el valor del token: en navegadores antiguos ::backdrop no hereda custom properties.
+		background: var(--ep-color-overlay, #{t.$overlay});
+		animation: ep-fade-in var(--ep-duration-base) var(--ep-easing-standard);
+	}
+
+	&__icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		margin-bottom: var(--ep-space-3);
+		font-size: var(--ep-font-size-xl);
+		border-radius: var(--ep-radius-pill);
+
+		&--danger {
+			color: var(--ep-color-error);
+			background: var(--ep-color-error-soft);
+		}
+
+		&--primary {
+			color: var(--ep-color-primary);
+			background: var(--ep-color-secondary-soft);
+		}
+	}
+
+	&__title {
+		margin: 0;
+		font-size: var(--ep-font-size-lg);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+	}
+
+	&__message {
+		margin: var(--ep-space-2) 0 var(--ep-space-6);
+		color: var(--ep-color-text-subtle);
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+		justify-content: center;
+
+		> * {
+			flex: 1 1 8rem;
+		}
+	}
+
+	@include m.reduced-motion {
+		animation: none;
+
+		&::backdrop {
+			animation: none;
+		}
+	}
+}

@@ -1,0 +1,26 @@
+// Toasts (ui/toast.js sobre Notyf). El color de fondo lo asigna Notyf con var(--ep-color-<tipo>).
+@use "../tools/mixins" as m;
+
+.ep-toast {
+	font-family: var(--ep-font-family-base);
+	font-size: var(--ep-font-size-md);
+	line-height: var(--ep-line-height-base);
+	color: var(--ep-color-on-primary);
+	border-radius: var(--ep-radius-md);
+	box-shadow: var(--ep-shadow-lg);
+
+	i {
+		font-size: 1.125rem;
+		color: var(--ep-color-on-primary);
+	}
+
+	button:focus-visible {
+		outline: 2px solid var(--ep-color-on-primary);
+		outline-offset: 2px;
+	}
+
+	// Notyf retira el toast al terminar la animación: se acorta en lugar de eliminarla.
+	@include m.reduced-motion {
+		animation-duration: 1ms !important;
+	}
+}

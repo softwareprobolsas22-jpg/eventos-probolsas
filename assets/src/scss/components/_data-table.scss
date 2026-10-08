@@ -1,0 +1,188 @@
+// Tabla de datos: acciones fijas a la izquierda, drag to scroll, truncado y pie con paginación.
+@use "../tools/mixins" as m;
+
+// Sin selección de texto (decisión del PO del 2026-10-06): arrastrar sobre la tabla la desplaza
+// (drag to scroll) en lugar de seleccionar celdas, y los clics no dejan texto resaltado.
+.ep-data-table {
+	overflow: hidden;
+	user-select: none;
+	background: var(--ep-color-surface);
+	border: 1px solid var(--ep-color-border);
+	border-radius: var(--ep-radius-lg);
+	box-shadow: var(--ep-shadow-sm);
+
+	&__scroll {
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+
+		// Cuando la tabla es más ancha que su recuadro se arrastra con el mouse (drag to scroll).
+		&.is-scrollable {
+			cursor: grab;
+		}
+
+		&.is-dragging {
+			cursor: grabbing;
+		}
+
+		&:focus-visible {
+			outline-offset: -2px;
+		}
+	}
+
+	&__table {
+		width: 100%;
+		margin: 0;
+		font-size: var(--ep-font-size-md);
+		border-spacing: 0;
+		border-collapse: separate;
+
+		th,
+		td {
+			padding: var(--ep-space-3) var(--ep-space-4);
+			text-align: left;
+			white-space: nowrap;
+			vertical-align: middle;
+			border-bottom: 1px solid var(--ep-color-border);
+		}
+
+		// Encabezados centrados (decisión del PO del 2026-10-06); la alineación de cada columna aplica a sus celdas.
+		th {
+			position: sticky;
+			top: 0;
+			font-size: var(--ep-font-size-sm);
+			font-weight: var(--ep-font-weight-semibold);
+			color: var(--ep-color-text-subtle);
+			text-align: center;
+			background: var(--ep-color-surface-muted);
+		}
+
+		tbody tr {
+			transition: background-color var(--ep-duration-fast) var(--ep-easing-standard);
+
+			&:hover td {
+				background: var(--ep-color-primary-soft);
+			}
+
+			&:last-child td {
+				border-bottom: 0;
+			}
+		}
+
+		td.is-align-end {
+			text-align: right;
+		}
+
+		td.is-align-center {
+			text-align: center;
+		}
+	}
+
+	// Columna de acciones: primera y fija al desplazarse en horizontal.
+	&__actions-col,
+	&__actions-cell {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		width: 1%;
+		background: var(--ep-color-surface);
+		box-shadow: inset -1px 0 0 var(--ep-color-border);
+	}
+
+	&__actions-col {
+		z-index: 2;
+		background: var(--ep-color-surface-muted);
+	}
+
+	&__table td.ep-data-table__actions-cell {
+		padding-top: var(--ep-space-1);
+		padding-bottom: var(--ep-space-1);
+	}
+
+	&__actions {
+		display: flex;
+		gap: var(--ep-space-1);
+	}
+
+	&__empty-value {
+		color: var(--ep-color-text-muted);
+	}
+
+	&__state:empty {
+		display: none;
+	}
+
+	&__state .ep-empty-state {
+		border: 0;
+		border-radius: 0;
+	}
+
+	&__footer {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-3) var(--ep-space-6);
+		align-items: center;
+		justify-content: space-between;
+		padding: var(--ep-space-3) var(--ep-space-4);
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-subtle);
+		background: var(--ep-color-surface-muted);
+		border-top: 1px solid var(--ep-color-border);
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	&__page-size {
+		display: flex;
+		gap: var(--ep-space-2);
+		align-items: center;
+	}
+
+	&__range {
+		margin: 0;
+	}
+
+	@include m.down(md) {
+		&__footer {
+			justify-content: center;
+		}
+
+		&__range {
+			order: -1;
+			width: 100%;
+			text-align: center;
+		}
+	}
+
+	@include m.reduced-motion {
+		&__table tbody tr {
+			transition: none;
+		}
+	}
+}
+
+// Texto largo cortado con «…»; el tooltip muestra el texto completo (ui/tooltip.js).
+.ep-truncate {
+	display: block;
+	max-width: var(--ep-truncate-width, 22rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+// Valor sí/no en una celda: ícono y texto, para no depender solo del color.
+.ep-flag {
+	display: inline-flex;
+	gap: var(--ep-space-1);
+	align-items: center;
+
+	&.is-on {
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-primary);
+	}
+
+	&.is-off {
+		color: var(--ep-color-text-muted);
+	}
+}

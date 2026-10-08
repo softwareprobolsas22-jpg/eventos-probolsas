@@ -1,0 +1,20 @@
+// Utilidades.
+@use "../tools/mixins" as m;
+
+.ep-visually-hidden {
+	@include m.visually-hidden;
+}
+
+// Contenedor donde cada pantalla monta su interfaz (templates/partials/mount.php).
+// `minmax(0, 1fr)`: sin ese límite, la columna de la grilla crece hasta el ancho mínimo de su contenido
+// (una tabla con celdas que no se parten) y la pantalla se sale del área de WordPress, con barra de
+// desplazamiento en toda la página en lugar de dentro de la tabla (y sin drag to scroll).
+.ep-mount {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--ep-space-6);
+}
+
+.ep-mount__loading {
+	color: var(--ep-color-text-muted);
+}

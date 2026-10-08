@@ -1,0 +1,43 @@
+// Badge de tipo de evento. El color lo elige el usuario (--ep-badge-color); el tono del texto es el
+// text_tone de la API (clases --light-text / --dark-text): blanco o negro puros, con los que cualquier
+// fondo alcanza al menos 4,58:1 (tests/fixtures/color-contrast.json).
+.ep-badge {
+	display: inline-flex;
+	gap: var(--ep-space-2);
+	align-items: center;
+	max-width: 100%;
+	padding: var(--ep-space-1) var(--ep-space-3);
+	font-size: var(--ep-font-size-sm);
+	font-weight: var(--ep-font-weight-semibold);
+	line-height: var(--ep-line-height-tight);
+	vertical-align: middle;
+	background: var(--ep-badge-color);
+	border-radius: var(--ep-radius-pill);
+
+	&--light-text {
+		color: var(--ep-color-on-color-light);
+	}
+
+	&--dark-text {
+		color: var(--ep-color-on-color-dark);
+	}
+
+	i {
+		flex-shrink: 0;
+	}
+
+	&__label {
+		min-width: 0;
+	}
+}
+
+// Valor corto en fuente monoespaciada (siglas, códigos).
+.ep-code {
+	padding: 0.125rem var(--ep-space-2);
+	font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+	font-size: var(--ep-font-size-sm);
+	font-weight: var(--ep-font-weight-semibold);
+	color: var(--ep-color-primary);
+	background: var(--ep-color-primary-soft);
+	border-radius: var(--ep-radius-sm);
+}

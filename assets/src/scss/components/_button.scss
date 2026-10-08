@@ -1,0 +1,103 @@
+// Botón base. Variantes: --primary, --secondary (contorno) y --ghost. Tamaño compacto: --sm.
+@use "../tools/mixins" as m;
+
+.ep-button {
+	display: inline-flex;
+	gap: var(--ep-space-2);
+	align-items: center;
+	justify-content: center;
+	min-height: 2.5rem;
+	padding: var(--ep-space-2) var(--ep-space-4);
+	font-family: inherit;
+	font-size: var(--ep-font-size-md);
+	font-weight: var(--ep-font-weight-medium);
+	line-height: var(--ep-line-height-tight);
+	color: var(--ep-color-primary);
+	text-decoration: none;
+	cursor: pointer;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: var(--ep-radius-md);
+	transition:
+		background-color var(--ep-duration-fast) var(--ep-easing-standard),
+		border-color var(--ep-duration-fast) var(--ep-easing-standard),
+		color var(--ep-duration-fast) var(--ep-easing-standard),
+		box-shadow var(--ep-duration-fast) var(--ep-easing-standard),
+		transform var(--ep-duration-fast) var(--ep-easing-standard);
+
+	&:active:not(:disabled) {
+		transform: translateY(1px);
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		cursor: not-allowed;
+		opacity: 0.55;
+	}
+
+	// Enviando: se mantiene visible (sin atenuar) y muestra un indicador animado.
+	&.is-busy {
+		cursor: progress;
+		opacity: 0.85;
+
+		i {
+			animation: ep-spin 0.9s linear infinite;
+
+			@include m.reduced-motion {
+				animation: none;
+			}
+		}
+	}
+
+	&--primary {
+		color: var(--ep-color-on-primary);
+		background: var(--ep-color-primary);
+
+		&:hover:not(:disabled) {
+			color: var(--ep-color-on-primary);
+			background: var(--ep-color-primary-hover);
+			box-shadow: var(--ep-shadow-sm);
+		}
+	}
+
+	&--secondary {
+		background: var(--ep-color-surface);
+		border-color: var(--ep-color-border-strong);
+
+		&:hover:not(:disabled) {
+			color: var(--ep-color-primary);
+			border-color: var(--ep-color-secondary);
+			background: var(--ep-color-secondary-soft);
+		}
+	}
+
+	&--danger {
+		color: var(--ep-color-on-primary);
+		background: var(--ep-color-error);
+
+		&:hover:not(:disabled) {
+			color: var(--ep-color-on-primary);
+			box-shadow: var(--ep-shadow-sm);
+			filter: brightness(0.9);
+		}
+	}
+
+	&--ghost:hover:not(:disabled) {
+		color: var(--ep-color-primary);
+		background: var(--ep-color-primary-soft);
+	}
+
+	&--sm {
+		min-height: 2rem;
+		padding: var(--ep-space-1) var(--ep-space-3);
+		font-size: var(--ep-font-size-sm);
+	}
+
+	@include m.reduced-motion {
+		transition: none;
+
+		&:active:not(:disabled) {
+			transform: none;
+		}
+	}
+}
