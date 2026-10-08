@@ -155,12 +155,24 @@ describe( 'selector de la Biblioteca de Medios', () => {
 		expect( frame.open ).toHaveBeenCalled();
 		expect( dialog.classList.contains( 'is-suspended' ) ).toBe( true );
 
-		handlers.select();
+		// Orden real de WordPress: primero cierra el selector y después emite «select» (QA-043).
 		handlers.close();
+		handlers.select();
 
 		await expect( result ).resolves.toEqual( fromWpAttachment( selected ) );
 		expect( dialog.classList.contains( 'is-suspended' ) ).toBe( false );
 		expect( dialog.open ).toBe( true );
+	} );
+
+	it( 'cerrar wp.media sin elegir resuelve null', async () => {
+		const handlers = {};
+		vi.stubGlobal( 'wp', { media: () => ( { on: ( event, handler ) => ( handlers[ event ] = handler ), open: () => {} } ) } );
+
+		const result = openMediaLibrary( { title: 'Adjunto', buttonText: 'Usar', libraryTypes: [], anchor: document.body } );
+		await flush();
+		handlers.close();
+
+		await expect( result ).resolves.toBeNull();
 	} );
 } );
 

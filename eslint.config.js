@@ -65,7 +65,7 @@ export default [
 		},
 	},
 	{
-		files: [ '*.config.js' ],
+		files: [ '*.config.js', 'tests/e2e/**/*.js' ],
 		languageOptions: {
 			ecmaVersion: 2022,
 			sourceType: 'module',
