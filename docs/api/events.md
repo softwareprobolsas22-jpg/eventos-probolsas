@@ -60,13 +60,15 @@
 |---|---|---|
 | `page` | ≥ 1 | 1 |
 | `per_page` | `25` \| `50` \| `100` (R-23); otro valor → 422 | 25 |
-| `search` | texto: busca en título y descripción, sin distinguir mayúsculas ni tildes | — |
+| `search` | texto (máx. 100): busca en título y descripción, sin distinguir mayúsculas ni tildes; deben aparecer todas las palabras, en cualquier orden | — |
 | `type` | ID de tipo | — |
 | `date_from`, `date_to` | `YYYY-MM-DD` (por solapamiento: incluye eventos que ocupan el rango) | — |
 | `orderby` | `start_date` \| `title` \| `type` \| `created_at` | `start_date` |
-| `order` | `asc` \| `desc` | `asc` |
+| `order` | `asc` \| `desc` (sin distinguir mayúsculas) | `asc` |
 
 Cabeceras: `X-WP-Total`, `X-WP-TotalPages`. Una página fuera de rango devuelve `200` con lista vacía (la interfaz vuelve a la última página).
+
+**CSV** (`/events/export.csv`): columnas `Evento; Tipo; Fecha; Hora; Descripción; Adjunto; Creado por; Actualizado`, en el orden de la tabla y sin paginar. «Hora» dice «Todo el día» si no hay hora; «Adjunto», «Sí» o «No». Las celdas que empiezan por `=`, `+`, `-` o `@` llevan un apóstrofo delante (protección contra fórmulas en Excel). El navegador lo descarga con el nonce en la dirección (`?_wpnonce=…`), porque un enlace no envía la cabecera `X-WP-Nonce`.
 
 ### Cuerpo de POST y PUT
 
@@ -92,7 +94,7 @@ Publicadas en `epConfig.rules.event`; la API las vuelve a aplicar.
 | `start_date` | obligatorio · fecha real `YYYY-MM-DD` | «El campo «Fecha» debe ser una fecha válida.» |
 | `start_time` | opcional · `HH:MM` | «El campo «Hora» debe ser una hora válida.» |
 | `description` | máx. 2.000 | «El campo «Descripción» admite máximo 2000 caracteres.» |
-| `attachment_id` | **obligatorio si el tipo tiene `requires_attachment`** · adjunto existente · imagen (`jpg`, `png`, `webp`, `gif`) o PDF según su tipo MIME real (R-09) | «Este tipo de evento requiere una imagen o un PDF.» · «El archivo debe ser una imagen o un PDF.» |
+| `attachment_id` | **obligatorio si el tipo tiene `requires_attachment`** · adjunto existente · imagen (`jpg`, `png`, `webp`, `gif`) o PDF según su tipo MIME real (R-09) | «Este tipo de evento requiere una imagen o un PDF.» · «El archivo debe ser una imagen o un PDF.» · «El archivo elegido ya no existe en la Biblioteca de Medios.» |
 | `end_date`, `end_time` | no admitidos en v1 | «La hora de fin estará disponible en una próxima versión.» |
 
 ```json

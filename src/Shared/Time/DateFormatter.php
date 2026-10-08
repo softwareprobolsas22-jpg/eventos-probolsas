@@ -147,7 +147,7 @@ final class DateFormatter {
 	public function format_calendar_time( string $time ): string {
 		$format = 5 === strlen( $time ) ? self::CALENDAR_SHORT_TIME_FORMAT : self::CALENDAR_TIME_FORMAT;
 
-		return $this->format_clock( $this->parse( $time, $format, $this->timezone ) );
+		return $this->format_clock( $this->parse( $time, $format, $this->timezone, 'Hora no válida.' ) );
 	}
 
 	/**
@@ -178,14 +178,15 @@ final class DateFormatter {
 	 * @param string       $value    Valor a interpretar.
 	 * @param string       $format   Formato esperado.
 	 * @param DateTimeZone $timezone Zona del valor.
+	 * @param string       $message  Mensaje si no es válido (las horas tienen el suyo, QA-004).
 	 *
 	 * @throws InvalidArgumentException Si el valor no cumple el formato o no es una fecha real.
 	 */
-	private function parse( string $value, string $format, DateTimeZone $timezone ): DateTimeImmutable {
+	private function parse( string $value, string $format, DateTimeZone $timezone, string $message = 'Fecha no válida.' ): DateTimeImmutable {
 		$date = DateTimeImmutable::createFromFormat( '!' . $format, $value, $timezone );
 
 		if ( false === $date || $date->format( $format ) !== $value ) {
-			throw new InvalidArgumentException( 'Fecha no válida.' );
+			throw new InvalidArgumentException( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Mensaje fijo del código, no se muestra en HTML.
 		}
 
 		return $date;
