@@ -124,6 +124,55 @@ export function releaseFloating( dialog ) {
 	}
 }
 
+/**
+ * Ejecuta una tarea con el diálogo modal que contiene al elemento convertido en no modal, y lo vuelve
+ * modal al terminar. Sirve para ventanas de terceros que se insertan en <body> (como el selector de la
+ * Biblioteca de Medios de WordPress): con el diálogo modal quedarían debajo de él e inertes.
+ *
+ * @template T
+ * @param {Element} element Elemento dentro del diálogo.
+ * @param {() => Promise<T>} task Tarea.
+ * @returns {Promise<T>} Resultado de la tarea.
+ */
+export async function suspendModal( element, task ) {
+	const dialog = element.closest( 'dialog[open]' );
+	const suspend = Boolean( dialog ) && isModal( dialog );
+
+	if ( suspend ) {
+		dialog.close();
+		dialog.show();
+		dialog.classList.add( 'is-suspended' );
+	}
+
+	try {
+		return await task();
+	} finally {
+		if ( suspend && dialog.isConnected ) {
+			dialog.classList.remove( 'is-suspended' );
+			dialog.close();
+			dialog.showModal();
+		}
+	}
+}
+
+/**
+ * Indica si un diálogo está abierto en modo modal: `:modal` o la marca `data-ep-modal` que ponen los
+ * diálogos del plugin (para navegadores sin `:modal`).
+ *
+ * @param {HTMLDialogElement} dialog Diálogo.
+ * @returns {boolean} Si es modal.
+ */
+function isModal( dialog ) {
+	if ( dialog.hasAttribute( 'data-ep-modal' ) ) {
+		return true;
+	}
+	try {
+		return dialog.matches( ':modal' );
+	} catch {
+		return false;
+	}
+}
+
 let uidCounter = 0;
 
 /**

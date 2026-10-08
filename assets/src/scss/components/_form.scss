@@ -216,3 +216,57 @@
 		}
 	}
 }
+
+// Grupo de campos con leyenda (por ejemplo, «Cuándo» del formulario de evento: fecha y hora).
+.ep-fieldset {
+	display: grid;
+	gap: var(--ep-space-3);
+	min-width: 0;
+	padding: var(--ep-space-4);
+	margin: 0;
+	border: 1px solid var(--ep-color-border);
+	border-radius: var(--ep-radius-md);
+
+	&__legend {
+		padding: 0 var(--ep-space-1);
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+	}
+
+	// Fecha y hora lado a lado desde tableta; una debajo de la otra en móvil.
+	&__row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--ep-space-3);
+
+		@include m.up(sm) {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+}
+
+// Aviso dentro de un formulario que informa sin bloquear (por ejemplo, «Esta fecha ya pasó», D-3).
+.ep-notice {
+	display: flex;
+	gap: var(--ep-space-2);
+	align-items: baseline;
+	padding: var(--ep-space-2) var(--ep-space-3);
+	margin: 0;
+	font-size: var(--ep-font-size-sm);
+	border-radius: var(--ep-radius-md);
+	animation: ep-fade-in var(--ep-duration-base) var(--ep-easing-enter);
+
+	&--warning {
+		color: var(--ep-color-warning);
+		background: var(--ep-color-warning-soft);
+	}
+
+	&[hidden] {
+		display: none;
+	}
+
+	@include m.reduced-motion {
+		animation: none;
+	}
+}

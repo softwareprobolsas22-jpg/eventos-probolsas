@@ -68,6 +68,8 @@ export function openDrawer( { title, body, footer = [], size = 'default', onRequ
 
 	document.body.append( dialog );
 	dialog.showModal();
+	// Marca de modal para core/dom.js suspendModal (no todos los navegadores tienen :modal).
+	dialog.setAttribute( 'data-ep-modal', '' );
 	dialog.querySelector( '.ep-drawer__body input, .ep-drawer__body textarea, .ep-drawer__body select' )?.focus();
 
 	return { element: dialog, close, requestClose };

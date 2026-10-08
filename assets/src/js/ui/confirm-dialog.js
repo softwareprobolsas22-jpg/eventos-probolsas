@@ -72,6 +72,7 @@ export function confirmDialog( {
 
 		document.body.append( dialog );
 		dialog.showModal();
+		dialog.setAttribute( 'data-ep-modal', '' );
 		// La acción segura recibe el foco: un Enter accidental no ejecuta la acción destructiva.
 		cancelButton.focus();
 	} );
