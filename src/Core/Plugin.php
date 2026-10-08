@@ -11,6 +11,7 @@ namespace Probolsas\Eventos\Core;
 
 use Probolsas\Eventos\Core\Lifecycle\Activator;
 use Probolsas\Eventos\Core\Lifecycle\Uninstaller;
+use Probolsas\Eventos\Domains\Event\EventServiceProvider;
 use Probolsas\Eventos\Domains\EventType\EventTypeServiceProvider;
 use Probolsas\Eventos\Domains\Media\MediaServiceProvider;
 use Probolsas\Eventos\Shared\SharedServiceProvider;
@@ -66,6 +67,7 @@ final class Plugin {
 			new SharedServiceProvider(),
 			new EventTypeServiceProvider(),
 			new MediaServiceProvider(),
+			new EventServiceProvider(),
 		];
 
 		foreach ( $this->providers as $provider ) {
