@@ -56,11 +56,34 @@ final class AdminMenuTest extends UnitTestCase {
 		$this->assertSame( [ 'eventos-probolsas', 'ep-eventos', 'ep-tipos' ], $registered );
 	}
 
-	public function test_does_not_register_menu_without_root_page(): void {
+	public function test_without_root_page_the_first_page_by_position_is_the_root(): void {
+		$types   = $this->page( 'eventos-probolsas-tipos', 20 );
+		$another = $this->page( 'eventos-probolsas-otra', 30 );
+
+		Functions\expect( 'add_menu_page' )
+			->once()
+			->with( 'Título eventos-probolsas-tipos', 'Eventos', 'eventos_manage', 'eventos-probolsas-tipos', [ $types, 'render' ], 'dashicons-calendar-alt', 26 );
+
+		$registered = [];
+		Functions\when( 'add_submenu_page' )->alias(
+			static function ( string $parent_slug, string $title, string $menu, string $cap, string $slug ) use ( &$registered ): string {
+				$registered[] = "{$parent_slug} > {$slug}";
+				return 'hook-' . $slug;
+			}
+		);
+		Actions\expectAdded( 'load-hook-eventos-probolsas-tipos' )->once();
+		Actions\expectAdded( 'load-hook-eventos-probolsas-otra' )->once();
+
+		$this->menu( [ $another, $types ] )->add_pages();
+
+		$this->assertSame( [ 'eventos-probolsas-tipos > eventos-probolsas-tipos', 'eventos-probolsas-tipos > eventos-probolsas-otra' ], $registered );
+	}
+
+	public function test_does_not_register_menu_without_pages(): void {
 		Functions\expect( 'add_menu_page' )->never();
 		Functions\expect( 'add_submenu_page' )->never();
 
-		$this->menu( [ $this->page( 'ep-eventos', 10 ) ] )->add_pages();
+		$this->menu( [] )->add_pages();
 	}
 
 	public function test_body_class_and_assets_are_added_only_on_plugin_screens(): void {

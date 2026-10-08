@@ -13,6 +13,7 @@ use Probolsas\Eventos\Core\Admin\AdminMenu;
 use Probolsas\Eventos\Core\Admin\AdminPage;
 use Probolsas\Eventos\Core\Assets\Assets;
 use Probolsas\Eventos\Core\Database\Migration;
+use Probolsas\Eventos\Core\Database\Migrations\CreateBaseSchema;
 use Probolsas\Eventos\Core\Database\Migrator;
 use Probolsas\Eventos\Core\Database\Tables;
 use Probolsas\Eventos\Core\Frontend\Shortcode;
@@ -28,7 +29,8 @@ use Probolsas\Eventos\Shared\Ui\IconCatalog;
 
 /**
  * Infraestructura común: configuración, base de datos, permisos, assets, vistas, menú de administración
- * y shortcodes. Las migraciones las aportan los dominios con la etiqueta `Migrator::MIGRATIONS_TAG`.
+ * y shortcodes. El esquema base (migración 1) lo crea el núcleo; los dominios aportan las siguientes
+ * migraciones con la etiqueta `Migrator::MIGRATIONS_TAG`.
  */
 final class CoreServiceProvider implements BootableProvider {
 
@@ -56,6 +58,12 @@ final class CoreServiceProvider implements BootableProvider {
 				return new Tables( $wpdb );
 			}
 		);
+
+		$container->set(
+			CreateBaseSchema::class,
+			static fn( Container $c ): CreateBaseSchema => new CreateBaseSchema( $c->get( Tables::class ) )
+		);
+		$container->tag( Migrator::MIGRATIONS_TAG, CreateBaseSchema::class );
 
 		$container->set(
 			Migrator::class,

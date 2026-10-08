@@ -14,6 +14,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Probolsas\Eventos\Shared\Persistence\DuplicateEntryException;
 use Probolsas\Eventos\Shared\Persistence\PersistenceException;
+use Probolsas\Eventos\Tests\Unit\Support\FakeWpdb;
 use Probolsas\Eventos\Tests\Unit\Support\FakeWpdbRepository;
 use Probolsas\Eventos\Tests\Unit\UnitTestCase;
 
@@ -39,26 +40,7 @@ final class WpdbRepositoryTest extends UnitTestCase {
 		Functions\stubTranslationFunctions();
 		Functions\stubEscapeFunctions();
 
-		$this->wpdb             = Mockery::mock( 'wpdb' );
-		$this->wpdb->insert_id  = 0;
-		$this->wpdb->last_error = '';
-		// prepare() simulado: %i → `identificador`, %d → entero, %s → 'texto'.
-		$this->wpdb->shouldReceive( 'prepare' )->andReturnUsing(
-			static function ( string $query, mixed ...$args ): string {
-				return (string) preg_replace_callback(
-					'/%[ids]/',
-					static function ( array $found ) use ( &$args ): string {
-						$value = array_shift( $args );
-						return match ( $found[0] ) {
-							'%i' => "`{$value}`",
-							'%d' => (string) (int) $value,
-							default => "'{$value}'",
-						};
-					},
-					$query
-				);
-			}
-		);
+		$this->wpdb = FakeWpdb::create();
 	}
 
 	public function test_find_returns_the_row_or_null(): void {

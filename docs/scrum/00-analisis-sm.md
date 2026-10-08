@@ -288,7 +288,7 @@ Es el **único punto de contacto** entre las ramas. Se detalla en `docs/api/` du
 | ID | Regla | Cómo se verifica |
 |---|---|---|
 | **R-01** | Paleta de la interfaz: `#155728` (primario), `#669F30` (secundario), `#FFFFFF`; neutros con matiz verde y estados como en `tokens/_colors.scss` de SGP. Ningún hex fuera de `assets/src/scss/tokens/`. **Excepción:** el color de cada tipo de evento es un dato que elige el usuario (D-2). | Stylelint `color-no-hex` |
-| **R-02** | Contraste AA: `#669F30` solo para acentos, bordes, íconos, foco y texto ≥ 18,66 px en negrita. En badges y eventos con el color del tipo, el texto se calcula automáticamente (blanco u oscuro) para lograr ≥ 4,5:1; el formulario de tipos avisa si el color elegido no lo permite. | `tests/js/a11y/contrast.test.js` + axe-core |
+| **R-02** | Contraste AA: `#669F30` solo para acentos, bordes, íconos, foco y texto ≥ 18,66 px en negrita. En badges y eventos con el color del tipo, el texto es blanco o negro según `text_tone` (lo calcula el backend): con ese par cualquier color alcanza al menos 4,58:1. | `tests/js/a11y/contrast.test.js`, `ColorContrastTest.php` + axe-core |
 | **R-03** | `textarea { resize: none; }` en todo el plugin. | Stylelint + prueba de componente |
 | **R-04** | Las tablas se desplazan arrastrando con el mouse (*drag to scroll*): umbral de 5 px, cancela el clic tras arrastrar, no actúa sobre campos. En pantallas táctiles se usa el desplazamiento nativo. | `drag-scroll.test.js` |
 | **R-05** | `th` con texto centrado. | Prueba de componente `data-table` |
@@ -359,8 +359,8 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-1 · Tipos de evento (gestionables, D-2)
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador | B | 8 |
-| H-102 | Migraciones de tablas y semilla con los 4 tipos actuales | B | 3 |
+| H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador  — *en `feature/H-101-H-102-tipos-backend`, pendiente de QA* | B | 8 |
+| H-102 | Migraciones de tablas y semilla con los 4 tipos actuales  — *en `feature/H-101-H-102-tipos-backend`, pendiente de QA* | B | 3 |
 | H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando | F | 8 |
 | H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24) | F | 5 |
 | H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos | Q | 3 |
