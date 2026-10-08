@@ -1,21 +1,21 @@
 {
-  "_bootstrap-BR71AnUD.css": {
-    "file": "css/bootstrap-BR71AnUD.css",
-    "src": "_bootstrap-BR71AnUD.css"
+  "_bootstrap-CUcyV1ZI.css": {
+    "file": "css/bootstrap-CUcyV1ZI.css",
+    "src": "_bootstrap-CUcyV1ZI.css"
   },
   "_date-edoDXXf3.js": {
     "file": "js/chunks/date-edoDXXf3.js",
     "name": "date"
   },
-  "_load-state-DxEV9hsy.js": {
-    "file": "js/chunks/load-state-DxEV9hsy.js",
+  "_load-state-mh9lhawJ.js": {
+    "file": "js/chunks/load-state-mh9lhawJ.js",
     "name": "load-state",
     "imports": [
-      "_runtime-BEwU5NzF.js"
+      "_runtime-B3gRtgAm.js"
     ]
   },
-  "_runtime-BEwU5NzF.js": {
-    "file": "js/chunks/runtime-BEwU5NzF.js",
+  "_runtime-B3gRtgAm.js": {
+    "file": "js/chunks/runtime-B3gRtgAm.js",
     "name": "runtime",
     "css": [
       "css/runtime-DKrxL7Be.css"
@@ -31,7 +31,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_runtime-BEwU5NzF.js"
+      "_runtime-B3gRtgAm.js"
     ],
     "dynamicImports": [
       "assets/src/js/screens/events.js",
@@ -39,7 +39,7 @@
     ],
     "css": [
       "css/admin.css",
-      "css/bootstrap-BR71AnUD.css"
+      "css/bootstrap-CUcyV1ZI.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -51,37 +51,37 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_runtime-BEwU5NzF.js",
+      "_runtime-B3gRtgAm.js",
       "_date-edoDXXf3.js"
     ],
     "css": [
       "css/public.css",
-      "css/bootstrap-BR71AnUD.css"
+      "css/bootstrap-CUcyV1ZI.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
     ]
   },
   "assets/src/js/screens/event-types.js": {
-    "file": "js/chunks/event-types-DPymab1I.js",
+    "file": "js/chunks/event-types-CgHFOpir.js",
     "name": "event-types",
     "src": "assets/src/js/screens/event-types.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-BEwU5NzF.js",
+      "_runtime-B3gRtgAm.js",
       "_date-edoDXXf3.js",
-      "_load-state-DxEV9hsy.js"
+      "_load-state-mh9lhawJ.js"
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-C1NY2sZU.js",
+    "file": "js/chunks/events-CkN7_HT4.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-BEwU5NzF.js",
+      "_runtime-B3gRtgAm.js",
       "_date-edoDXXf3.js",
-      "_load-state-DxEV9hsy.js"
+      "_load-state-mh9lhawJ.js"
     ]
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {

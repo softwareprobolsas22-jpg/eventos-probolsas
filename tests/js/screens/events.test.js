@@ -15,6 +15,18 @@ const { filterParams, mount } = await import( '../../../assets/src/js/screens/ev
 const config = {
 	restUrl: 'https://intranet.test/wp-json/eventos/v1/',
 	restNonce: 'nonce-123',
+	today: '2026-10-07',
+	media: { allowed_mimes: [ 'image/jpeg', 'image/png', 'application/pdf' ], library_types: [ 'image', 'application/pdf' ] },
+	rules: {
+		event: {
+			title: { required: true, minLength: 3, maxLength: 150 },
+			type_id: { required: true, oneOf: 'event_types' },
+			start_date: { required: true, format: 'date' },
+			start_time: { format: 'time' },
+			description: { maxLength: 2000 },
+			attachment_id: { requiredWhen: 'type.requires_attachment', mimes: 'media.allowed_mimes' },
+		},
+	},
 	ui: {
 		timezone: 'America/Bogota',
 		date_format: 'd/m/Y',
@@ -26,8 +38,8 @@ const config = {
 };
 
 const TYPES = [
-	{ id: 1, name: 'Cumpleaños', slug: 'cumpleanos', color: '#9D174D', text_tone: 'light', icon: 'cake-candles' },
-	{ id: 2, name: 'Reuniones laborales', slug: 'reuniones-laborales', color: '#1D4ED8', text_tone: 'light', icon: 'briefcase' },
+	{ id: 1, name: 'Cumpleaños', slug: 'cumpleanos', color: '#9D174D', text_tone: 'light', icon: 'cake-candles', requires_attachment: true },
+	{ id: 2, name: 'Reuniones laborales', slug: 'reuniones-laborales', color: '#1D4ED8', text_tone: 'light', icon: 'briefcase', requires_attachment: false },
 ];
 
 const event = ( overrides ) => ( {
@@ -39,13 +51,14 @@ const event = ( overrides ) => ( {
 	start_time: '15:00',
 	all_day: false,
 	is_past: false,
-	attachment: { id: 315, kind: 'image' },
+	attachment: { id: 315, kind: 'image', mime: 'image/jpeg', url: 'https://intranet.test/uploads/ana.jpg', thumbnail_url: 'https://intranet.test/uploads/ana-150x150.jpg', filename: 'ana.jpg' },
 	...overrides,
 } );
 
 let screen;
 let api;
 let download;
+let openLibrary;
 let store;
 
 const flush = async () => {
@@ -76,6 +89,8 @@ function fakeApi( events ) {
 			);
 			return { items: matches.slice( ( page - 1 ) * size, page * size ), total: matches.length, totalPages: Math.ceil( matches.length / size ) };
 		} ),
+		post: vi.fn( async ( path, body ) => ( { id: 99, ...body } ) ),
+		put: vi.fn( async ( path, body ) => ( { id: 42, ...body } ) ),
 		del: vi.fn( async ( path ) => {
 			store = store.filter( ( item ) => `events/${ item.id }` !== path );
 			return { deleted: true };
@@ -92,7 +107,8 @@ async function mountWith( events, overrides = {} ) {
 	screen = document.querySelector( '[data-ep-screen]' );
 	api = { ...fakeApi( events ), ...overrides };
 	download = vi.fn();
-	await mount( screen, config, { api, download } );
+	openLibrary = vi.fn( async () => ( { id: 400, mime: 'application/pdf', url: 'https://intranet.test/uploads/acta.pdf', thumbnail_url: null, filename: 'acta.pdf' } ) );
+	await mount( screen, config, { api, download, openLibrary } );
 }
 
 beforeEach( async () => {
@@ -252,3 +268,139 @@ describe( 'pantalla Eventos: contrato con la página PHP', () => {
 		expect( read( 'assets/src/js/screens/events.js' ) ).toContain( `querySelector( '#${ mountId }' )` );
 	} );
 } );
+
+describe( 'pantalla Eventos: formulario (H-204)', () => {
+	const drawer = () => document.querySelector( 'dialog.ep-drawer' );
+	const field = ( name ) => drawer().querySelector( `[name="${ name }"]` );
+	const errorOf = ( name ) => field( name ).closest( '.ep-field' ).querySelector( '.ep-field__error' );
+	const mediaError = () => drawer().querySelector( '.ep-media-field .ep-field__error' );
+	const header = ( text ) => buttonIn( screen.querySelector( '[data-ep-header-actions]' ), text );
+	const submit = () => drawer().querySelector( 'form' ).dispatchEvent( new Event( 'submit', { cancelable: true } ) );
+	const type = ( name, value, eventName = 'input' ) => {
+		field( name ).value = value;
+		field( name ).dispatchEvent( new Event( eventName ) );
+	};
+
+	it( 'crear: reglas de epConfig.rules.event, fecha de hoy del servidor y bloque «Cuándo»', () => {
+		header( 'Añadir evento' ).click();
+
+		expect( drawer().querySelector( '.ep-drawer__title' ).textContent ).toBe( 'Nuevo evento' );
+		expect( field( 'title' ).maxLength ).toBe( 150 );
+		expect( field( 'start_date' ).value ).toBe( '2026-10-07' );
+		expect( field( 'start_time' ).type ).toBe( 'time' );
+		expect( drawer().querySelector( 'fieldset legend' ).textContent ).toBe( 'Cuándo' );
+		expect( [ ...field( 'type_id' ).options ].map( ( option ) => option.textContent ) ).toEqual( [ 'Selecciona un tipo', 'Cumpleaños', 'Reuniones laborales' ] );
+		expect( field( 'description' ).tagName ).toBe( 'TEXTAREA' );
+	} );
+
+	it( 'no envía si faltan datos: título corto, tipo y adjunto que el tipo exige', () => {
+		header( 'Añadir evento' ).click();
+		type( 'title', 'Ab' );
+		submit();
+
+		expect( api.post ).not.toHaveBeenCalled();
+		expect( errorOf( 'title' ).textContent ).toBe( 'El campo «Título» debe tener al menos 3 caracteres.' );
+		expect( errorOf( 'type_id' ).textContent ).toBe( 'El campo «Tipo» es obligatorio.' );
+
+		type( 'type_id', '1', 'change' );
+		submit();
+		expect( mediaError().textContent ).toBe( 'Este tipo de evento requiere una imagen o un PDF.' );
+
+		type( 'type_id', '2', 'change' );
+		expect( mediaError().hidden ).toBe( true );
+	} );
+
+	it( 'el aviso de fecha pasada no bloquea (D-3) y compara con «hoy» del servidor', () => {
+		header( 'Añadir evento' ).click();
+		const notice = drawer().querySelector( '.ep-notice' );
+		expect( notice.hidden ).toBe( true );
+
+		type( 'start_date', '2026-10-06' );
+		expect( notice.hidden ).toBe( false );
+		expect( notice.textContent ).toContain( 'Esta fecha ya pasó' );
+
+		type( 'start_date', '2026-10-07' );
+		expect( notice.hidden ).toBe( true );
+	} );
+
+	it( 'crea un evento con adjunto de la biblioteca, confirma con un toast y recarga la tabla', async () => {
+		header( 'Añadir evento' ).click();
+		type( 'title', '  Cumpleaños de Carlos ' );
+		type( 'type_id', '1', 'change' );
+		type( 'start_time', '15:00' );
+		buttonIn( drawer(), 'Elegir archivo' ).click();
+		await flush();
+		const calls = api.getPage.mock.calls.length;
+
+		submit();
+		await flush();
+
+		expect( api.post ).toHaveBeenCalledWith(
+			'events',
+			{ title: 'Cumpleaños de Carlos', type_id: '1', start_date: '2026-10-07', start_time: '15:00', description: '', attachment_id: '400' },
+			{ silent: true }
+		);
+		expect( drawer() ).toBeNull();
+		expect( toast.success ).toHaveBeenCalledWith( 'Evento «Cumpleaños de Carlos» creado.' );
+		expect( api.getPage.mock.calls.length ).toBe( calls + 1 );
+	} );
+
+	it( 'edita con los datos actuales, incluida la vista previa del adjunto', async () => {
+		rows()[ 0 ].querySelector( 'button[aria-label="Editar"]' ).click();
+
+		expect( drawer().querySelector( '.ep-drawer__title' ).textContent ).toBe( 'Editar evento' );
+		expect( field( 'title' ).value ).toBe( 'Cumpleaños de Ana María' );
+		expect( field( 'type_id' ).value ).toBe( '1' );
+		expect( field( 'start_time' ).value ).toBe( '15:00' );
+		expect( drawer().querySelector( '.ep-media-field img' ).getAttribute( 'src' ) ).toBe( 'https://intranet.test/uploads/ana-150x150.jpg' );
+
+		type( 'title', 'Cumpleaños de Ana' );
+		submit();
+		await flush();
+
+		expect( api.put ).toHaveBeenCalledWith( 'events/42', expect.objectContaining( { title: 'Cumpleaños de Ana', attachment_id: '315' } ), { silent: true } );
+		expect( toast.success ).toHaveBeenCalledWith( 'Cambios guardados en «Cumpleaños de Ana».' );
+	} );
+
+	it( 'muestra los errores 422 bajo cada campo y el mensaje en un toast', async () => {
+		api.post.mockRejectedValueOnce(
+			new ApiError( 'Revisa los campos marcados.', { status: 422, fieldErrors: { attachment_id: [ 'El archivo debe ser una imagen o un PDF.' ], start_date: [ 'El campo «Fecha» debe ser una fecha válida.' ] } } )
+		);
+		header( 'Añadir evento' ).click();
+		type( 'title', 'Reunión de planeación' );
+		type( 'type_id', '2', 'change' );
+		submit();
+		await flush();
+
+		expect( toast.error ).toHaveBeenCalledWith( 'Revisa los campos marcados.' );
+		expect( errorOf( 'start_date' ).textContent ).toBe( 'El campo «Fecha» debe ser una fecha válida.' );
+		expect( mediaError().textContent ).toBe( 'El archivo debe ser una imagen o un PDF.' );
+		expect( drawer() ).not.toBeNull();
+	} );
+
+	it( 'si el evento ya no existe al guardar, cierra el panel y recarga', async () => {
+		api.put.mockRejectedValueOnce( new ApiError( 'El evento no existe o fue eliminado.', { status: 404 } ) );
+		rows()[ 0 ].querySelector( 'button[aria-label="Editar"]' ).click();
+		const calls = api.getPage.mock.calls.length;
+		submit();
+		await flush();
+
+		expect( toast.error ).toHaveBeenCalledWith( 'El evento no existe o fue eliminado.' );
+		expect( drawer() ).toBeNull();
+		expect( api.getPage.mock.calls.length ).toBe( calls + 1 );
+	} );
+
+	it( 'pide confirmación antes de cerrar con cambios sin guardar', async () => {
+		header( 'Añadir evento' ).click();
+		type( 'title', 'Borrador' );
+
+		drawer().querySelector( 'button[aria-label="Cerrar"]' ).click();
+		await flush();
+		expect( dialog().textContent ).toContain( '¿Descartar los cambios?' );
+
+		buttonIn( dialog(), 'Descartar' ).click();
+		await flush();
+		expect( drawer() ).toBeNull();
+	} );
+} );
+

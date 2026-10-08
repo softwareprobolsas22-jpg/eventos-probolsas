@@ -1,0 +1,73 @@
+// Campo de adjunto (ui/media-field.js): vista previa de la imagen o del PDF y botones para elegir o quitar.
+
+.ep-media-field {
+	&__preview {
+		display: flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		min-height: 4.5rem;
+		padding: var(--ep-space-3);
+		background: var(--ep-color-surface-muted);
+		border: 1px dashed var(--ep-color-border-strong);
+		border-radius: var(--ep-radius-md);
+	}
+
+	&__empty {
+		margin: 0;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__thumbnail {
+		flex-shrink: 0;
+		width: 3.5rem;
+		height: 3.5rem;
+		object-fit: cover;
+		border-radius: var(--ep-radius-sm);
+	}
+
+	&__icon {
+		display: inline-flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		font-size: 1.75rem;
+		color: var(--ep-color-primary);
+		background: var(--ep-color-surface);
+		border-radius: var(--ep-radius-sm);
+	}
+
+	&__details {
+		display: flex;
+		flex-direction: column;
+		gap: var(--ep-space-1);
+		min-width: 0;
+	}
+
+	&__name {
+		--ep-truncate-width: 100%;
+
+		font-weight: var(--ep-font-weight-medium);
+		color: var(--ep-color-text);
+	}
+
+	&__link {
+		display: inline-flex;
+		gap: var(--ep-space-1);
+		align-items: center;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-primary);
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+	}
+
+	&.is-invalid &__preview {
+		border-color: var(--ep-color-error);
+	}
+}

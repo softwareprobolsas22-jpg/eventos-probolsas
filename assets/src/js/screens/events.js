@@ -1,7 +1,8 @@
 /**
- * Pantalla «Eventos» (H-203): tabla paginada en el servidor con búsqueda, filtros por tipo y rango de
- * fechas, exportación CSV con los filtros activos y eliminación con confirmación.
- * El formulario de crear y editar llega con H-204; el detalle, con H-205. Contrato en docs/api/events.md.
+ * Pantalla «Eventos» (H-203, H-204): tabla paginada en el servidor con búsqueda, filtros por tipo y
+ * rango de fechas, exportación CSV con los filtros activos, formulario para crear y editar
+ * (screens/event-form.js) y eliminación con confirmación. El detalle llega con H-205.
+ * Contrato en docs/api/events.md.
  */
 import { createApi } from '../core/api.js';
 import { createDateFormatter } from '../core/date.js';
@@ -15,6 +16,7 @@ import { createDataTable } from '../ui/data-table.js';
 import { createFilterBar } from '../ui/filter-bar.js';
 import { loadError } from '../ui/load-state.js';
 import { showToast, toast } from '../ui/toast.js';
+import { openEventForm } from './event-form.js';
 
 /** Ícono y nombre de cada clase de adjunto. */
 const ATTACHMENT_KINDS = {
@@ -48,15 +50,16 @@ export function filterParams( filters ) {
  *
  * @param {HTMLElement} screen Contenedor de la pantalla (data-ep-screen).
  * @param {Object} config Configuración (epConfig).
- * @param {{ api?: ReturnType<typeof createApi>, download?: (url: string) => void }} [dependencies] Dependencias inyectables (pruebas).
+ * @param {{ api?: ReturnType<typeof createApi>, download?: (url: string) => void, openLibrary?: Function }} [dependencies] Dependencias inyectables (pruebas).
  * @returns {Promise<void>} Termina cuando se cargan los tipos y la primera página.
  */
-export async function mount( screen, config, { api = createApi( config, { notify: showToast } ), download = ( url ) => globalThis.location.assign( url ) } = {} ) {
+export async function mount( screen, config, { api = createApi( config, { notify: showToast } ), download = ( url ) => globalThis.location.assign( url ), openLibrary } = {} ) {
 	const root = screen.querySelector( '#ep-events' );
 	const dates = createDateFormatter( config.ui );
 	let filters = {};
 	let total = 0;
 	let loadedOnce = false;
+	let types = [];
 	// Solo se muestra la respuesta de la última petición: al escribir rápido, una anterior puede llegar después.
 	let requestId = 0;
 
@@ -83,11 +86,14 @@ export async function mount( screen, config, { api = createApi( config, { notify
 			},
 			{ key: 'attachment', label: __( 'Adjunto', 'eventos-probolsas' ), align: 'center', render: ( row ) => attachmentKind( row.attachment ) },
 		],
-		actions: () => [ { icon: 'fa-solid fa-trash', label: __( 'Eliminar', 'eventos-probolsas' ), variant: 'danger', onClick: ( row ) => remove( row ) } ],
+		actions: () => [
+			{ icon: 'fa-solid fa-pen', label: __( 'Editar', 'eventos-probolsas' ), onClick: ( row ) => openForm( row ) },
+			{ icon: 'fa-solid fa-trash', label: __( 'Eliminar', 'eventos-probolsas' ), variant: 'danger', onClick: ( row ) => remove( row ) },
+		],
 		emptyState: {
 			icon: 'fa-solid fa-calendar-days',
 			title: __( 'Todavía no hay eventos', 'eventos-probolsas' ),
-			message: __( 'Los eventos que se creen aparecerán aquí.', 'eventos-probolsas' ),
+			message: __( 'Crea el primero con «Añadir evento».', 'eventos-probolsas' ),
 		},
 		noResultsState: {
 			icon: 'fa-solid fa-magnifying-glass',
@@ -109,8 +115,20 @@ export async function mount( screen, config, { api = createApi( config, { notify
 		},
 	} );
 
+	const addButton = button( { label: __( 'Añadir evento', 'eventos-probolsas' ), icon: 'fa-solid fa-plus', variant: 'primary', onClick: () => openForm() } );
+	screen.querySelector( '[data-ep-header-actions]' )?.append( addButton );
+
 	root.removeAttribute( 'aria-busy' );
 	root.replaceChildren( filtersSlot, toolbar, tableSlot );
+
+	/**
+	 * Abre el formulario para crear (sin evento) o editar.
+	 *
+	 * @param {Object|null} event Evento a editar.
+	 */
+	function openForm( event = null ) {
+		openEventForm( { event, types, config, api, openLibrary, onSaved: () => table.refresh(), onMissing: () => table.refresh() } );
+	}
 
 	/**
 	 * Pide una página con los filtros activos.
@@ -139,6 +157,7 @@ export async function mount( screen, config, { api = createApi( config, { notify
 			}
 			if ( ! loadedOnce ) {
 				root.replaceChildren( loadError() );
+				addButton.disabled = true;
 				return;
 			}
 			total = 0;
@@ -200,7 +219,7 @@ export async function mount( screen, config, { api = createApi( config, { notify
 	/** Tipos para el filtro: si fallan, el filtro queda solo con «Todos los tipos» (la API ya avisó). */
 	async function loadTypes() {
 		try {
-			const types = await api.get( 'event-types' );
+			types = await api.get( 'event-types' );
 			filterBar.setOptions(
 				'type',
 				types.map( ( type ) => ( { value: type.id, label: type.name } ) )
