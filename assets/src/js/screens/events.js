@@ -1,7 +1,7 @@
 /**
  * Pantalla «Eventos» (H-203, H-204): tabla paginada en el servidor con búsqueda, filtros por tipo y
  * rango de fechas, exportación CSV con los filtros activos, formulario para crear y editar
- * (screens/event-form.js) y eliminación con confirmación. El detalle llega con H-205.
+ * (screens/event-form.js), detalle (screens/event-detail.js, H-205) y eliminación con confirmación.
  * Contrato en docs/api/events.md.
  */
 import { createApi } from '../core/api.js';
@@ -16,6 +16,7 @@ import { createDataTable } from '../ui/data-table.js';
 import { createFilterBar } from '../ui/filter-bar.js';
 import { loadError } from '../ui/load-state.js';
 import { showToast, toast } from '../ui/toast.js';
+import { openEventDetail } from './event-detail.js';
 import { openEventForm } from './event-form.js';
 
 /** Ícono y nombre de cada clase de adjunto. */
@@ -87,6 +88,7 @@ export async function mount( screen, config, { api = createApi( config, { notify
 			{ key: 'attachment', label: __( 'Adjunto', 'eventos-probolsas' ), align: 'center', render: ( row ) => attachmentKind( row.attachment ) },
 		],
 		actions: () => [
+			{ icon: 'fa-solid fa-eye', label: __( 'Ver detalle', 'eventos-probolsas' ), onClick: ( row ) => openEventDetail( { event: row, config, api, onEdit: ( detail ) => openForm( detail ), onMissing: () => table.refresh() } ) },
 			{ icon: 'fa-solid fa-pen', label: __( 'Editar', 'eventos-probolsas' ), onClick: ( row ) => openForm( row ) },
 			{ icon: 'fa-solid fa-trash', label: __( 'Eliminar', 'eventos-probolsas' ), variant: 'danger', onClick: ( row ) => remove( row ) },
 		],
