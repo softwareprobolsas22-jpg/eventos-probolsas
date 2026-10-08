@@ -74,13 +74,32 @@ function isScoped( selector ) {
 	return null !== group && splitSelector( group[ 1 ] ).every( isScoped );
 }
 
+/**
+ * Indica si un selector es solo de Tippy o Notyf: empieza por una de sus clases y no nombra ninguna
+ * otra clase (QA-028: `.notyf .btn` sí se revisa).
+ *
+ * @param {string} selector Selector.
+ * @returns {boolean} Si pertenece solo a esas librerías.
+ */
+function isFloatingLibrary( selector ) {
+	return /^(\.tippy-|\[data-tippy-root\]|\.notyf)/.test( selector ) && ! /\.(?!tippy-|notyf)[a-z_-]/i.test( selector );
+}
+
 describe( 'Bootstrap encapsulado en los contenedores del plugin', () => {
 	const bootstrap = rules( css( 'shared' ) )
 		.flatMap( ( { selector } ) => splitSelector( selector ) )
 		// Font Awesome, Tippy y Notyf se cargan en la raíz a propósito: sus clases (`.fa*`, `.tippy-*`,
-		// `.notyf*`) no chocan con wp-admin ni el tema, y los tooltips y toasts viven en <body>, fuera de
-		// los contenedores del plugin.
-		.filter( ( selector ) => ! /^(:root|:host|\.fa|:is\(\.fas|\.tippy-|\[data-tippy-root\]|\.notyf)/.test( selector ) );
+		// `.notyf*`) no chocan con wp-admin ni el tema, y los tooltips y toasts viven en <body> o en el
+		// diálogo abierto, fuera de los contenedores del plugin.
+		.filter( ( selector ) => ! /^(:root|:host|\.fa|:is\(\.fas)/.test( selector ) && ! isFloatingLibrary( selector ) );
+
+	it( 'solo omite los selectores propios de Tippy y Notyf (QA-028)', () => {
+		expect( isFloatingLibrary( '.tippy-box[data-placement^=top]>.tippy-arrow:before' ) ).toBe( true );
+		expect( isFloatingLibrary( '.notyf__toast--upper' ) ).toBe( true );
+		expect( isFloatingLibrary( '[data-tippy-root]' ) ).toBe( true );
+		expect( isFloatingLibrary( '.notyf .btn' ) ).toBe( false );
+		expect( isFloatingLibrary( '.tippy-box .form-control' ) ).toBe( false );
+	} );
 
 	it( 'compila Bootstrap', () => {
 		expect( bootstrap.length ).toBeGreaterThan( 500 );

@@ -95,6 +95,33 @@ describe( 'createField', () => {
 		expect( field.element.querySelector( '.ep-field__error' ).hidden ).toBe( true );
 	} );
 
+	it( 'el error de la API se mantiene al salir del campo sin editarlo (QA-025)', () => {
+		const field = createField( { name: 'name', label: 'Nombre', required: true, value: 'Cumpleaños' } );
+		const error = field.element.querySelector( '.ep-field__error' );
+		field.setError( 'Ya existe un tipo de evento llamado «Cumpleaños».' );
+
+		field.control.dispatchEvent( new Event( 'blur' ) );
+		expect( error.hidden ).toBe( false );
+		expect( error.textContent ).toBe( 'Ya existe un tipo de evento llamado «Cumpleaños».' );
+		expect( field.control.getAttribute( 'aria-invalid' ) ).toBe( 'true' );
+
+		// Al cambiar el valor manda la validación local: aquí, «obligatorio».
+		field.control.value = '';
+		field.control.dispatchEvent( new Event( 'input' ) );
+		expect( error.textContent ).toBe( 'El campo «Nombre» es obligatorio.' );
+	} );
+
+	it( 'el error de la API no impide volver a enviar: el servidor vuelve a decidir', () => {
+		const onSubmit = vi.fn();
+		const field = createField( { name: 'name', label: 'Nombre', required: true, value: 'Cumpleaños' } );
+		const form = createForm( { fields: [ field ], onSubmit } );
+		form.setErrors( { name: [ 'Ya existe un tipo de evento llamado «Cumpleaños».' ] } );
+
+		submit( form );
+
+		expect( onSubmit ).toHaveBeenCalledWith( { name: 'Cumpleaños' } );
+	} );
+
 	it( 'cuenta caracteres, no unidades UTF-16 (igual que mb_strlen)', () => {
 		expect( characterCount( 'ñ📄' ) ).toBe( 2 );
 	} );

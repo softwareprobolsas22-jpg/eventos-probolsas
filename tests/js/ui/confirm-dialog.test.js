@@ -56,4 +56,19 @@ describe( 'confirmDialog (CP-1.30)', () => {
 
 		expect( dialog().querySelector( 'img, b' ) ).toBeNull();
 	} );
+
+	it( 'al cerrarse devuelve los toasts al panel que sigue abierto (QA-024)', async () => {
+		const drawer = document.createElement( 'dialog' );
+		document.body.append( drawer );
+		drawer.showModal();
+
+		const result = open();
+		const toasts = document.createElement( 'div' );
+		toasts.setAttribute( 'data-ep-floating', '' );
+		dialog().append( toasts );
+		buttonByText( 'Cancelar' ).click();
+
+		expect( await result ).toBe( false );
+		expect( toasts.parentElement ).toBe( drawer );
+	} );
 } );

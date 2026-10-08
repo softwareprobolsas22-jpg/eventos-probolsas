@@ -5,7 +5,7 @@
 import { isHexColor } from '../core/color.js';
 import { h, icon, uid } from '../core/dom.js';
 import { __, sprintf } from '../core/i18n.js';
-import { revalidateIfInvalid } from './form.js';
+import { createFieldError, revalidateIfInvalid } from './form.js';
 
 /**
  * Crea el campo de color.
@@ -59,6 +59,13 @@ export function createColorField( { name, label, value = '', presets = [], requi
 		error
 	);
 
+	const fieldError = createFieldError( () => hex.value.trim().toUpperCase(), ( message ) => {
+		errorText.textContent = message ?? '';
+		error.hidden = ! message;
+		element.classList.toggle( 'is-invalid', Boolean( message ) );
+		hex.setAttribute( 'aria-invalid', String( Boolean( message ) ) );
+	} );
+
 	update( value.toUpperCase(), { silent: true } );
 
 	/**
@@ -96,15 +103,8 @@ export function createColorField( { name, label, value = '', presets = [], requi
 			/* translators: %s: nombre del campo. */
 			message = sprintf( __( 'El campo «%s» debe ser un color hexadecimal, por ejemplo #155728.', 'eventos-probolsas' ), label );
 		}
-		setError( message );
+		fieldError.fromValidation( message );
 		return message;
-	}
-
-	function setError( message ) {
-		errorText.textContent = message ?? '';
-		error.hidden = ! message;
-		element.classList.toggle( 'is-invalid', Boolean( message ) );
-		hex.setAttribute( 'aria-invalid', String( Boolean( message ) ) );
 	}
 
 	return {
@@ -113,7 +113,7 @@ export function createColorField( { name, label, value = '', presets = [], requi
 		getValue: () => hex.value.trim().toUpperCase(),
 		setValue: ( newValue ) => update( String( newValue ).toUpperCase(), { silent: true } ),
 		validate,
-		setError,
+		setError: fieldError.fromServer,
 		focus: () => hex.focus(),
 	};
 }

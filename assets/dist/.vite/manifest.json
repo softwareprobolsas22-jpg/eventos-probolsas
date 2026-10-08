@@ -1,6 +1,6 @@
 {
-  "_tooltip-DdrDG20F.js": {
-    "file": "js/chunks/tooltip-DdrDG20F.js",
+  "_tooltip-Cf_kA9OC.js": {
+    "file": "js/chunks/tooltip-Cf_kA9OC.js",
     "name": "tooltip",
     "css": [
       "css/tooltip-DgC38MBH.css"
@@ -19,7 +19,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_tooltip-DdrDG20F.js"
+      "_tooltip-Cf_kA9OC.js"
     ],
     "css": [
       "css/admin.css"
@@ -31,7 +31,7 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_tooltip-DdrDG20F.js"
+      "_tooltip-Cf_kA9OC.js"
     ],
     "css": [
       "css/public.css"

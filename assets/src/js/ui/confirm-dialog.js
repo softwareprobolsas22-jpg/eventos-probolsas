@@ -4,7 +4,7 @@
  * Usa el elemento nativo <dialog> en modo modal: el foco queda atrapado dentro, Esc cancela y el
  * resto de la página queda inerte. Al cerrarse, el foco vuelve al elemento que lo abrió.
  */
-import { h, icon, uid } from '../core/dom.js';
+import { h, icon, releaseFloating, uid } from '../core/dom.js';
 import { __ } from '../core/i18n.js';
 
 /**
@@ -50,6 +50,7 @@ export function confirmDialog( {
 			}
 			settled = true;
 			dialog.close();
+			releaseFloating( dialog );
 			dialog.remove();
 			if ( opener instanceof HTMLElement && opener.isConnected ) {
 				opener.focus();

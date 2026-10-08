@@ -55,4 +55,15 @@ describe( 'openDrawer', () => {
 		expect( onRequestClose ).not.toHaveBeenCalled();
 		expect( drawerElement() ).toBeNull();
 	} );
+
+	it( 'al cerrarse devuelve a <body> los toasts que mostraba (QA-024)', () => {
+		const drawer = open();
+		const toasts = document.createElement( 'div' );
+		toasts.setAttribute( 'data-ep-floating', '' );
+		drawerElement().append( toasts );
+
+		drawer.close();
+
+		expect( toasts.parentElement ).toBe( document.body );
+	} );
 } );

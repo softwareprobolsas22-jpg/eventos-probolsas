@@ -57,6 +57,31 @@ export function revalidateIfInvalid( element, validate ) {
 }
 
 /**
+ * Error visible de un campo. El de la API (422) tiene prioridad y se mantiene mientras el valor no
+ * cambie: salir del campo sin editarlo no lo borra (§6.2, R-24, QA-025). Cuando el valor cambia,
+ * vuelve a mandar la validación local. Al enviar, el servidor vuelve a decidir.
+ *
+ * @param {() => string} readValue Valor actual del campo.
+ * @param {(message: string|null) => void} show Muestra u oculta el mensaje.
+ * @returns {{ fromServer: (message: string|null) => void, fromValidation: (message: string|null) => void }} Estado.
+ */
+export function createFieldError( readValue, show ) {
+	let server = null;
+	return {
+		fromServer( message ) {
+			server = message ? { message, value: readValue() } : null;
+			show( message || null );
+		},
+		fromValidation( message ) {
+			if ( server && server.value !== readValue() ) {
+				server = null;
+			}
+			show( message ?? server?.message ?? null );
+		},
+	};
+}
+
+/**
  * @typedef {Object} FieldOptions
  * @property {string} name Nombre del campo (clave en los datos y en los errores de la API).
  * @property {string} label Etiqueta visible.
@@ -83,7 +108,7 @@ export function revalidateIfInvalid( element, validate ) {
  * @property {() => string} getValue Valor actual.
  * @property {(value: string|number) => void} setValue Cambia el valor.
  * @property {() => string|null} validate Valida y muestra el error; devuelve el mensaje o null.
- * @property {(message: string|null) => void} setError Muestra u oculta un error.
+ * @property {(message: string|null) => void} setError Muestra (o quita, con null) el error de la API; se mantiene hasta que cambie el valor.
  * @property {() => void} focus Lleva el foco al campo.
  */
 
@@ -169,7 +194,7 @@ export function createField( { name, label, type = 'text', required = false, max
 		return control.value.trim();
 	}
 
-	function setError( message ) {
+	function showError( message ) {
 		const hasError = Boolean( message );
 		errorText.textContent = message ?? '';
 		error.hidden = ! hasError;
@@ -177,10 +202,13 @@ export function createField( { name, label, type = 'text', required = false, max
 		control.setAttribute( 'aria-invalid', String( hasError ) );
 	}
 
+	const fieldError = createFieldError( () => control.value, showError );
+
 	/**
-	 * Valida con las mismas reglas y mensajes que el servidor.
+	 * Valida con las mismas reglas y mensajes que el servidor. Si la validación local pasa, sigue
+	 * visible el error de la API mientras el valor no cambie.
 	 *
-	 * @returns {string|null} Mensaje de error o null si es válido.
+	 * @returns {string|null} Mensaje de error local o null si es válido.
 	 */
 	function validate() {
 		const current = getValue();
@@ -199,7 +227,7 @@ export function createField( { name, label, type = 'text', required = false, max
 			message = rule( current );
 		}
 
-		setError( message );
+		fieldError.fromValidation( message );
 		return message;
 	}
 
@@ -210,7 +238,7 @@ export function createField( { name, label, type = 'text', required = false, max
 		getValue,
 		setValue,
 		validate,
-		setError,
+		setError: fieldError.fromServer,
 		focus: () => control.focus(),
 		setHint( text ) {
 			if ( hintElement ) {

@@ -4,9 +4,11 @@
  * - Cuatro tipos: success, error, warning e info, con su ícono y el color de los tokens.
  * - Apilables, con cierre manual y anunciados a lectores de pantalla (región aria-live de Notyf).
  * - El mensaje se escapa siempre: Notyf lo inserta como HTML y puede venir del servidor.
+ * - Con un drawer o diálogo abierto, los toasts se muestran dentro de él: si no, quedarían debajo
+ *   de la top layer, invisibles e inertes (QA-024).
  */
 import { Notyf } from 'notyf';
-import { escapeHtml } from '../core/dom.js';
+import { escapeHtml, topLayerHost } from '../core/dom.js';
 
 /** Ícono y duración (ms) de cada tipo. Los errores se muestran más tiempo. */
 const TYPES = {
@@ -18,8 +20,12 @@ const TYPES = {
 
 let notyf = null;
 
+/** Contenedor de los toasts y región aria-live de Notyf. */
+let floating = [];
+
 /**
- * Instancia única, creada la primera vez que se muestra un toast.
+ * Instancia única, creada la primera vez que se muestra un toast. Antes de cada toast lleva sus
+ * contenedores a la capa visible (topLayerHost).
  *
  * @returns {Notyf} Instancia.
  */
@@ -37,6 +43,14 @@ function instance() {
 				icon: { className: icon, tagName: 'i' },
 			} ) ),
 		} );
+		// Notyf 3 no expone sus contenedores en la API pública; están en view.container y view.a11yContainer.
+		floating = [ notyf.view.container, notyf.view.a11yContainer ];
+		floating.forEach( ( element ) => element.setAttribute( 'data-ep-floating', '' ) );
+	}
+
+	const host = topLayerHost();
+	if ( floating[ 0 ].parentElement !== host ) {
+		host.append( ...floating );
 	}
 	return notyf;
 }

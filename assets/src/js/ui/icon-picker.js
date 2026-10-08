@@ -8,6 +8,7 @@
 import { h, icon, uid } from '../core/dom.js';
 import { __, sprintf } from '../core/i18n.js';
 import { matchesQuery } from '../core/search.js';
+import { createFieldError } from './form.js';
 
 /**
  * Crea el selector.
@@ -18,7 +19,9 @@ import { matchesQuery } from '../core/search.js';
 export function createIconPicker( { name, label, icons, value = '', required = false, onChange } ) {
 	const labelId = uid( `ep-field-${ name }-label` );
 	const errorId = uid( `ep-field-${ name }-error` );
-	let selected = icons.some( ( item ) => item.key === value ) ? value : '';
+	// Una clave fuera del catálogo (por ejemplo, un ícono retirado) cuenta como «sin elegir» (QA-026).
+	const inCatalog = ( key ) => ( icons.some( ( item ) => item.key === key ) ? key : '' );
+	let selected = inCatalog( value );
 
 	const options = icons.map( ( item ) =>
 		h(
@@ -58,6 +61,12 @@ export function createIconPicker( { name, label, icons, value = '', required = f
 		error
 	);
 
+	const fieldError = createFieldError( () => selected, ( message ) => {
+		errorText.textContent = message ?? '';
+		error.hidden = ! message;
+		element.classList.toggle( 'is-invalid', Boolean( message ) );
+	} );
+
 	refresh();
 
 	function visibleOptions() {
@@ -79,7 +88,7 @@ export function createIconPicker( { name, label, icons, value = '', required = f
 	function select( key, { silent = false } = {} ) {
 		selected = key;
 		refresh();
-		setError( null );
+		fieldError.fromValidation( null );
 		if ( ! silent ) {
 			onChange?.( key );
 		}
@@ -112,24 +121,18 @@ export function createIconPicker( { name, label, icons, value = '', required = f
 		next?.focus();
 	}
 
-	function setError( message ) {
-		errorText.textContent = message ?? '';
-		error.hidden = ! message;
-		element.classList.toggle( 'is-invalid', Boolean( message ) );
-	}
-
 	return {
 		name,
 		element,
 		getValue: () => selected,
-		setValue: ( key ) => select( String( key ), { silent: true } ),
+		setValue: ( key ) => select( inCatalog( String( key ) ), { silent: true } ),
 		validate() {
 			/* translators: %s: nombre del campo. */
 			const message = required && '' === selected ? sprintf( __( 'El campo «%s» es obligatorio.', 'eventos-probolsas' ), label ) : null;
-			setError( message );
+			fieldError.fromValidation( message );
 			return message;
 		},
-		setError,
+		setError: fieldError.fromServer,
 		focus: () => ( options.find( ( option ) => 0 === option.tabIndex ) ?? search ).focus(),
 	};
 }

@@ -99,6 +99,31 @@ export function icon( classes ) {
 	return h( 'i', { class: classes, attrs: { 'aria-hidden': 'true' } } );
 }
 
+/**
+ * Dónde insertar los elementos flotantes (toasts, tooltips): el último <dialog> modal abierto o <body>.
+ * Un diálogo abierto con showModal() queda por encima de todo (top layer) y deja inerte el resto de
+ * la página: un toast fuera de él no se vería ni se anunciaría (QA-024).
+ *
+ * @returns {HTMLElement} Contenedor.
+ */
+export function topLayerHost() {
+	return [ ...document.querySelectorAll( 'dialog[open]' ) ].pop() ?? document.body;
+}
+
+/**
+ * Antes de eliminar un diálogo, lleva a la capa visible los elementos flotantes que aloja
+ * (marcados con `data-ep-floating`), para no perder los toasts que siguen en pantalla.
+ * Se llama después de dialog.close(), cuando el diálogo ya no cuenta como abierto.
+ *
+ * @param {HTMLDialogElement} dialog Diálogo que se va a eliminar.
+ */
+export function releaseFloating( dialog ) {
+	const floating = [ ...dialog.children ].filter( ( child ) => child.hasAttribute( 'data-ep-floating' ) );
+	if ( floating.length > 0 ) {
+		topLayerHost().append( ...floating );
+	}
+}
+
 let uidCounter = 0;
 
 /**

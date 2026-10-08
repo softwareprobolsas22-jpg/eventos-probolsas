@@ -65,6 +65,20 @@ describe( 'createColorField (CP-3.17)', () => {
 		field.element.querySelector( '[data-color="#7C3AED"]' ).click();
 		expect( hex.getAttribute( 'aria-invalid' ) ).toBe( 'false' );
 	} );
+
+	it( 'el error de la API se mantiene al salir sin editar y desaparece al cambiar el color (QA-025)', () => {
+		const { field } = build();
+		const hex = field.element.querySelector( 'input[type="text"]' );
+		const error = field.element.querySelector( '.ep-field__error' );
+		field.setError( 'El color no es válido.' );
+
+		hex.dispatchEvent( new Event( 'blur' ) );
+		expect( error.hidden ).toBe( false );
+		expect( error.textContent ).toBe( 'El color no es válido.' );
+
+		field.element.querySelector( '[data-color="#7C3AED"]' ).click();
+		expect( error.hidden ).toBe( true );
+	} );
 } );
 
 describe( 'createIconPicker (CP-3.18)', () => {
@@ -122,6 +136,28 @@ describe( 'createIconPicker (CP-3.18)', () => {
 	it( 'es obligatorio', () => {
 		const picker = createIconPicker( { name: 'icon', label: 'Ícono', icons: ICONS, required: true } );
 
+		expect( picker.validate() ).toBe( 'El campo «Ícono» es obligatorio.' );
+	} );
+
+	it( 'el error de la API se mantiene al validar sin cambiar de ícono y desaparece al elegir otro (QA-025)', () => {
+		const { picker, options } = build();
+		const error = picker.element.querySelector( '.ep-field__error' );
+		picker.setError( 'El ícono no está permitido.' );
+
+		expect( picker.validate() ).toBeNull();
+		expect( error.hidden ).toBe( false );
+
+		options[ 0 ].click();
+		expect( error.hidden ).toBe( true );
+	} );
+
+	it( 'setValue() con un ícono fuera del catálogo deja el campo sin elegir (QA-026)', () => {
+		const { picker, options } = build();
+
+		picker.setValue( 'no-existe' );
+
+		expect( picker.getValue() ).toBe( '' );
+		expect( options.every( ( option ) => 'false' === option.getAttribute( 'aria-checked' ) ) ).toBe( true );
 		expect( picker.validate() ).toBe( 'El campo «Ícono» es obligatorio.' );
 	} );
 } );

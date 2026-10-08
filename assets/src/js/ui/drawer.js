@@ -5,7 +5,7 @@
  * cerrar consulta onRequestClose (por ejemplo, para confirmar si hay cambios sin guardar).
  * En pantallas pequeñas ocupa todo el ancho.
  */
-import { h, uid } from '../core/dom.js';
+import { h, releaseFloating, uid } from '../core/dom.js';
 import { __ } from '../core/i18n.js';
 import { iconButton } from './button.js';
 
@@ -49,6 +49,7 @@ export function openDrawer( { title, body, footer = [], size = 'default', onRequ
 		}
 		closed = true;
 		dialog.close();
+		releaseFloating( dialog );
 		dialog.remove();
 		if ( opener instanceof HTMLElement && opener.isConnected ) {
 			opener.focus();

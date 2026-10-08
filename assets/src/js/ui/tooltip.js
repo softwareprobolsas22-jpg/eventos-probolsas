@@ -21,7 +21,8 @@ function baseOptions() {
 		duration: reduced ? 0 : [ 150, 100 ],
 		delay: [ 250, 0 ],
 		maxWidth: 320,
-		appendTo: () => document.body,
+		// Dentro de un drawer o diálogo modal, el tooltip va en él: en <body> quedaría debajo de la top layer (QA-024).
+		appendTo: ( reference ) => reference.closest( 'dialog[open]' ) ?? document.body,
 		// El elemento ya tiene nombre accesible; evita que el lector de pantalla lea el texto dos veces.
 		aria: { content: null, expanded: false },
 	};

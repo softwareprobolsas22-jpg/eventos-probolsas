@@ -40,7 +40,7 @@ describe( 'tooltips (D-11)', () => {
 		expect( labels.target ).toBe( '[data-ep-tooltip]' );
 		expect( labels.theme ).toBe( 'ep' );
 		expect( labels.trigger ).toBe( 'mouseenter focus' );
-		expect( labels.appendTo() ).toBe( document.body );
+		expect( labels.appendTo( document.body.appendChild( document.createElement( 'button' ) ) ) ).toBe( document.body );
 		expect( truncated.target ).toBe( '.ep-truncate' );
 
 		const action = document.createElement( 'button' );
@@ -72,5 +72,21 @@ describe( 'tooltips (D-11)', () => {
 
 		expect( tippy.calls[ 0 ].options.animation ).toBe( false );
 		expect( tippy.calls[ 0 ].options.duration ).toBe( 0 );
+	} );
+
+	it( 'dentro de un drawer o diálogo abierto, el tooltip se inserta en él (QA-024)', () => {
+		initTooltips( document.body );
+		const { appendTo } = tippy.calls[ 0 ].options;
+
+		const dialog = document.createElement( 'dialog' );
+		const close = document.createElement( 'button' );
+		dialog.append( close );
+		document.body.append( dialog );
+		dialog.setAttribute( 'open', '' );
+
+		expect( appendTo( close ) ).toBe( dialog );
+
+		dialog.removeAttribute( 'open' );
+		expect( appendTo( close ) ).toBe( document.body );
 	} );
 } );
