@@ -1,0 +1,73 @@
+// Encabezado de pantalla: icono + título + subtítulo y, a la derecha, las acciones.
+@use "../tools/mixins" as m;
+
+.ep-page-header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ep-space-4);
+	align-items: center;
+	justify-content: space-between;
+	margin: var(--ep-space-4) 0 var(--ep-space-6);
+
+	&__heading {
+		display: flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		min-width: 0;
+	}
+
+	&__icon {
+		display: inline-flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		font-size: var(--ep-font-size-xl);
+		color: var(--ep-color-primary);
+		background: var(--ep-color-primary-soft);
+		border-radius: var(--ep-radius-lg);
+	}
+
+	&__text {
+		min-width: 0;
+	}
+
+	&__title {
+		margin: 0;
+		padding: 0;
+		font-size: var(--ep-font-size-xl);
+		font-weight: var(--ep-font-weight-semibold);
+		line-height: var(--ep-line-height-tight);
+		color: var(--ep-color-text);
+
+		@include m.up(md) {
+			font-size: var(--ep-font-size-2xl);
+		}
+	}
+
+	&__subtitle {
+		margin: var(--ep-space-1) 0 0;
+		font-size: var(--ep-font-size-md);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+
+		&:empty {
+			display: none;
+		}
+
+		@include m.down(sm) {
+			width: 100%;
+		}
+	}
+}
+
+.ep-page-body {
+	display: grid;
+	gap: var(--ep-space-6);
+}

@@ -1,0 +1,20 @@
+// Tarjeta contenedora de secciones.
+.ep-card {
+	padding: var(--ep-space-4);
+	background: var(--ep-color-surface);
+	border: 1px solid var(--ep-color-border);
+	border-radius: var(--ep-radius-lg);
+	box-shadow: var(--ep-shadow-sm);
+
+	&__title {
+		margin: 0;
+		font-size: var(--ep-font-size-lg);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+	}
+
+	&__description {
+		margin: var(--ep-space-1) 0 var(--ep-space-4);
+		color: var(--ep-color-text-muted);
+	}
+}

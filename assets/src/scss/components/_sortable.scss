@@ -1,0 +1,75 @@
+// Lista ordenable (ui/sortable-list.js): arrastrar con el mouse o subir/bajar con los botones.
+@use "../tools/mixins" as m;
+
+.ep-reorder__hint {
+	margin-bottom: var(--ep-space-4);
+}
+
+.ep-sortable {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ep-space-2);
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	user-select: none;
+
+	&__item {
+		display: flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		min-width: 0;
+		padding: var(--ep-space-2) var(--ep-space-3);
+		cursor: grab;
+		background: var(--ep-color-surface);
+		border: 1px solid var(--ep-color-border);
+		border-radius: var(--ep-radius-md);
+		transition:
+			border-color var(--ep-duration-fast) var(--ep-easing-standard),
+			box-shadow var(--ep-duration-fast) var(--ep-easing-standard);
+
+		&:hover {
+			border-color: var(--ep-color-secondary);
+		}
+
+		&.is-dragging {
+			cursor: grabbing;
+			background: var(--ep-color-primary-soft);
+			border-style: dashed;
+			box-shadow: var(--ep-shadow-md);
+		}
+
+		@include m.reduced-motion {
+			transition: none;
+		}
+	}
+
+	&__handle {
+		flex-shrink: 0;
+		color: var(--ep-color-text-muted);
+	}
+
+	&__position {
+		flex-shrink: 0;
+		min-width: 1.5rem;
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		font-variant-numeric: tabular-nums;
+		color: var(--ep-color-text-muted);
+		text-align: right;
+	}
+
+	&__content {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__actions {
+		display: flex;
+		flex-shrink: 0;
+		gap: var(--ep-space-1);
+	}
+}

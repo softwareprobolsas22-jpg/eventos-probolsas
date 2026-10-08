@@ -1,0 +1,37 @@
+// Barra entre los filtros y la tabla: resumen del resultado y acciones sobre él (exportar).
+@use "../tools/mixins" as m;
+
+.ep-table-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ep-space-3);
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: var(--ep-space-3);
+
+	&__summary {
+		margin: 0;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-muted);
+
+		strong {
+			font-weight: var(--ep-font-weight-semibold);
+			color: var(--ep-color-text);
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+
+		@include m.down(sm) {
+			width: 100%;
+
+			> * {
+				flex: 1 1 0;
+				justify-content: center;
+			}
+		}
+	}
+}

@@ -1,17 +1,17 @@
 {
-  "_config-Btk8m41d.css": {
-    "file": "css/config-Btk8m41d.css",
-    "src": "_config-Btk8m41d.css"
-  },
-  "_config-uWcC4SY3.js": {
-    "file": "js/chunks/config-uWcC4SY3.js",
-    "name": "config",
+  "_tooltip-Cf_kA9OC.js": {
+    "file": "js/chunks/tooltip-Cf_kA9OC.js",
+    "name": "tooltip",
     "css": [
-      "css/config-Btk8m41d.css"
+      "css/tooltip-DgC38MBH.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
     ]
+  },
+  "_tooltip-DgC38MBH.css": {
+    "file": "css/tooltip-DgC38MBH.css",
+    "src": "_tooltip-DgC38MBH.css"
   },
   "assets/src/js/pages/admin.js": {
     "file": "js/admin.js",
@@ -19,7 +19,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_config-uWcC4SY3.js"
+      "_tooltip-Cf_kA9OC.js"
     ],
     "css": [
       "css/admin.css"
@@ -31,7 +31,7 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_config-uWcC4SY3.js"
+      "_tooltip-Cf_kA9OC.js"
     ],
     "css": [
       "css/public.css"

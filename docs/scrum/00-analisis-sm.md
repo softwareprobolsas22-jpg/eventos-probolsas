@@ -361,7 +361,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 |---|---|---|---|
 | H-101 | Como gestor, quiero crear, editar, reordenar y eliminar tipos de evento con nombre, color, ícono y «requiere adjunto», para clasificar los eventos sin depender de un desarrollador  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 8 |
 | H-102 | Migraciones de tablas y semilla con los 4 tipos actuales  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-101-H-102.md)); integrada en `develop`* | B | 3 |
-| H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando | F | 8 |
+| H-103 | Design system: tokens, tema Bootstrap, botones, badge de tipo con contraste automático, toasts (Notyf), tooltips (Tippy), confirm-dialog, drawer, estados vacío/cargando  — *✅ aprobada por QA en la segunda revisión ([informe](../qa/2026-10-08-H-103.md)); integrada en `develop`* | F | 8 |
 | H-104 | Pantalla «Tipos de evento»: tabla (R-19, R-23), formulario en drawer con `color-field` e `icon-picker` y validación en tiempo real (R-24) | F | 5 |
 | H-105 | Pruebas de tipos: unicidad, conflicto al borrar con eventos, contraste, permisos | Q | 3 |
 
@@ -446,3 +446,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.11 | 2026-10-07 | H-001, H-005, H-006 y H-007 aprobadas por QA e integradas; CI con integración en WordPress real en verde |
 | 2.12 | 2026-10-07 | Cierre del Sprint 0 (23/23 puntos, [informe](../qa/2026-10-07-cierre-sprint-0.md)). Decisión del PO: pruebas de integración solo en el CI (QA-020) |
 | 2.13 | 2026-10-07 | Planning del Sprint 1 ([plan](sprint-1.md)); propuesta de colores de los tipos iniciales para la Review |
+| 2.14 | 2026-10-08 | H-101/H-102 integradas. H-103 aprobada por QA en la segunda revisión (QA-024: toasts y tooltips dentro de drawers y diálogos; QA-025: errores de la API persistentes); breakpoint `sm` = 576 px, igual que R-23 |

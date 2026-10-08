@@ -1,0 +1,112 @@
+// Panel lateral (ui/drawer.js): se desliza desde la derecha; en móvil ocupa toda la pantalla.
+@use "../tokens" as t;
+@use "../tools/mixins" as m;
+
+.ep-drawer {
+	width: min(32rem, 100vw);
+	max-width: 100vw;
+	height: 100dvh;
+	max-height: 100dvh;
+	padding: 0;
+	margin: 0 0 0 auto;
+
+	// Solo el cuerpo se desplaza: el encabezado y el pie quedan fijos (un único scroll).
+	overflow: hidden;
+	background: var(--ep-color-surface);
+	border: 0;
+	box-shadow: var(--ep-shadow-lg);
+	animation: ep-drawer-in var(--ep-duration-slow) var(--ep-easing-enter);
+
+	&[open] {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&--wide {
+		width: min(44rem, 100vw);
+	}
+
+	&::backdrop {
+		// Respaldo con el valor del token: en navegadores antiguos ::backdrop no hereda custom properties.
+		background: var(--ep-color-overlay, #{t.$overlay});
+		animation: ep-fade-in var(--ep-duration-base) var(--ep-easing-standard);
+	}
+
+	&__header {
+		display: flex;
+		gap: var(--ep-space-3);
+		align-items: center;
+		justify-content: space-between;
+		padding: var(--ep-space-4) var(--ep-space-5);
+		border-bottom: 1px solid var(--ep-color-border);
+	}
+
+	&__title {
+		margin: 0;
+		font-size: var(--ep-font-size-xl);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+	}
+
+	&__body {
+		flex: 1;
+
+		// Sin min-height: 0 un hijo flex no se encoge por debajo de su contenido, y el panel entero
+		// se desplazaba además del cuerpo (dos barras de desplazamiento).
+		min-height: 0;
+		padding: var(--ep-space-5);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	&__header,
+	&__footer {
+		flex-shrink: 0;
+	}
+
+	&__footer {
+		display: flex;
+		gap: var(--ep-space-2);
+		justify-content: flex-end;
+		padding: var(--ep-space-4) var(--ep-space-5);
+		background: var(--ep-color-surface-muted);
+		border-top: 1px solid var(--ep-color-border);
+	}
+
+	&__note {
+		margin-top: var(--ep-space-5);
+
+		code {
+			padding: 0 var(--ep-space-1);
+			font-size: var(--ep-font-size-sm);
+			background: var(--ep-color-surface-sunken);
+			border-radius: var(--ep-radius-sm);
+		}
+	}
+
+	@include m.down(sm) {
+		width: 100vw;
+
+		&__footer > * {
+			flex: 1;
+		}
+	}
+
+	@include m.reduced-motion {
+		animation: none;
+
+		&::backdrop {
+			animation: none;
+		}
+	}
+}
+
+@keyframes ep-drawer-in {
+	from {
+		transform: translateX(100%);
+	}
+
+	to {
+		transform: none;
+	}
+}
