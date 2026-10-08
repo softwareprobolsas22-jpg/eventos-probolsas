@@ -87,6 +87,19 @@ final class EventServiceProvider implements BootableProvider {
 		$container->get( EventRestController::class )->register();
 
 		add_filter( 'eventos_client_config', [ self::class, 'add_client_rules' ] );
+		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_media_library' ] );
+	}
+
+	/**
+	 * Carga el selector de la Biblioteca de Medios (`wp.media`) en la pantalla de eventos: el formulario
+	 * elige ahí la imagen o el PDF (R-09). Solo en esa pantalla, para no cargarlo en todo wp-admin (R-17).
+	 *
+	 * @param string $hook_suffix Pantalla actual de wp-admin.
+	 */
+	public static function enqueue_media_library( string $hook_suffix ): void {
+		if ( 'toplevel_page_' . EventsPage::SLUG === $hook_suffix ) {
+			wp_enqueue_media();
+		}
 	}
 
 	/**

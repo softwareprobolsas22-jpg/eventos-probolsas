@@ -386,6 +386,13 @@ final class EventRestControllerTest extends UnitTestCase {
 		$this->assertSame( EventService::client_rules(), $config['rules']['event'] );
 	}
 
+	public function test_the_media_library_loads_only_on_the_events_screen(): void {
+		Functions\expect( 'wp_enqueue_media' )->once();
+
+		EventServiceProvider::enqueue_media_library( 'eventos_page_eventos-probolsas-tipos' );
+		EventServiceProvider::enqueue_media_library( 'toplevel_page_eventos-probolsas' );
+	}
+
 	/**
 	 * Cuerpo válido de un evento, con cambios.
 	 *
