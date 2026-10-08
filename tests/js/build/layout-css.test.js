@@ -55,6 +55,13 @@ describe( 'reglas transversales en el CSS compilado', () => {
 		expect( range[ 1 ] ).not.toContain( 'display:none' );
 	} );
 
+	it( 'la tabla contiene sus elementos ocultos con posición absoluta: no ensanchan la página en móvil (R-13, QA-040)', () => {
+		const source = css( 'admin' );
+
+		expect( lastValue( source, '.ep-app .ep-data-table', 'position' ) ).toBe( 'relative' );
+		expect( lastValue( source, '.ep-app .ep-data-table__scroll', 'position' ) ).toBe( 'relative' );
+	} );
+
 	it( 'Bootstrap también deja los textarea sin redimensionar y los th centrados (no depende del orden de carga)', () => {
 		const shared = css( 'shared' );
 
