@@ -26,6 +26,7 @@ use Probolsas\Eventos\Tests\Unit\Support\InMemoryEventTypeRepository;
 use Probolsas\Eventos\Tests\Unit\UnitTestCase;
 
 /**
+ * @covers \Probolsas\Eventos\Core\Database\Tables
  * @covers \Probolsas\Eventos\Core\Database\Migrations\CreateBaseSchema
  * @covers \Probolsas\Eventos\Domains\EventType\Infrastructure\SeedDefaultEventTypes
  */
@@ -38,8 +39,9 @@ final class SeedAndSchemaTest extends UnitTestCase {
 	}
 
 	public function test_schema_creates_both_tables_with_the_agreed_columns(): void {
-		$wpdb         = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
+		$wpdb->charset = 'utf8mb4';
 		$wpdb->shouldReceive( 'get_charset_collate' )->andReturn( 'DEFAULT CHARSET=utf8mb4' );
 
 		$migration          = new CreateBaseSchema( new Tables( $wpdb ) );
@@ -48,6 +50,8 @@ final class SeedAndSchemaTest extends UnitTestCase {
 		$this->assertSame( 1, $migration->version() );
 		$this->assertStringStartsWith( "CREATE TABLE wp_eventos_event_types (\n", $types );
 		$this->assertStringContainsString( 'UNIQUE KEY name_key (name_key)', $types );
+		// La ñ es una letra propia: la unicidad compara name_key letra por letra (H-105).
+		$this->assertStringContainsString( 'name_key varchar(100) COLLATE utf8mb4_bin NOT NULL', $types );
 		$this->assertStringContainsString( 'requires_attachment tinyint(1) unsigned NOT NULL DEFAULT 0', $types );
 		$this->assertStringStartsWith( "CREATE TABLE wp_eventos_events (\n", $events );
 		// D-7 (v1.1): fin reservado desde v1 e índice para la consulta por solapamiento de rango.
@@ -111,5 +115,14 @@ final class SeedAndSchemaTest extends UnitTestCase {
 			DateFormatter::from_config( $config, new SystemClock() ),
 			new IconCatalog( $config )
 		);
+	}
+
+	public function test_binary_collation_follows_the_installation_charset(): void {
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->charset = 'utf8';
+		$this->assertSame( 'utf8_bin', ( new Tables( $wpdb ) )->binary_collation() );
+
+		$wpdb->charset = '';
+		$this->assertSame( 'utf8mb4_bin', ( new Tables( $wpdb ) )->binary_collation(), 'Sin DB_CHARSET, el de WordPress por defecto.' );
 	}
 }

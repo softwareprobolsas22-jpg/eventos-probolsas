@@ -18,8 +18,9 @@ use Probolsas\Eventos\Core\Database\Tables;
  * Decisiones del esquema (docs/scrum/00-analisis-sm.md §5.5):
  * - Sin llaves foráneas: dbDelta no las soporta. La integridad la garantizan los servicios de cada dominio,
  *   que además impiden eliminar un tipo que tenga eventos.
- * - `name_key` guarda el nombre normalizado (minúsculas, sin tildes) para que la unicidad no dependa del
- *   collation de la instalación.
+ * - `name_key` guarda el nombre normalizado (minúsculas, sin tildes, con la ñ) y se compara con collation
+ *   binaria: así la unicidad no depende del collation de la instalación, cuyas variantes `*_ci` tratan la
+ *   ñ como n y rechazarían «Cumpleanos» si existe «Cumpleaños» (H-105).
  * - Las fechas de auditoría se guardan en UTC (`*_gmt`); las de calendario (`start_*`, `end_*`) son la hora
  *   de pared de Colombia y no se convierten.
  * - `end_date` y `end_time` quedan reservados para la hora de fin y los eventos de varios días (D-7, v1.1):
@@ -64,7 +65,7 @@ final class CreateBaseSchema implements Migration {
 		$event_types = [
 			'id bigint(20) unsigned NOT NULL AUTO_INCREMENT',
 			'name varchar(100) NOT NULL',
-			'name_key varchar(100) NOT NULL',
+			'name_key varchar(100) COLLATE ' . $this->tables->binary_collation() . ' NOT NULL',
 			'slug varchar(120) NOT NULL',
 			'color char(7) NOT NULL',
 			'icon varchar(60) NOT NULL',
