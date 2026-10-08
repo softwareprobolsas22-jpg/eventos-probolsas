@@ -406,7 +406,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | Sprint | Meta | Historias | Pts |
 |---|---|---|---|
 | **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
-| **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — 🚧 en curso ([plan](sprint-1.md)) | H-101 … H-105 | 27 |
+| **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» | H-201 … H-207 | 40 |
 | **3** | «Los colaboradores ven el calendario sin desfases» | H-301 … H-305 | 26 |
 | **4** | «Listo para producción» | H-401 … H-404 | 11 |
@@ -449,3 +449,4 @@ El Sprint 2 está por encima de la capacidad estimada (30–35 pts): si la veloc
 | 2.14 | 2026-10-08 | H-101/H-102 integradas. H-103 aprobada por QA en la segunda revisión (QA-024: toasts y tooltips dentro de drawers y diálogos; QA-025: errores de la API persistentes); breakpoint `sm` = 576 px, igual que R-23 |
 | 2.15 | 2026-10-08 | H-104 aprobada por QA e integrada: pantalla «Tipos de evento» con interruptor «Requiere adjunto» (`createSwitchField`) |
 | 2.16 | 2026-10-08 | H-105 aprobada: pruebas de aceptación en WordPress real; QA-032 (la ñ se trataba como n por el collation) corregido con collation binaria en `name_key` |
+| 2.17 | 2026-10-08 | Cierre del Sprint 1 (27/27 puntos, [informe](../qa/2026-10-08-cierre-sprint-1.md)); pendiente en la Review: colores de los tipos iniciales y QA-029 |
