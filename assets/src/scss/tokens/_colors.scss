@@ -12,6 +12,7 @@
 $brand-primary: #155728;
 $brand-secondary: #669f30;
 $brand-white: #fff;
+$pure-black: #000;
 
 // Neutros con un leve matiz verde para armonizar con la marca.
 $neutral-900: #1b1f1c;
@@ -37,6 +38,9 @@ $colors: (
 	"secondary": $brand-secondary,
 	"secondary-soft": color.mix($brand-secondary, $brand-white, 14%),
 	"on-primary": $brand-white,
+	// Texto sobre el color de un tipo de evento (text_tone light/dark de la API, R-02).
+	"on-color-light": $brand-white,
+	"on-color-dark": $pure-black,
 	"text": $neutral-900,
 	"text-subtle": $neutral-700,
 	"text-muted": $neutral-500,

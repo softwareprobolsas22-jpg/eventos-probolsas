@@ -1,0 +1,53 @@
+// Botón de solo ícono (acciones de tabla, paginación). Área táctil mínima de 2.25rem (36 px).
+@use "../tools/mixins" as m;
+
+.ep-icon-button {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	font-size: var(--ep-font-size-md);
+	color: var(--ep-color-text-subtle);
+	cursor: pointer;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: var(--ep-radius-md);
+	transition:
+		background-color var(--ep-duration-fast) var(--ep-easing-standard),
+		color var(--ep-duration-fast) var(--ep-easing-standard),
+		transform var(--ep-duration-fast) var(--ep-easing-standard);
+
+	&:hover:not(:disabled) {
+		color: var(--ep-color-primary);
+		background: var(--ep-color-primary-soft);
+	}
+
+	&:active:not(:disabled) {
+		transform: scale(0.94);
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.4;
+	}
+
+	&--primary {
+		color: var(--ep-color-primary);
+	}
+
+	&--danger:hover:not(:disabled) {
+		color: var(--ep-color-error);
+		background: var(--ep-color-error-soft);
+	}
+
+	@include m.reduced-motion {
+		transition: none;
+
+		&:active:not(:disabled) {
+			transform: none;
+		}
+	}
+}

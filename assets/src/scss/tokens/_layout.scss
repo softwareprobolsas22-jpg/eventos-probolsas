@@ -1,6 +1,7 @@
 // Breakpoints de la matriz de QA (360 / 768 / 1024 / 1440 px). Se usan con los mixins up() y down().
+// "sm" coincide con el de Bootstrap: por debajo de 576 px la paginación pasa a su vista compacta (R-23).
 $breakpoints: (
-	"sm": 480px,
+	"sm": 576px,
 	"md": 768px,
 	"lg": 1024px,
 	"xl": 1440px,
@@ -15,3 +16,6 @@ $z-index: (
 	"toast": 100030,
 	"tooltip": 100040,
 );
+
+// Tamaño mínimo de un control táctil en móvil (WCAG 2.5.5, R-23).
+$touch-target: 2.75rem;

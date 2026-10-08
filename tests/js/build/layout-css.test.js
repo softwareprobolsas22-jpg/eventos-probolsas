@@ -37,6 +37,17 @@ describe( 'reglas transversales en el CSS compilado', () => {
 		expect( lastValue( source, `${ scope } [hidden]`, 'display' ) ).toBe( 'none!important' );
 	} );
 
+	it( 'en móvil (< 576 px) la paginación queda en anterior / «Página x de y» / siguiente, con botones de 44 px (R-23)', () => {
+		const source = css( 'admin' );
+		const mobile = /@media not \(min-width:576px\)\{([^@]*)\}/.exec( source.slice( source.indexOf( '.ep-pagination__compact{' ) ) );
+
+		expect( mobile ).not.toBeNull();
+		expect( mobile[ 1 ] ).toContain( '.ep-app .ep-pagination__pages{display:none}' );
+		expect( mobile[ 1 ] ).toContain( '.ep-app .ep-pagination [data-ep-page-edge]{display:none}' );
+		expect( mobile[ 1 ] ).toContain( '.ep-app .ep-pagination .ep-icon-button{width:var(--ep-touch-target);height:var(--ep-touch-target)}' );
+		expect( source ).toContain( '--ep-touch-target:2.75rem' );
+	} );
+
 	it( 'Bootstrap también deja los textarea sin redimensionar y los th centrados (no depende del orden de carga)', () => {
 		const shared = css( 'shared' );
 
@@ -66,8 +77,10 @@ function isScoped( selector ) {
 describe( 'Bootstrap encapsulado en los contenedores del plugin', () => {
 	const bootstrap = rules( css( 'shared' ) )
 		.flatMap( ( { selector } ) => splitSelector( selector ) )
-		// Font Awesome se carga en la raíz a propósito: sus clases `.fa*` no chocan con wp-admin ni el tema.
-		.filter( ( selector ) => ! /^(:root|:host|\.fa|:is\(\.fas)/.test( selector ) );
+		// Font Awesome, Tippy y Notyf se cargan en la raíz a propósito: sus clases (`.fa*`, `.tippy-*`,
+		// `.notyf*`) no chocan con wp-admin ni el tema, y los tooltips y toasts viven en <body>, fuera de
+		// los contenedores del plugin.
+		.filter( ( selector ) => ! /^(:root|:host|\.fa|:is\(\.fas|\.tippy-|\[data-tippy-root\]|\.notyf)/.test( selector ) );
 
 	it( 'compila Bootstrap', () => {
 		expect( bootstrap.length ).toBeGreaterThan( 500 );

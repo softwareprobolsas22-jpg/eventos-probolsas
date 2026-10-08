@@ -1,0 +1,18 @@
+// Tema «ep» de Tippy.js (ui/tooltip.js). Se selecciona por atributo: Tippy agrega data-theme="ep".
+[data-theme~="ep"] {
+	padding: var(--ep-space-1) var(--ep-space-2);
+	font-family: var(--ep-font-family-base);
+	font-size: var(--ep-font-size-sm);
+	line-height: var(--ep-line-height-tight);
+	color: var(--ep-color-on-primary);
+	overflow-wrap: anywhere;
+	background-color: var(--ep-color-text);
+	border-radius: var(--ep-radius-sm);
+	box-shadow: var(--ep-shadow-md);
+
+	// La flecha de Tippy toma su color de la propiedad color.
+	/* stylelint-disable-next-line selector-class-pattern -- Clase propia de Tippy.js. */
+	> .tippy-arrow {
+		color: var(--ep-color-text);
+	}
+}
