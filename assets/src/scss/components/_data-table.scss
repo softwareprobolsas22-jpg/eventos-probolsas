@@ -155,6 +155,14 @@
 		}
 	}
 
+	// En móvil «Página x de y» reemplaza al rango (R-23, QA-029). Se oculta solo a la vista: sigue siendo
+	// la región aria-live que anuncia el cambio de página a los lectores de pantalla.
+	@include m.down(sm) {
+		&__range {
+			@include m.visually-hidden;
+		}
+	}
+
 	@include m.reduced-motion {
 		&__table tbody tr {
 			transition: none;
