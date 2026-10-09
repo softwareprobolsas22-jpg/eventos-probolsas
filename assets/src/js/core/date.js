@@ -69,6 +69,7 @@ export function createDateFormatter( ui ) {
 		day: '2-digit',
 		hour: '2-digit',
 		minute: '2-digit',
+		second: '2-digit',
 		hourCycle: 'h23',
 	} );
 
@@ -162,6 +163,19 @@ export function createDateFormatter( ui ) {
 		today( now = new Date() ) {
 			const parts = partsOf( now );
 			return `${ parts.year }-${ parts.month }-${ parts.day }`;
+		},
+
+		/**
+		 * Fecha y hora de pared actuales en la zona configurada, sin zona (`YYYY-MM-DDTHH:MM:SS`). Es el
+		 * `now` de FullCalendar, que trabaja en `timeZone: 'UTC'` para no convertir las horas de los
+		 * eventos: sin esto, su «hoy» sería la fecha UTC (RL-02).
+		 *
+		 * @param {Date} [now] Momento de referencia (inyectable en pruebas).
+		 * @returns {string} Fecha y hora.
+		 */
+		wallTime( now = new Date() ) {
+			const parts = partsOf( now );
+			return `${ parts.year }-${ parts.month }-${ parts.day }T${ parts.hour }:${ parts.minute }:${ parts.second }`;
 		},
 	};
 }

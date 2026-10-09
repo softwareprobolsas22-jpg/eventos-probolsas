@@ -56,6 +56,25 @@
     },
     {
       "files": [
+        "assets/src/scss/widgets/**/*.scss"
+      ],
+      "rules": {
+        "selector-class-pattern": [
+          "^(ep-[a-z0-9]+(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?|is-[a-z0-9]+(-[a-z0-9]+)*|fc(-[a-z0-9]+)*|ts-[a-z0-9]+(-[a-z0-9]+)*|item|remove|option|active|focus|no-results)$",
+          {
+            "message": "Clases BEM con prefijo ep-, o las de FullCalendar (fc-*) y Tom Select (ts-*, item, remove, option, active, focus, no-results) al darles el tema."
+          }
+        ],
+        "custom-property-pattern": [
+          "^(ep|fc)-[a-z0-9]+(-[a-z0-9]+)*$",
+          {
+            "message": "Las custom properties llevan el prefijo --ep- (o --fc- al dar el tema a FullCalendar)."
+          }
+        ]
+      }
+    },
+    {
+      "files": [
         "assets/src/scss/vendor/**/*.scss"
       ],
       "rules": {

@@ -31,6 +31,12 @@ describe( 'createDateFormatter (casos compartidos con PHP)', () => {
 		expect( formatter.today( new Date( `${ nowUtc.replace( ' ', 'T' ) }Z` ) ) ).toBe( today );
 	} );
 
+	it( 'wallTime(): hora de pared de Bogotá sin zona, para el «ahora» de FullCalendar (RL-02)', () => {
+		expect( formatter.wallTime( new Date( '2026-10-08T01:30:00Z' ) ) ).toBe( '2026-10-07T20:30:00' );
+		expect( formatter.wallTime( new Date( '2026-10-08T04:59:59Z' ) ) ).toBe( '2026-10-07T23:59:59' );
+		expect( formatter.wallTime( new Date( '2026-10-08T05:00:00Z' ) ) ).toBe( '2026-10-08T00:00:00' );
+	} );
+
 	it( 'rechaza momentos sin zona horaria (serían ambiguos)', () => {
 		expect( () => formatter.formatDateTime( '2026-10-01 10:00:00' ) ).toThrow( /zona horaria/ );
 	} );

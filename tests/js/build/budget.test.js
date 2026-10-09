@@ -4,7 +4,7 @@
  * de forma estática, según el manifest de Vite), comprimido con gzip como lo sirve el servidor.
  *
  * Medición de H-004 (2026-10-07): CSS inicial ≈ 41 KB (Bootstrap encapsulado y Font Awesome, que incluye
- * la tabla de todos sus íconos); JS inicial < 2 KB. FullCalendar se cargará bajo demanda con el widget del
+ * la tabla de todos sus íconos); JS inicial < 2 KB. FullCalendar se carga bajo demanda con el widget del
  * calendario (H-302), fuera de la carga inicial.
  */
 import { readFileSync } from 'node:fs';
@@ -14,10 +14,16 @@ import { describe, expect, it } from 'vitest';
 const dist = new URL( '../../../assets/dist/', import.meta.url );
 const manifest = JSON.parse( readFileSync( new URL( '.vite/manifest.json', dist ), 'utf8' ) );
 
-/** Límites en KB (gzip), con margen sobre la medición de H-004. */
-const BUDGET = { initialJs: 30, initialCss: 45 };
+/**
+ * Límites en KB (gzip), con margen sobre la medición de H-004. El calendario se mide aparte: lo que
+ * descarga al montarse, además de lo que ya cargó la página (H-302: JS 76 KB, CSS 1,5 KB; FullCalendar
+ * inyecta su propio CSS desde el JS).
+ */
+const BUDGET = { initialJs: 30, initialCss: 45, calendarJs: 85, calendarCss: 5 };
 
 const ENTRIES = [ 'assets/src/js/pages/admin.js', 'assets/src/js/pages/public.js' ];
+
+const CALENDAR = 'assets/src/js/public/calendar.js';
 
 /**
  * Peso de un archivo con gzip, en KB.
@@ -57,6 +63,17 @@ describe( 'presupuesto de peso de los assets (R-17)', () => {
 
 		expect( total( load.js ) ).toBeLessThanOrEqual( BUDGET.initialJs );
 		expect( total( load.css ) ).toBeLessThanOrEqual( BUDGET.initialCss );
+	} );
+
+	it( 'el calendario (FullCalendar y Tom Select) se descarga aparte, dentro de su presupuesto', () => {
+		const page = initialLoad( 'assets/src/js/pages/public.js' );
+		const widget = initialLoad( CALENDAR );
+		const extra = ( files, loaded ) => files.filter( ( file ) => ! loaded.includes( file ) );
+
+		expect( manifest[ 'assets/src/js/pages/public.js' ].dynamicImports ).toContain( CALENDAR );
+		expect( page.js.some( ( file ) => file.includes( 'calendar' ) ) ).toBe( false );
+		expect( total( extra( widget.js, page.js ) ) ).toBeLessThanOrEqual( BUDGET.calendarJs );
+		expect( total( extra( widget.css, page.css ) ) ).toBeLessThanOrEqual( BUDGET.calendarCss );
 	} );
 
 	it( 'solo se publica la fuente sólida de Font Awesome (la única que usa el plugin)', () => {
