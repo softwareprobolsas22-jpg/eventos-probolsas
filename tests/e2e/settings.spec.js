@@ -14,7 +14,9 @@ test.describe( 'Ajustes', () => {
 		await expect( save ).toBeDisabled();
 
 		try {
-			await toggle.check();
+			// Como una persona: clic en la etiqueta (el input mide 1 px y queda bajo la pista del interruptor).
+			await page.locator( '.ep-switch__label' ).click();
+			await expect( toggle ).toBeChecked();
 			await save.click();
 			const dialog = page.locator( 'dialog.ep-dialog' );
 			await expect( dialog ).toContainText( '¿Borrar los datos al desinstalar?' );
@@ -28,7 +30,7 @@ test.describe( 'Ajustes', () => {
 			await openScreen( page, 'eventos-probolsas-ajustes' );
 			const current = page.getByRole( 'switch', { name: 'Borrar todos los datos al desinstalar' } );
 			if ( await current.isChecked() ) {
-				await current.uncheck();
+				await page.locator( '.ep-switch__label' ).click();
 				await page.getByRole( 'button', { name: 'Guardar cambios' } ).click();
 				await expect( toastWith( page, 'al desinstalar se conservarán los datos' ) ).toBeVisible();
 			}
