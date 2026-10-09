@@ -17,10 +17,12 @@ use Probolsas\Eventos\Core\Database\Tables;
 use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Domains\EventType\Application\EventTypeService;
 use Probolsas\Eventos\Domains\EventType\Domain\EventTypeRepository;
+use Probolsas\Eventos\Domains\EventType\Infrastructure\CacheFlushingEventTypeRepository;
 use Probolsas\Eventos\Domains\EventType\Infrastructure\SeedDefaultEventTypes;
 use Probolsas\Eventos\Domains\EventType\Infrastructure\WpdbEventTypeRepository;
 use Probolsas\Eventos\Domains\EventType\Presentation\EventTypeRestController;
 use Probolsas\Eventos\Domains\EventType\Presentation\EventTypesPage;
+use Probolsas\Eventos\Shared\Cache\ResponseCache;
 use Probolsas\Eventos\Shared\Text\Slugger;
 use Probolsas\Eventos\Shared\Text\TextNormalizer;
 use Probolsas\Eventos\Shared\Time\DateFormatter;
@@ -44,7 +46,8 @@ final class EventTypeServiceProvider implements BootableProvider {
 			static function ( Container $c ): EventTypeRepository {
 				global $wpdb;
 
-				return new WpdbEventTypeRepository( $wpdb, $c->get( Tables::class ) );
+				// Cada escritura invalida el feed del calendario y los próximos guardados en caché (H-401).
+				return new CacheFlushingEventTypeRepository( new WpdbEventTypeRepository( $wpdb, $c->get( Tables::class ) ), $c->get( ResponseCache::class ) );
 			}
 		);
 

@@ -11,7 +11,9 @@ namespace Probolsas\Eventos\Shared;
 
 use Probolsas\Eventos\Core\Config;
 use Probolsas\Eventos\Core\Container;
+use Probolsas\Eventos\Core\Lifecycle\Uninstaller;
 use Probolsas\Eventos\Core\ServiceProvider;
+use Probolsas\Eventos\Shared\Cache\ResponseCache;
 use Probolsas\Eventos\Shared\Text\Slugger;
 use Probolsas\Eventos\Shared\Text\TextNormalizer;
 use Probolsas\Eventos\Shared\Time\Clock;
@@ -32,6 +34,9 @@ final class SharedServiceProvider implements ServiceProvider {
 	 */
 	public function register( Container $container ): void {
 		$container->set( Clock::class, static fn(): Clock => new SystemClock() );
+
+		$container->set( ResponseCache::class, static fn(): ResponseCache => new ResponseCache() );
+		$container->tag( Uninstaller::TASKS_TAG, ResponseCache::class );
 
 		$container->set(
 			DateFormatter::class,

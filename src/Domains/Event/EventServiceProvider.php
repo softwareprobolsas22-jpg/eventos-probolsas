@@ -21,6 +21,7 @@ use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Domains\Event\Application\CalendarService;
 use Probolsas\Eventos\Domains\Event\Application\EventService;
 use Probolsas\Eventos\Domains\Event\Domain\EventRepository;
+use Probolsas\Eventos\Domains\Event\Infrastructure\CacheFlushingEventRepository;
 use Probolsas\Eventos\Domains\Event\Infrastructure\WpdbEventRepository;
 use Probolsas\Eventos\Domains\Event\Presentation\CalendarFeedController;
 use Probolsas\Eventos\Domains\Event\Presentation\CalendarShortcode;
@@ -36,6 +37,7 @@ use Probolsas\Eventos\Domains\Event\Presentation\UpcomingShortcode;
 use Probolsas\Eventos\Domains\EventType\Domain\EventTypeRepository;
 use Probolsas\Eventos\Domains\Media\Domain\AttachmentGateway;
 use Probolsas\Eventos\Domains\Media\Domain\MediaPolicy;
+use Probolsas\Eventos\Shared\Cache\ResponseCache;
 use Probolsas\Eventos\Shared\Time\Clock;
 use Probolsas\Eventos\Shared\Time\DateFormatter;
 use Probolsas\Eventos\Shared\Ui\ColorContrast;
@@ -58,7 +60,8 @@ final class EventServiceProvider implements BootableProvider {
 			static function ( Container $c ): EventRepository {
 				global $wpdb;
 
-				return new WpdbEventRepository( $wpdb, $c->get( Tables::class ) );
+				// Cada escritura invalida el feed del calendario y los próximos guardados en caché (H-401).
+				return new CacheFlushingEventRepository( new WpdbEventRepository( $wpdb, $c->get( Tables::class ) ), $c->get( ResponseCache::class ) );
 			}
 		);
 
@@ -114,12 +117,12 @@ final class EventServiceProvider implements BootableProvider {
 	private function register_calendar( Container $container ): void {
 		$container->set(
 			CalendarFeedController::class,
-			static fn( Container $c ): CalendarFeedController => new CalendarFeedController( $c->get( CalendarService::class ), $c->get( EventPresenter::class ), $c->get( ColorContrast::class ) )
+			static fn( Container $c ): CalendarFeedController => new CalendarFeedController( $c->get( CalendarService::class ), $c->get( EventPresenter::class ), $c->get( ColorContrast::class ), $c->get( ResponseCache::class ) )
 		);
 
 		$container->set(
 			UpcomingController::class,
-			static fn( Container $c ): UpcomingController => new UpcomingController( $c->get( CalendarService::class ), $c->get( EventPresenter::class ) )
+			static fn( Container $c ): UpcomingController => new UpcomingController( $c->get( CalendarService::class ), $c->get( EventPresenter::class ), $c->get( ResponseCache::class ), $c->get( DateFormatter::class ) )
 		);
 
 		$container->set(
@@ -160,6 +163,15 @@ final class EventServiceProvider implements BootableProvider {
 
 		add_filter( 'eventos_client_config', [ self::class, 'add_client_rules' ] );
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue_media_library' ] );
+
+		// El feed y los próximos llevan la dirección y el tipo del adjunto: si se edita o se borra en la
+		// Biblioteca de Medios, las respuestas guardadas dejan de valer (H-401).
+		$cache = $container->get( ResponseCache::class );
+		add_action( 'edit_attachment', [ $cache, 'flush' ] );
+		add_action( 'delete_attachment', [ $cache, 'flush' ] );
+
+		// Tipos y usuarios leídos una vez por petición REST, no por proceso.
+		add_filter( 'rest_pre_dispatch', [ $container->get( EventPresenter::class ), 'forget' ] );
 	}
 
 	/**
