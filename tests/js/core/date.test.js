@@ -43,6 +43,12 @@ describe( 'createDateFormatter (casos compartidos con PHP)', () => {
 		expect( () => formatter.formatLongCalendarDate( '2026-02-30' ) ).toThrow( /Fecha no válida/ );
 	} );
 
+	it( 'calendarDateParts(): día, mes y día de la semana cortos, sin punto final', () => {
+		expect( formatter.calendarDateParts( '2026-10-07' ) ).toEqual( { day: '7', month: 'oct', weekday: 'mié' } );
+		expect( formatter.calendarDateParts( '2026-09-07' ) ).toEqual( { day: '7', month: 'sept', weekday: 'lun' } );
+		expect( () => formatter.calendarDateParts( '2026-13-01' ) ).toThrow( /Fecha no válida/ );
+	} );
+
 	it( 'rechaza momentos sin zona horaria (serían ambiguos)', () => {
 		expect( () => formatter.formatDateTime( '2026-10-01 10:00:00' ) ).toThrow( /zona horaria/ );
 	} );

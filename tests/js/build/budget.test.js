@@ -19,11 +19,13 @@ const manifest = JSON.parse( readFileSync( new URL( '.vite/manifest.json', dist 
  * descarga al montarse, además de lo que ya cargó la página (H-302: JS 76 KB, CSS 1,5 KB; FullCalendar
  * inyecta su propio CSS desde el JS).
  */
-const BUDGET = { initialJs: 30, initialCss: 45, calendarJs: 85, calendarCss: 5 };
+const BUDGET = { initialJs: 30, initialCss: 45, calendarJs: 85, calendarCss: 5, upcomingJs: 10, upcomingCss: 3 };
 
 const ENTRIES = [ 'assets/src/js/pages/admin.js', 'assets/src/js/pages/public.js' ];
 
 const CALENDAR = 'assets/src/js/public/calendar.js';
+
+const UPCOMING = 'assets/src/js/public/upcoming.js';
 
 /**
  * Peso de un archivo con gzip, en KB.
@@ -74,6 +76,17 @@ describe( 'presupuesto de peso de los assets (R-17)', () => {
 		expect( page.js.some( ( file ) => file.includes( 'calendar' ) ) ).toBe( false );
 		expect( total( extra( widget.js, page.js ) ) ).toBeLessThanOrEqual( BUDGET.calendarJs );
 		expect( total( extra( widget.css, page.css ) ) ).toBeLessThanOrEqual( BUDGET.calendarCss );
+	} );
+
+	it( 'los próximos eventos se descargan aparte y sin FullCalendar', () => {
+		const page = initialLoad( 'assets/src/js/pages/public.js' );
+		const widget = initialLoad( UPCOMING );
+		const extra = ( files, loaded ) => files.filter( ( file ) => ! loaded.includes( file ) );
+
+		expect( manifest[ 'assets/src/js/pages/public.js' ].dynamicImports ).toContain( UPCOMING );
+		expect( widget.js.some( ( file ) => file.includes( 'calendar' ) ) ).toBe( false );
+		expect( total( extra( widget.js, page.js ) ) ).toBeLessThanOrEqual( BUDGET.upcomingJs );
+		expect( total( extra( widget.css, page.css ) ) ).toBeLessThanOrEqual( BUDGET.upcomingCss );
 	} );
 
 	it( 'solo se publica la fuente sólida de Font Awesome (la única que usa el plugin)', () => {

@@ -34,6 +34,7 @@ test.describe( 'Calendario de la intranet', () => {
 	let allDay = '';
 	let pageUrl = '';
 	let twoCalendarsUrl = '';
+	let upcomingUrl = '';
 
 	test.beforeAll( async ( { browser }, testInfo ) => {
 		const page = await adminPage( browser, testInfo );
@@ -47,9 +48,11 @@ test.describe( 'Calendario de la intranet', () => {
 
 		const single = await createPage( page, nonce, unique( 'Calendario E2E' ), '[eventos_calendario]' );
 		const double = await createPage( page, nonce, unique( 'Dos calendarios E2E' ), '[eventos_calendario]\n\n[eventos_calendario tipos="reuniones-laborales"]' );
-		created.pages.push( single.id, double.id );
+		const upcoming = await createPage( page, nonce, unique( 'Próximos E2E' ), '[eventos_proximos limite="20" tipos="reuniones-laborales" titulo="Lo que viene"]' );
+		created.pages.push( single.id, double.id, upcoming.id );
 		pageUrl = single.link;
 		twoCalendarsUrl = double.link;
+		upcomingUrl = upcoming.link;
 		await page.close();
 	} );
 
@@ -116,6 +119,30 @@ test.describe( 'Calendario de la intranet', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect( modal ).toHaveCount( 0 );
 		await expect( event ).toBeFocused();
+	} );
+
+	test( '[eventos_proximos] lista desde hoy en Colombia y abre el mismo modal (H-304)', async ( { page } ) => {
+		await page.setViewportSize( { width: 1280, height: 900 } );
+		await page.goto( upcomingUrl );
+
+		const widget = page.locator( '.ep-upcoming' );
+		await expect( widget.getByRole( 'heading', { name: 'Lo que viene' } ) ).toBeVisible();
+		const item = widget.locator( '.ep-upcoming__event', { hasText: afternoon } );
+		await expect( item.locator( '.ep-upcoming__month' ) ).toHaveText( 'Hoy' );
+		await expect( item.locator( '.ep-upcoming__time' ) ).toHaveText( '03:00 p. m.' );
+		await expect( widget.locator( '.ep-upcoming__event', { hasText: allDay } ).locator( '.ep-upcoming__time' ) ).toHaveText( 'Todo el día' );
+		await expect( widget.locator( '.ep-badge', { hasText: 'Reuniones laborales' } ).first() ).toBeVisible();
+
+		await item.click();
+		const modal = page.locator( 'dialog.ep-event-modal[open]' );
+		await expect( modal.locator( '.ep-event-modal__title' ) ).toHaveText( afternoon );
+		await page.keyboard.press( 'Escape' );
+		await expect( modal ).toHaveCount( 0 );
+		await expect( item ).toBeFocused();
+
+		// No carga FullCalendar: solo el chunk de la lista (R-17).
+		const scripts = await page.evaluate( () => globalThis.performance.getEntriesByType( 'resource' ).map( ( entry ) => entry.name ).filter( ( name ) => name.includes( '/assets/dist/js/' ) ) );
+		expect( scripts.some( ( name ) => /chunks\/calendar-/.test( name ) ) ).toBe( false );
 	} );
 
 	test( 'en móvil empieza en la lista y no hay scroll horizontal (R-11, R-13)', async ( { page } ) => {

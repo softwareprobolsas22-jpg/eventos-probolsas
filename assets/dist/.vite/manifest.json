@@ -10,16 +10,38 @@
       "_runtime-DKPNw9Pd.js"
     ]
   },
-  "_date-B1KdQ3cG.js": {
-    "file": "js/chunks/date-B1KdQ3cG.js",
+  "_date-B6jkZ4Xu.js": {
+    "file": "js/chunks/date-B6jkZ4Xu.js",
     "name": "date"
   },
-  "_load-state-BjOEEZLW.js": {
-    "file": "js/chunks/load-state-BjOEEZLW.js",
-    "name": "load-state",
+  "_drawer-LQDyzTDl.js": {
+    "file": "js/chunks/drawer-LQDyzTDl.js",
+    "name": "drawer",
     "imports": [
       "_runtime-DKPNw9Pd.js",
       "_button-Zn7ZjNtw.js"
+    ]
+  },
+  "_event-modal-BM7CLY2r.css": {
+    "file": "css/event-modal-BM7CLY2r.css",
+    "src": "_event-modal-BM7CLY2r.css"
+  },
+  "_event-modal-Dld6g-eV.js": {
+    "file": "js/chunks/event-modal-Dld6g-eV.js",
+    "name": "event-modal",
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_button-Zn7ZjNtw.js"
+    ],
+    "css": [
+      "css/event-modal-BM7CLY2r.css"
+    ]
+  },
+  "_load-state-CHFTowJc.js": {
+    "file": "js/chunks/load-state-CHFTowJc.js",
+    "name": "load-state",
+    "imports": [
+      "_runtime-DKPNw9Pd.js"
     ]
   },
   "_runtime-DKPNw9Pd.js": {
@@ -60,10 +82,11 @@
     "isEntry": true,
     "imports": [
       "_runtime-DKPNw9Pd.js",
-      "_date-B1KdQ3cG.js"
+      "_date-B6jkZ4Xu.js"
     ],
     "dynamicImports": [
-      "assets/src/js/public/calendar.js"
+      "assets/src/js/public/calendar.js",
+      "assets/src/js/public/upcoming.js"
     ],
     "css": [
       "css/public.css",
@@ -74,40 +97,58 @@
     ]
   },
   "assets/src/js/public/calendar.js": {
-    "file": "js/chunks/calendar-BuMjR1wp.js",
+    "file": "js/chunks/calendar-CyseaOor.js",
     "name": "calendar",
     "src": "assets/src/js/public/calendar.js",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-DKPNw9Pd.js",
-      "_button-Zn7ZjNtw.js"
+      "_button-Zn7ZjNtw.js",
+      "_event-modal-Dld6g-eV.js"
     ],
     "css": [
-      "css/calendar-C1qp0RxW.css"
+      "css/calendar-DXf5THfx.css"
+    ]
+  },
+  "assets/src/js/public/upcoming.js": {
+    "file": "js/chunks/upcoming-UjN5LYQA.js",
+    "name": "upcoming",
+    "src": "assets/src/js/public/upcoming.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_button-Zn7ZjNtw.js",
+      "_event-modal-Dld6g-eV.js",
+      "_load-state-CHFTowJc.js"
+    ],
+    "css": [
+      "css/upcoming-BJ3u2dOv.css"
     ]
   },
   "assets/src/js/screens/event-types.js": {
-    "file": "js/chunks/event-types-B_-nvV5C.js",
+    "file": "js/chunks/event-types-DjFq8HvW.js",
     "name": "event-types",
     "src": "assets/src/js/screens/event-types.js",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-DKPNw9Pd.js",
-      "_date-B1KdQ3cG.js",
+      "_date-B6jkZ4Xu.js",
       "_button-Zn7ZjNtw.js",
-      "_load-state-BjOEEZLW.js"
+      "_load-state-CHFTowJc.js",
+      "_drawer-LQDyzTDl.js"
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-C3aW-1na.js",
+    "file": "js/chunks/events-B82gHHI_.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-DKPNw9Pd.js",
-      "_date-B1KdQ3cG.js",
+      "_date-B6jkZ4Xu.js",
       "_button-Zn7ZjNtw.js",
-      "_load-state-BjOEEZLW.js"
+      "_load-state-CHFTowJc.js",
+      "_drawer-LQDyzTDl.js"
     ]
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
