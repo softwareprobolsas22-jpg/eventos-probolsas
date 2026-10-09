@@ -3,6 +3,7 @@
  * página pública, sin desfases aunque el navegador esté en otra zona horaria.
  */
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { bogotaToday, createEvent, createPage, deleteEvent, deletePage, restNonce, typeId, updateSettings } from './helpers.js';
 
@@ -19,6 +20,9 @@ async function adminPage( browser, testInfo ) {
 	const context = await browser.newContext( { baseURL, storageState } );
 	return context.newPage();
 }
+
+/** axe-core (devDependency), que se inyecta en la página para auditar la accesibilidad. */
+const AXE = fileURLToPath( new URL( '../../node_modules/axe-core/axe.min.js', import.meta.url ) );
 
 /** Título único por ejecución (los reintentos del CI no chocan entre sí). */
 const unique = ( text ) => `${ text } ${ Date.now().toString( 36 ) }`;
@@ -143,6 +147,37 @@ test.describe( 'Calendario de la intranet', () => {
 		// No carga FullCalendar: solo el chunk de la lista (R-17).
 		const scripts = await page.evaluate( () => globalThis.performance.getEntriesByType( 'resource' ).map( ( entry ) => entry.name ).filter( ( name ) => name.includes( '/assets/dist/js/' ) ) );
 		expect( scripts.some( ( name ) => /chunks\/calendar-/.test( name ) ) ).toBe( false );
+	} );
+
+	test( 'axe sin problemas graves en el mes, la lista, el modal y los próximos (R-16, WCAG 2.2 AA)', async ( { page } ) => {
+		const audit = async ( where ) => {
+			await page.addScriptTag( { path: AXE } );
+			const violations = await page.evaluate( async () => {
+				const result = await globalThis.axe.run( globalThis.document, { runOnly: { type: 'tag', values: [ 'wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa' ] } } );
+				return result.violations.filter( ( item ) => [ 'serious', 'critical' ].includes( item.impact ) ).map( ( item ) => `${ item.id }: ${ item.nodes.map( ( node ) => node.target.join( ' ' ) ).join( ', ' ) }` );
+			} );
+			// Solo lo del plugin: el tema de la página de pruebas no es parte de la revisión.
+			expect( violations.filter( ( text ) => /ep-|fc-|ts-/.test( text ) ), where ).toEqual( [] );
+		};
+
+		await page.setViewportSize( { width: 1280, height: 900 } );
+		await page.goto( pageUrl );
+		await expect( page.locator( `.fc-daygrid-day[data-date="${ today }"] .fc-event`, { hasText: afternoon } ) ).toBeVisible();
+		await audit( 'mes' );
+
+		await page.locator( `.fc-daygrid-day[data-date="${ today }"] .fc-event`, { hasText: afternoon } ).click();
+		await expect( page.locator( 'dialog.ep-event-modal[open] .ep-event-modal__title' ) ).toHaveText( afternoon );
+		await audit( 'modal' );
+		await page.keyboard.press( 'Escape' );
+
+		await page.setViewportSize( { width: 360, height: 800 } );
+		await page.goto( pageUrl );
+		await expect( page.locator( '.fc-list-event', { hasText: afternoon } ) ).toBeVisible();
+		await audit( 'lista en móvil' );
+
+		await page.goto( upcomingUrl );
+		await expect( page.locator( '.ep-upcoming__event', { hasText: afternoon } ) ).toBeVisible();
+		await audit( 'próximos' );
 	} );
 
 	test( 'en móvil empieza en la lista y no hay scroll horizontal (R-11, R-13)', async ( { page } ) => {
