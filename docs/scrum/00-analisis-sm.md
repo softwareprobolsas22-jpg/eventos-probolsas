@@ -378,7 +378,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-203.md)); corrigió QA-038 (doble carga de `admin.js` en WordPress), QA-039 y QA-040; integrada en `develop`* | F | 8 |
 | H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-204.md)); integrada en `develop`. QA-041 cubierta por las pruebas en el navegador de H-207* | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla)  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-205.md)); integrada en `develop`* | F | 3 |
-| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo) como tarjetas arriba de «Eventos» que filtran la tabla (D-17)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
+| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo) como tarjetas arriba de «Eventos» que filtran la tabla (D-17)  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-206.md)); integrada en `develop`* | B+F | 5 |
 | H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-207.md)); agrega pruebas en el navegador sobre WordPress real en el CI; detectó QA-043; integrada en `develop`* | Q | 5 |
 
 ### EP-3 · Calendario para colaboradores
