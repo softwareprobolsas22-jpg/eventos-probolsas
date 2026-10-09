@@ -7,7 +7,8 @@
  * Tipos de campo:
  * - `search`: texto libre (espera a que el usuario deje de escribir).
  * - `select`: desplegable nativo con la opción «Todos».
- * - `date-range`: dos fechas (desde y hasta); su valor es `{ from, to }`. Cada extremo limita al otro.
+ * - `date-range`: dos fechas (desde y hasta) que ocupan dos campos de la grilla (H-409); su valor es
+ *   `{ from, to }`. Cada extremo limita al otro.
  */
 import { h, icon, uid } from '../core/dom.js';
 import { countActiveFilters } from '../core/filtering.js';
@@ -28,11 +29,13 @@ import { debounce } from '../core/timing.js';
  * @property {string} [placeholder] Texto de ayuda (search).
  * @property {FilterOption[]} [options] Opciones (select). Se pueden cambiar con setOptions().
  * @property {string} [allLabel] Texto de la opción «todos» (select).
+ * @property {string} [fromLabel] Etiqueta de la fecha inicial (date-range).
+ * @property {string} [toLabel] Etiqueta de la fecha final (date-range).
  */
 
 /**
  * @typedef {Object} FilterControl
- * @property {HTMLElement} element Control con su etiqueta.
+ * @property {HTMLElement|HTMLElement[]} element Control con su etiqueta (date-range: dos campos).
  * @property {(value: unknown) => unknown} set Cambia el valor sin avisar y devuelve el valor efectivo.
  * @property {() => void} focus Lleva el foco al control.
  * @property {(options: FilterOption[]) => void} [setOptions] Reemplaza las opciones.
@@ -254,19 +257,11 @@ const CONTROLS = {
 			update( { from: from.value, to: to.value } );
 		}
 
-		const element = h(
-			'fieldset',
-			{ class: 'ep-field ep-filter-bar__field ep-filter-bar__field--range' },
-			h( 'legend', { class: 'ep-field__label', text: field.label } ),
-			h(
-				'div',
-				{ class: 'ep-filter-bar__range' },
-				h( 'label', { class: 'ep-filter-bar__range-label', htmlFor: fromId, text: __( 'Desde', 'eventos-probolsas' ) } ),
-				from,
-				h( 'label', { class: 'ep-filter-bar__range-label', htmlFor: toId, text: __( 'Hasta', 'eventos-probolsas' ) } ),
-				to
-			)
-		);
+		// Dos campos de la grilla (H-409): en escritorio quedan tres campos por fila.
+		const element = [
+			labelled( { label: field.fromLabel ?? __( 'Fecha desde', 'eventos-probolsas' ) }, fromId, from, 'date' ),
+			labelled( { label: field.toLabel ?? __( 'Fecha hasta', 'eventos-probolsas' ) }, toId, to, 'date' ),
+		];
 
 		return {
 			element,

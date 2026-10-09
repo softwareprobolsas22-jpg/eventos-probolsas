@@ -53,6 +53,15 @@ describe( 'createFilterBar', () => {
 		expect( clear().disabled ).toBe( false );
 	} );
 
+	it( 'las fechas son dos campos de la grilla con su propia etiqueta (H-409)', () => {
+		const fields = [ ...container.querySelectorAll( '.ep-filter-bar__fields > .ep-field' ) ];
+		const labels = fields.map( ( field ) => field.querySelector( 'label' ).textContent );
+
+		expect( labels ).toEqual( [ 'Buscar', 'Tipo', 'Fecha desde', 'Fecha hasta' ] );
+		expect( container.querySelector( 'fieldset' ) ).toBeNull();
+		expect( fields[ 2 ].querySelector( 'input' ).type ).toBe( 'date' );
+	} );
+
 	it( 'la búsqueda espera a que el usuario deje de escribir', () => {
 		input( 'input[type="search"]' ).value = 'ana';
 		input( 'input[type="search"]' ).dispatchEvent( new Event( 'input' ) );

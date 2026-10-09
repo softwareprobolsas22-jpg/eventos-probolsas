@@ -37,6 +37,13 @@ describe( 'reglas transversales en el CSS compilado', () => {
 		expect( lastValue( source, `${ scope } [hidden]`, 'display' ) ).toBe( 'none!important' );
 	} );
 
+	it( 'la casilla oculta del interruptor queda anclada a su etiqueta: el panel no salta al activarlo (H-407)', () => {
+		const source = css( 'admin' );
+
+		expect( lastValue( source, '.ep-app .ep-switch__label', 'position' ) ).toBe( 'relative' );
+		expect( lastValue( source, '.ep-app .ep-switch__input', 'position' ) ).toBe( 'absolute' );
+	} );
+
 	it( 'en móvil (< 576 px) la paginación queda en anterior / «Página x de y» / siguiente, con botones de 44 px (R-23)', () => {
 		const source = css( 'admin' );
 		const mobile = /@media not \(min-width:576px\)\{([^@]*)\}/.exec( source.slice( source.indexOf( '.ep-pagination__compact{' ) ) );

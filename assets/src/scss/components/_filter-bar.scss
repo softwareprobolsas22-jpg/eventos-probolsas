@@ -36,8 +36,8 @@
 		}
 	}
 
-	// Una columna en móvil, dos en tablet y tres en escritorio. En Eventos: Buscar y Tipo en la primera
-	// fila de tablet; el rango de fechas ocupa dos columnas. Un campo único ocupa todo el ancho.
+	// Una columna en móvil, dos en tablet y tres en escritorio. En Eventos, «Fecha desde» y «Fecha hasta»
+	// son dos campos más de la grilla (H-409). Un campo único ocupa todo el ancho.
 	&__fields {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
@@ -54,39 +54,6 @@
 
 	&__field:only-child {
 		grid-column: 1 / -1;
-	}
-
-	// Rango de fechas: grupo con leyenda y dos campos «Desde» / «Hasta».
-	&__field--range {
-		min-width: 0;
-		padding: 0;
-		margin: 0;
-		border: 0;
-
-		legend {
-			padding: 0;
-			margin-bottom: var(--ep-space-1);
-		}
-
-		@include m.up(md) {
-			grid-column: span 2;
-		}
-	}
-
-	&__range {
-		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
-		gap: var(--ep-space-2);
-		align-items: center;
-
-		@include m.up(sm) {
-			grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
-		}
-	}
-
-	&__range-label {
-		font-size: var(--ep-font-size-sm);
-		color: var(--ep-color-text-muted);
 	}
 
 	&__count {

@@ -97,7 +97,8 @@ export async function mount( screen, config, { api = createApi( config, { notify
 			{ key: 'name', label: __( 'Tipo', 'eventos-probolsas' ), render: ( row ) => eventTypeBadge( { ...row, maxWidth: '20rem' } ) },
 			{ key: 'requires_attachment', label: __( 'Requiere adjunto', 'eventos-probolsas' ), align: 'center', render: ( row ) => yesNo( row.requires_attachment ) },
 			{ key: 'events_count', label: __( 'Eventos', 'eventos-probolsas' ), align: 'center', render: ( row ) => String( row.events_count ) },
-			{ key: 'sort_order', label: __( 'Orden', 'eventos-probolsas' ), align: 'center', render: ( row ) => String( row.sort_order ) },
+			// El orden ya se ve en el de las filas y se cambia con «Ordenar» (H-408).
+			{ key: 'description', label: __( 'Descripción', 'eventos-probolsas' ), truncate: true, maxWidth: '24rem' },
 		],
 		actions: ( row ) => [
 			{ icon: 'fa-solid fa-pen', label: __( 'Editar', 'eventos-probolsas' ), onClick: () => openForm( row ) },
