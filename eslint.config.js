@@ -39,7 +39,7 @@ const DOM_RULES = [
 
 export default [
 	{
-		ignores: [ 'assets/dist/**', 'vendor/**', 'node_modules/**', 'legacy/**', 'coverage/**' ],
+		ignores: [ 'assets/dist/**', 'vendor/**', 'node_modules/**', 'legacy/**', 'coverage/**', 'build/**' ],
 	},
 	js.configs.recommended,
 	{

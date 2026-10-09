@@ -55,6 +55,23 @@ export function initTooltips( root ) {
 }
 
 /**
+ * Hace enfocables con el teclado los textos cortados con «…» de un contenedor (y solo esos), para que su
+ * tooltip con el texto completo también aparezca sin mouse (QA-027, WCAG 1.4.13). Los que caben dejan de
+ * ser enfocables, así no se agregan paradas de tabulación inútiles.
+ *
+ * @param {ParentNode} root Contenedor (por ejemplo, el cuerpo de una tabla).
+ */
+export function syncTruncatedFocus( root ) {
+	root.querySelectorAll( '.ep-truncate' ).forEach( ( element ) => {
+		if ( isTruncated( element ) ) {
+			element.tabIndex = 0;
+		} else {
+			element.removeAttribute( 'tabindex' );
+		}
+	} );
+}
+
+/**
  * Indica si el texto de un elemento está cortado.
  *
  * @param {Element} element Elemento con text-overflow.

@@ -10,7 +10,7 @@ vi.mock( 'tippy.js', () => ( {
 	},
 } ) );
 
-const { initTooltips, isTruncated } = await import( '../../../assets/src/js/ui/tooltip.js' );
+const { initTooltips, isTruncated, syncTruncatedFocus } = await import( '../../../assets/src/js/ui/tooltip.js' );
 
 /**
  * Elemento con medidas simuladas (happy-dom no calcula el layout).
@@ -63,6 +63,24 @@ describe( 'tooltips (D-11)', () => {
 		expect( truncated.onShow( { reference: measured( 100 ) } ) ).toBe( false );
 		expect( isTruncated( measured( 180 ) ) ).toBe( true );
 		expect( truncated.onShow( { reference: measured( 180 ) } ) ).toBe( true );
+	} );
+
+	it( 'los textos cortados se pueden enfocar con el teclado para ver el tooltip; los que caben no (QA-027)', () => {
+		const root = document.createElement( 'div' );
+		const cut = measured( 180 );
+		const fits = measured( 100 );
+		cut.className = 'ep-truncate';
+		fits.className = 'ep-truncate';
+		fits.tabIndex = 0;
+		root.append( cut, fits );
+
+		syncTruncatedFocus( root );
+
+		expect( cut.getAttribute( 'tabindex' ) ).toBe( '0' );
+		expect( fits.hasAttribute( 'tabindex' ) ).toBe( false );
+		expect( tippy.calls.length ).toBe( 0 );
+		initTooltips( document.body );
+		expect( tippy.calls[ 1 ].options.trigger ).toBe( 'mouseenter focus' );
 	} );
 
 	it( 'respeta la preferencia de movimiento reducido', () => {

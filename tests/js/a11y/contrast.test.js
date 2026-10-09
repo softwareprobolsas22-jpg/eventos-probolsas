@@ -47,6 +47,8 @@ const TEXT_PAIRS = [
 	[ 'text-subtle', 'surface', 'etiquetas de campos' ],
 	[ 'text-muted', 'surface', 'ayudas y metadatos' ],
 	[ 'text-muted', 'surface-muted', 'estados vacíos' ],
+	[ 'text', 'canvas', 'títulos sobre el fondo de wp-admin' ],
+	[ 'text-subtle', 'canvas', 'subtítulo, resumen de la tabla y «Cargando…» sobre el fondo de wp-admin (H-403)' ],
 	[ 'primary', 'surface', 'enlaces y botones secundarios' ],
 	[ 'on-primary', 'primary', 'botón primario' ],
 	[ 'on-primary', 'primary-hover', 'botón primario al pasar el mouse' ],

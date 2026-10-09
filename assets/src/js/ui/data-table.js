@@ -16,6 +16,7 @@ import { __, sprintf } from '../core/i18n.js';
 import { paginate } from '../core/pagination.js';
 import { iconButton } from './button.js';
 import { enableDragScroll } from './drag-scroll.js';
+import { syncTruncatedFocus } from './tooltip.js';
 
 /**
  * @typedef {Object} Column
@@ -138,6 +139,9 @@ export function createDataTable( container, options ) {
 	container.append( element );
 
 	const disableDragScroll = enableDragScroll( scroll );
+	// Al cambiar el ancho, un texto puede pasar a estar cortado o dejar de estarlo (QA-027).
+	const resizer = globalThis.ResizeObserver ? new globalThis.ResizeObserver( () => syncTruncatedFocus( tbody ) ) : null;
+	resizer?.observe( scroll );
 	render();
 
 	function alignClass( column ) {
@@ -163,6 +167,7 @@ export function createDataTable( container, options ) {
 
 		const visible = server ? state.rows : state.filtered.slice( page.startIndex, page.endIndex );
 		tbody.replaceChildren( ...visible.map( renderRow ) );
+		syncTruncatedFocus( tbody );
 		renderState();
 		renderFooter( page );
 	}
@@ -345,6 +350,7 @@ export function createDataTable( container, options ) {
 		getVisibleRows: () => ( server ? [ ...state.rows ] : [ ...state.filtered ] ),
 		destroy() {
 			disableDragScroll();
+			resizer?.disconnect();
 			element.remove();
 		},
 	};

@@ -1,66 +1,66 @@
 {
-  "_badge-bZCOorv0.js": {
-    "file": "js/chunks/badge-bZCOorv0.js",
+  "_badge-0kzO9DRl.js": {
+    "file": "js/chunks/badge-0kzO9DRl.js",
     "name": "badge",
     "imports": [
-      "_runtime-DKPNw9Pd.js"
+      "_runtime-B1nseNsq.js"
     ]
   },
   "_bootstrap-CoLDHkJW.css": {
     "file": "css/bootstrap-CoLDHkJW.css",
     "src": "_bootstrap-CoLDHkJW.css"
   },
-  "_button-s5PUT68y.js": {
-    "file": "js/chunks/button-s5PUT68y.js",
+  "_button-JjcB3iJR.js": {
+    "file": "js/chunks/button-JjcB3iJR.js",
     "name": "button",
     "imports": [
-      "_runtime-DKPNw9Pd.js"
+      "_runtime-B1nseNsq.js"
     ]
   },
-  "_confirm-dialog-DONWWe7O.js": {
-    "file": "js/chunks/confirm-dialog-DONWWe7O.js",
+  "_confirm-dialog-BEdYHDDT.js": {
+    "file": "js/chunks/confirm-dialog-BEdYHDDT.js",
     "name": "confirm-dialog",
     "imports": [
-      "_runtime-DKPNw9Pd.js"
+      "_runtime-B1nseNsq.js"
     ]
   },
   "_date-B6jkZ4Xu.js": {
     "file": "js/chunks/date-B6jkZ4Xu.js",
     "name": "date"
   },
-  "_drawer-DtVkx2vH.js": {
-    "file": "js/chunks/drawer-DtVkx2vH.js",
+  "_drawer-DWFohbrW.js": {
+    "file": "js/chunks/drawer-DWFohbrW.js",
     "name": "drawer",
     "imports": [
-      "_runtime-DKPNw9Pd.js",
-      "_button-s5PUT68y.js"
+      "_runtime-B1nseNsq.js",
+      "_button-JjcB3iJR.js"
     ]
   },
   "_event-modal-BM7CLY2r.css": {
     "file": "css/event-modal-BM7CLY2r.css",
     "src": "_event-modal-BM7CLY2r.css"
   },
-  "_event-modal-JESDTCug.js": {
-    "file": "js/chunks/event-modal-JESDTCug.js",
+  "_event-modal-is089s7z.js": {
+    "file": "js/chunks/event-modal-is089s7z.js",
     "name": "event-modal",
     "imports": [
-      "_runtime-DKPNw9Pd.js",
-      "_button-s5PUT68y.js",
-      "_badge-bZCOorv0.js"
+      "_runtime-B1nseNsq.js",
+      "_button-JjcB3iJR.js",
+      "_badge-0kzO9DRl.js"
     ],
     "css": [
       "css/event-modal-BM7CLY2r.css"
     ]
   },
-  "_load-state-CHFTowJc.js": {
-    "file": "js/chunks/load-state-CHFTowJc.js",
+  "_load-state-CvhshwYF.js": {
+    "file": "js/chunks/load-state-CvhshwYF.js",
     "name": "load-state",
     "imports": [
-      "_runtime-DKPNw9Pd.js"
+      "_runtime-B1nseNsq.js"
     ]
   },
-  "_runtime-DKPNw9Pd.js": {
-    "file": "js/chunks/runtime-DKPNw9Pd.js",
+  "_runtime-B1nseNsq.js": {
+    "file": "js/chunks/runtime-B1nseNsq.js",
     "name": "runtime",
     "css": [
       "css/runtime-DKrxL7Be.css"
@@ -76,7 +76,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js"
+      "_runtime-B1nseNsq.js"
     ],
     "dynamicImports": [
       "assets/src/js/screens/events.js",
@@ -97,7 +97,7 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js",
+      "_runtime-B1nseNsq.js",
       "_date-B6jkZ4Xu.js"
     ],
     "dynamicImports": [
@@ -113,76 +113,76 @@
     ]
   },
   "assets/src/js/public/calendar.js": {
-    "file": "js/chunks/calendar-CiNhYgOy.js",
+    "file": "js/chunks/calendar-CBXTc8g_.js",
     "name": "calendar",
     "src": "assets/src/js/public/calendar.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js",
-      "_button-s5PUT68y.js",
-      "_event-modal-JESDTCug.js",
-      "_badge-bZCOorv0.js"
+      "_runtime-B1nseNsq.js",
+      "_button-JjcB3iJR.js",
+      "_event-modal-is089s7z.js",
+      "_badge-0kzO9DRl.js"
     ],
     "css": [
       "css/calendar-CWEXfaxd.css"
     ]
   },
   "assets/src/js/public/upcoming.js": {
-    "file": "js/chunks/upcoming-aF6Km7kL.js",
+    "file": "js/chunks/upcoming-CRheN6dO.js",
     "name": "upcoming",
     "src": "assets/src/js/public/upcoming.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js",
-      "_button-s5PUT68y.js",
-      "_event-modal-JESDTCug.js",
-      "_badge-bZCOorv0.js",
-      "_load-state-CHFTowJc.js"
+      "_runtime-B1nseNsq.js",
+      "_button-JjcB3iJR.js",
+      "_event-modal-is089s7z.js",
+      "_badge-0kzO9DRl.js",
+      "_load-state-CvhshwYF.js"
     ],
     "css": [
       "css/upcoming-BJ3u2dOv.css"
     ]
   },
   "assets/src/js/screens/event-types.js": {
-    "file": "js/chunks/event-types-DTIQu16w.js",
+    "file": "js/chunks/event-types-6U4SN1sK.js",
     "name": "event-types",
     "src": "assets/src/js/screens/event-types.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js",
+      "_runtime-B1nseNsq.js",
       "_date-B6jkZ4Xu.js",
-      "_button-s5PUT68y.js",
-      "_badge-bZCOorv0.js",
-      "_load-state-CHFTowJc.js",
-      "_confirm-dialog-DONWWe7O.js",
-      "_drawer-DtVkx2vH.js"
+      "_button-JjcB3iJR.js",
+      "_badge-0kzO9DRl.js",
+      "_load-state-CvhshwYF.js",
+      "_confirm-dialog-BEdYHDDT.js",
+      "_drawer-DWFohbrW.js"
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-D1vl2gVU.js",
+    "file": "js/chunks/events-BtATzXZC.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js",
+      "_runtime-B1nseNsq.js",
       "_date-B6jkZ4Xu.js",
-      "_button-s5PUT68y.js",
-      "_badge-bZCOorv0.js",
-      "_load-state-CHFTowJc.js",
-      "_confirm-dialog-DONWWe7O.js",
-      "_drawer-DtVkx2vH.js"
+      "_button-JjcB3iJR.js",
+      "_badge-0kzO9DRl.js",
+      "_load-state-CvhshwYF.js",
+      "_confirm-dialog-BEdYHDDT.js",
+      "_drawer-DWFohbrW.js"
     ]
   },
   "assets/src/js/screens/settings.js": {
-    "file": "js/chunks/settings-DXncFNWY.js",
+    "file": "js/chunks/settings-D0htUwWx.js",
     "name": "settings",
     "src": "assets/src/js/screens/settings.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-DKPNw9Pd.js",
-      "_button-s5PUT68y.js",
-      "_load-state-CHFTowJc.js",
-      "_confirm-dialog-DONWWe7O.js"
+      "_runtime-B1nseNsq.js",
+      "_button-JjcB3iJR.js",
+      "_load-state-CvhshwYF.js",
+      "_confirm-dialog-BEdYHDDT.js"
     ]
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
