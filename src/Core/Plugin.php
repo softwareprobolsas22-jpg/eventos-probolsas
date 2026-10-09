@@ -14,6 +14,7 @@ use Probolsas\Eventos\Core\Lifecycle\Uninstaller;
 use Probolsas\Eventos\Domains\Event\EventServiceProvider;
 use Probolsas\Eventos\Domains\EventType\EventTypeServiceProvider;
 use Probolsas\Eventos\Domains\Media\MediaServiceProvider;
+use Probolsas\Eventos\Domains\Settings\SettingsServiceProvider;
 use Probolsas\Eventos\Shared\SharedServiceProvider;
 
 /**
@@ -68,6 +69,7 @@ final class Plugin {
 			new EventTypeServiceProvider(),
 			new MediaServiceProvider(),
 			new EventServiceProvider(),
+			new SettingsServiceProvider(),
 		];
 
 		foreach ( $this->providers as $provider ) {

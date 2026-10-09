@@ -13,6 +13,8 @@ use Probolsas\Eventos\Core\Database\Migrator;
 use Probolsas\Eventos\Core\Database\Tables;
 use Probolsas\Eventos\Core\Plugin;
 use Probolsas\Eventos\Core\Security\Capabilities;
+use Probolsas\Eventos\Core\Settings\PluginSettings;
+use Probolsas\Eventos\Domains\EventType\Domain\EventTypeRepository;
 
 /**
  * Activación, desactivación y desinstalación. La creación de tablas se prueba junto con las migraciones
@@ -95,9 +97,29 @@ final class LifecycleTest extends IntegrationTestCase {
 		$this->assertTrue( get_role( 'administrator' )->has_cap( Capabilities::MANAGE ) );
 	}
 
-	public function test_uninstall_removes_tables_option_and_capabilities(): void {
+	public function test_uninstall_keeps_the_data_by_default_but_removes_capabilities(): void {
 		$this->plugin()->activate();
 		get_role( 'editor' )->add_cap( Capabilities::MANAGE );
+
+		Plugin::uninstall( $this->plugin_file() );
+
+		foreach ( $this->tables()->all_names() as $table ) {
+			$this->assertTrue( $this->table_exists( $table ), "D-16: la tabla {$table} se conserva si no se marcó la casilla." );
+		}
+		$this->assertSame( $this->latest_schema_version(), (int) get_option( Migrator::OPTION, 0 ), 'La versión del esquema se conserva con las tablas.' );
+		foreach ( wp_roles()->role_objects as $name => $role ) {
+			$this->assertFalse( $role->has_cap( Capabilities::MANAGE ), "El rol {$name} conserva eventos_manage." );
+		}
+
+		// Reinstalar no duplica los tipos iniciales ni pierde nada.
+		$this->plugin()->activate();
+		$this->assertCount( 4, $this->plugin()->container()->get( EventTypeRepository::class )->all_with_event_counts() );
+	}
+
+	public function test_uninstall_removes_tables_option_and_capabilities_when_asked(): void {
+		$this->plugin()->activate();
+		get_role( 'editor' )->add_cap( Capabilities::MANAGE );
+		( new PluginSettings() )->set_delete_data_on_uninstall( true );
 
 		Plugin::uninstall( $this->plugin_file() );
 
@@ -105,6 +127,7 @@ final class LifecycleTest extends IntegrationTestCase {
 			$this->assertFalse( $this->table_exists( $table ), "La tabla {$table} no se eliminó." );
 		}
 		$this->assertFalse( get_option( Migrator::OPTION ) );
+		$this->assertFalse( get_option( PluginSettings::DELETE_DATA_OPTION ), 'El ajuste también se borra.' );
 		foreach ( wp_roles()->role_objects as $name => $role ) {
 			$this->assertFalse( $role->has_cap( Capabilities::MANAGE ), "El rol {$name} conserva eventos_manage." );
 		}
@@ -112,6 +135,7 @@ final class LifecycleTest extends IntegrationTestCase {
 
 	public function test_uninstall_keeps_media_library_files(): void {
 		$this->plugin()->activate();
+		( new PluginSettings() )->set_delete_data_on_uninstall( true );
 		$attachment = self::factory()->attachment->create_object(
 			[
 				'file'           => 'agenda.pdf',

@@ -23,6 +23,7 @@ use Probolsas\Eventos\Core\Lifecycle\Activator;
 use Probolsas\Eventos\Core\Lifecycle\Uninstaller;
 use Probolsas\Eventos\Core\Lifecycle\UninstallTask;
 use Probolsas\Eventos\Core\Security\Capabilities;
+use Probolsas\Eventos\Core\Settings\PluginSettings;
 use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Shared\Time\DateFormatter;
 use Probolsas\Eventos\Shared\Ui\IconCatalog;
@@ -74,6 +75,7 @@ final class CoreServiceProvider implements BootableProvider {
 		);
 
 		$container->set( Capabilities::class, static fn(): Capabilities => new Capabilities() );
+		$container->set( PluginSettings::class, static fn(): PluginSettings => new PluginSettings() );
 
 		$container->set(
 			Activator::class,
@@ -85,6 +87,7 @@ final class CoreServiceProvider implements BootableProvider {
 			static fn( Container $c ): Uninstaller => new Uninstaller(
 				$c->get( Migrator::class ),
 				$c->get( Capabilities::class ),
+				$c->get( PluginSettings::class ),
 				$c->tagged( Uninstaller::TASKS_TAG, UninstallTask::class )
 			)
 		);
