@@ -7,7 +7,7 @@
 - **Namespace:** `/wp-json/eventos/v1/` (`RestApi::NAMESPACE_V1`). El navegador lo recibe ya armado en `epConfig.restUrl`.
 - **Autenticación:** cookie de sesión de WordPress más la cabecera `X-WP-Nonce` con `epConfig.restNonce` (acción `wp_rest`). Sin un nonce válido WordPress trata la petición como anónima.
 - **Formato:** JSON en el cuerpo de las peticiones (`Content-Type: application/json`) y en las respuestas.
-- **Caché:** todas las respuestas llevan `Cache-Control: no-store, private` (y la señal equivalente para LiteSpeed): los datos cambian con cada guardado.
+- **Caché:** todas las respuestas llevan `Cache-Control: no-store, private` (y la señal equivalente para LiteSpeed): los datos cambian con cada guardado. En el servidor, el feed del calendario y los próximos se guardan ya armados (`Shared/Cache/ResponseCache`, H-401): la clave lleva el rango, los tipos (y «hoy» de Colombia en los próximos) y una versión que cambia al crear, editar o eliminar eventos o tipos, al reordenar tipos y al editar o borrar un adjunto en la Biblioteca de Medios. Las respuestas de error (422) no se guardan.
 
 ## Permisos
 

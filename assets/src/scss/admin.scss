@@ -24,6 +24,7 @@
 	@include meta.load-css("components/media-field");
 	@include meta.load-css("components/event-detail");
 	@include meta.load-css("components/skeleton");
+	@include meta.load-css("components/summary");
 	@include meta.load-css("components/filter-bar");
 	@include meta.load-css("components/table-toolbar");
 	@include meta.load-css("components/data-table");

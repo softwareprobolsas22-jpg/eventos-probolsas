@@ -52,7 +52,19 @@
 | PUT | `/events/{id}` | `200` · `404` · `422` |
 | DELETE | `/events/{id}` | `200 { "deleted": true, "id": 42 }` · `404`. **Nunca borra el archivo de la Biblioteca de Medios** (D-4) |
 | GET | `/events/export.csv` | Archivo CSV con los filtros activos (separador `;`, BOM UTF-8, fechas `dd/mm/aaaa`, horas en 12 h) |
-| GET | `/dashboard` | `200 { "today": 2, "next_30_days": 9, "by_type": [ { "type_id": 1, "count": 4 } ], "total": 57 }` |
+| GET | `/dashboard` | `200 { "today": 2, "next_30_days": 9, "by_type": [ { "type_id": 1, "count": 4 } ], "total": 57, "date_from": "2026-10-07", "date_to": "2026-11-05" }` (ver «Dashboard») |
+
+### Dashboard (`GET /dashboard`, H-206)
+
+Cifras de las tarjetas que se ven arriba de la tabla de «Eventos» (D-17), con la fecha de Colombia (R-08). No se cachean: son de wp-admin.
+
+| Campo | Contenido |
+|---|---|
+| `today` | Eventos que ocupan hoy (por solapamiento) |
+| `next_30_days` | Eventos que ocupan algún día entre `date_from` y `date_to` (hoy y los 29 días siguientes) |
+| `by_type` | Todos los tipos en su orden (`sort_order`), también los que tienen 0 eventos |
+| `total` | Todos los eventos |
+| `date_from`, `date_to` | El rango de `next_30_days` calculado por el servidor: la interfaz lo usa tal cual para filtrar la tabla (`date_from`/`date_to` de `GET /events`), sin calcular fechas en el navegador |
 
 ### Filtros de `GET /events` y del CSV
 
