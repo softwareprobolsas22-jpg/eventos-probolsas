@@ -410,7 +410,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | **0** (1 semana) | «Podemos trabajar con seguridad» — ✅ cerrado, 23/23 | H-001 … H-007 | 23 |
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» — ✅ cerrado, 35/35 ([plan](sprint-2.md), [cierre](../qa/2026-10-08-cierre-sprint-2.md)) | H-201 … H-205, H-207 | 35 |
-| **3** | «Los colaboradores ven el calendario sin desfases» — en curso ([plan](sprint-3.md)) | H-301 … H-305 | 26 |
+| **3** | «Los colaboradores ven el calendario sin desfases» — ✅ cerrado, 26/26 ([plan](sprint-3.md), [cierre](../qa/2026-10-09-cierre-sprint-3.md)) | H-301 … H-305 | 26 |
 | **4** | «Listo para producción» | H-401 … H-404, H-206 | 16 |
 
 Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Sprint 4 (Review del Sprint 1, 2026-10-08).
@@ -457,3 +457,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.20 | 2026-10-08 | H-202, H-201 y H-203 aprobadas e integradas. QA-038 (alta): las pantallas importaban la entrada `admin.js`, que WordPress encola con `?ver=`, y no montaban; corregido con el chunk `runtime`. Regla: si Backend agrega un ícono en PHP, Frontend regenera el `dist` en la misma rama (QA-036) |
 | 2.21 | 2026-10-08 | H-204, H-207 y H-205 aprobadas. Pruebas en el navegador sobre WordPress real en el CI (H-207), que detectaron QA-043. Cierre del Sprint 2 (35/35 puntos, [informe](../qa/2026-10-08-cierre-sprint-2.md)) |
 | 2.22 | 2026-10-09 | PR #3 del Sprint 2 fusionado en `main`. Planning del Sprint 3 ([plan](sprint-3.md)): 26 puntos; las clases PHP de `[eventos_calendario]` y `[eventos_proximos]` van en H-301 (Backend); QA-005 se cierra en H-302 |
+| 2.23 | 2026-10-09 | H-301 a H-305 aprobadas e integradas. Pruebas en el navegador con la zona de Tokio y axe-core, que detectaron QA-056 a QA-058; QA-005 cerrado. Cierre del Sprint 3 (26/26 puntos, [informe](../qa/2026-10-09-cierre-sprint-3.md)) |

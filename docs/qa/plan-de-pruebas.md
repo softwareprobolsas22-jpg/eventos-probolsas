@@ -103,3 +103,6 @@ Cada caso se automatiza en la historia indicada y se vuelve a ejecutar al cierre
 | Fase | Informe de cierre | PR |
 |---|---|---|
 | Sprint 0 | [`2026-10-07-cierre-sprint-0.md`](2026-10-07-cierre-sprint-0.md) | `develop` → `main` |
+| Sprint 1 | [`2026-10-08-cierre-sprint-1.md`](2026-10-08-cierre-sprint-1.md) | #2 |
+| Sprint 2 | [`2026-10-08-cierre-sprint-2.md`](2026-10-08-cierre-sprint-2.md) | #3 |
+| Sprint 3 | [`2026-10-09-cierre-sprint-3.md`](2026-10-09-cierre-sprint-3.md) | `develop` → `main` |
