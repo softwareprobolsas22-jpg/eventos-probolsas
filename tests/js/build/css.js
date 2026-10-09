@@ -6,16 +6,22 @@ import { readFileSync, readdirSync } from 'node:fs';
 const dist = new URL( '../../../assets/dist/', import.meta.url );
 
 /**
- * CSS compilado de una entrada (`admin`, `public`) o de la hoja compartida (Bootstrap + Font Awesome).
+ * Hojas de los widgets de la intranet que se descargan con su chunk (H-302), no con la página.
+ */
+const WIDGET_SHEET = /^calendar-/;
+
+/**
+ * CSS compilado de una entrada (`admin`, `public`), de las hojas compartidas que se cargan con la página
+ * (Bootstrap, Font Awesome, Tippy y Notyf) o de las de los widgets.
  *
- * @param {'admin'|'public'|'shared'} name Hoja.
+ * @param {'admin'|'public'|'shared'|'widgets'} name Hoja.
  * @returns {string} CSS minificado.
  */
 export function css( name ) {
-	if ( 'shared' !== name ) {
+	if ( 'shared' !== name && 'widgets' !== name ) {
 		return readFileSync( new URL( `css/${ name }.css`, dist ), 'utf8' );
 	}
-	const files = readdirSync( new URL( 'css/', dist ) ).filter( ( file ) => ! [ 'admin.css', 'public.css' ].includes( file ) );
+	const files = readdirSync( new URL( 'css/', dist ) ).filter( ( file ) => ! [ 'admin.css', 'public.css' ].includes( file ) && ( 'widgets' === name ) === WIDGET_SHEET.test( file ) );
 	return files.map( ( file ) => readFileSync( new URL( `css/${ file }`, dist ), 'utf8' ) ).join( '\n' );
 }
 

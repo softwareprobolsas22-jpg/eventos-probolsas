@@ -1,21 +1,28 @@
 {
+  "_badge-B0g8et8t.js": {
+    "file": "js/chunks/badge-B0g8et8t.js",
+    "name": "badge",
+    "imports": [
+      "_runtime-DKPNw9Pd.js"
+    ]
+  },
   "_bootstrap-B5KRnI0P.css": {
     "file": "css/bootstrap-B5KRnI0P.css",
     "src": "_bootstrap-B5KRnI0P.css"
   },
-  "_date-edoDXXf3.js": {
-    "file": "js/chunks/date-edoDXXf3.js",
+  "_date-CGMw9wtL.js": {
+    "file": "js/chunks/date-CGMw9wtL.js",
     "name": "date"
   },
-  "_load-state-mh9lhawJ.js": {
-    "file": "js/chunks/load-state-mh9lhawJ.js",
+  "_load-state-dJHZ0B-8.js": {
+    "file": "js/chunks/load-state-dJHZ0B-8.js",
     "name": "load-state",
     "imports": [
-      "_runtime-B3gRtgAm.js"
+      "_runtime-DKPNw9Pd.js"
     ]
   },
-  "_runtime-B3gRtgAm.js": {
-    "file": "js/chunks/runtime-B3gRtgAm.js",
+  "_runtime-DKPNw9Pd.js": {
+    "file": "js/chunks/runtime-DKPNw9Pd.js",
     "name": "runtime",
     "css": [
       "css/runtime-DKrxL7Be.css"
@@ -31,7 +38,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js"
+      "_runtime-DKPNw9Pd.js"
     ],
     "dynamicImports": [
       "assets/src/js/screens/events.js",
@@ -51,8 +58,11 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js",
-      "_date-edoDXXf3.js"
+      "_runtime-DKPNw9Pd.js",
+      "_date-CGMw9wtL.js"
+    ],
+    "dynamicImports": [
+      "assets/src/js/public/calendar.js"
     ],
     "css": [
       "css/public.css",
@@ -62,26 +72,41 @@
       "fonts/fa-solid-900.woff2"
     ]
   },
+  "assets/src/js/public/calendar.js": {
+    "file": "js/chunks/calendar-CDm-UQvP.js",
+    "name": "calendar",
+    "src": "assets/src/js/public/calendar.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_badge-B0g8et8t.js"
+    ],
+    "css": [
+      "css/calendar-DXf5THfx.css"
+    ]
+  },
   "assets/src/js/screens/event-types.js": {
-    "file": "js/chunks/event-types-CgHFOpir.js",
+    "file": "js/chunks/event-types-CKVLUbwX.js",
     "name": "event-types",
     "src": "assets/src/js/screens/event-types.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js",
-      "_date-edoDXXf3.js",
-      "_load-state-mh9lhawJ.js"
+      "_runtime-DKPNw9Pd.js",
+      "_date-CGMw9wtL.js",
+      "_badge-B0g8et8t.js",
+      "_load-state-dJHZ0B-8.js"
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-BMEm_O6j.js",
+    "file": "js/chunks/events-BuFL7Qbc.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js",
-      "_date-edoDXXf3.js",
-      "_load-state-mh9lhawJ.js"
+      "_runtime-DKPNw9Pd.js",
+      "_date-CGMw9wtL.js",
+      "_badge-B0g8et8t.js",
+      "_load-state-dJHZ0B-8.js"
     ]
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {

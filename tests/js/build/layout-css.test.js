@@ -124,6 +124,13 @@ describe( 'Bootstrap encapsulado en los contenedores del plugin', () => {
 		expect( bootstrap.filter( ( selector ) => ! isScoped( selector ) ) ).toEqual( [] );
 	} );
 
+	it( 'las hojas de los widgets (FullCalendar, Tom Select) solo actúan dentro de sus contenedores `.ep-*`', () => {
+		const selectors = rules( css( 'widgets' ) ).flatMap( ( { selector } ) => splitSelector( selector ) );
+
+		expect( selectors.length ).toBeGreaterThan( 20 );
+		expect( selectors.filter( ( selector ) => ! /^(:where\()?\.ep-[a-z]/.test( selector ) ) ).toEqual( [] );
+	} );
+
 	it( 'la verificación detecta un selector sin encapsular', () => {
 		expect( isScoped( '.btn' ) ).toBe( false );
 		expect( isScoped( ':is(.btn,.ep-app .card)' ) ).toBe( false );

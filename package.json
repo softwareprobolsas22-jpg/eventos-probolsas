@@ -24,9 +24,13 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",
+    "@fullcalendar/core": "^6.1.21",
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/list": "^6.1.21",
     "bootstrap": "^5.3.8",
     "notyf": "^3.10.0",
-    "tippy.js": "^6.3.7"
+    "tippy.js": "^6.3.7",
+    "tom-select": "^2.6.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -174,15 +174,6 @@
 	}
 }
 
-// Texto largo cortado con «…»; el tooltip muestra el texto completo (ui/tooltip.js).
-.ep-truncate {
-	display: block;
-	max-width: var(--ep-truncate-width, 22rem);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
 // Valor sí/no en una celda: ícono y texto, para no depender solo del color.
 .ep-flag {
 	display: inline-flex;
