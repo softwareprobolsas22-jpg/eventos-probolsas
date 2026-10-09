@@ -414,7 +414,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» — ✅ cerrado, 35/35 ([plan](sprint-2.md), [cierre](../qa/2026-10-08-cierre-sprint-2.md)) | H-201 … H-205, H-207 | 35 |
 | **3** | «Los colaboradores ven el calendario sin desfases» — ✅ cerrado, 26/26 ([plan](sprint-3.md), [cierre](../qa/2026-10-09-cierre-sprint-3.md)) | H-301 … H-305 | 26 |
-| **4** | «Listo para producción» — en curso ([plan](sprint-4.md)) | H-401 … H-404, H-206 | 17 |
+| **4** | «Listo para producción» — ✅ cerrado, 17/17 ([plan](sprint-4.md), [cierre](../qa/2026-10-09-cierre-sprint-4.md)); pendiente la aceptación del PO ([lista](../qa/aceptacion-v1.md)) antes de desplegar (D-14) | H-401 … H-404, H-206 | 17 |
 
 Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Sprint 4 (Review del Sprint 1, 2026-10-08).
 
@@ -462,3 +462,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.22 | 2026-10-09 | PR #3 del Sprint 2 fusionado en `main`. Planning del Sprint 3 ([plan](sprint-3.md)): 26 puntos; las clases PHP de `[eventos_calendario]` y `[eventos_proximos]` van en H-301 (Backend); QA-005 se cierra en H-302 |
 | 2.23 | 2026-10-09 | H-301 a H-305 aprobadas e integradas. Pruebas en el navegador con la zona de Tokio y axe-core, que detectaron QA-056 a QA-058; QA-005 cerrado. Cierre del Sprint 3 (26/26 puntos, [informe](../qa/2026-10-09-cierre-sprint-3.md)) |
 | 2.24 | 2026-10-09 | PR #4 del Sprint 3 fusionado en `main`. Planning del Sprint 4 ([plan](sprint-4.md)): decisiones D-15 (`.ics` de 1 hora, cierra QA-047), D-16 (conservar datos al desinstalar, pantalla «Ajustes»; H-402 pasa a 3 puntos) y D-17 (dashboard en «Eventos»); staging de H-404 por definir |
+| 2.25 | 2026-10-09 | H-206, H-401 a H-404 aprobadas e integradas: resumen en «Eventos», caché del feed (la integración detectó QA-061), «Ajustes» con conservar datos al desinstalar, auditoría con axe de wp-admin (QA-063) y paquete `.zip` verificado en el CI. Cierre del Sprint 4 (17/17, [informe](../qa/2026-10-09-cierre-sprint-4.md)); la v1 queda lista para la aceptación del PO |
