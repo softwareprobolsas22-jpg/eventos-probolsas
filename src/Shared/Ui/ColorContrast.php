@@ -41,6 +41,17 @@ final class ColorContrast {
 	}
 
 	/**
+	 * Color del texto más legible sobre un fondo: `#FFFFFF` u `#000000` (el `textColor` de FullCalendar).
+	 *
+	 * @param string $background Color `#RRGGBB`.
+	 *
+	 * @throws InvalidArgumentException Si el color no es válido.
+	 */
+	public function readable_color( string $background ): string {
+		return self::TONE_LIGHT === $this->readable_tone( $background ) ? self::WHITE : self::BLACK;
+	}
+
+	/**
 	 * Contraste del texto más legible sobre el fondo (el mejor de los dos tonos).
 	 *
 	 * @param string $background Color `#RRGGBB`.

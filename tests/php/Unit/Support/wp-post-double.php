@@ -23,6 +23,13 @@ if ( ! class_exists( 'WP_Post' ) ) {
 		public int $ID; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase -- Nombre de WordPress.
 
 		/**
+		 * Contenido (donde se buscan los shortcodes).
+		 *
+		 * @var string
+		 */
+		public string $post_content = '';
+
+		/**
 		 * Crea la entrada.
 		 *
 		 * @param int    $id             ID.
