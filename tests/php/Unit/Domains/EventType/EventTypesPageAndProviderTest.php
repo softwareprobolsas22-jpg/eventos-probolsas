@@ -23,7 +23,7 @@ use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Domains\EventType\Application\EventTypeService;
 use Probolsas\Eventos\Domains\EventType\EventTypeServiceProvider;
 use Probolsas\Eventos\Domains\EventType\Infrastructure\SeedDefaultEventTypes;
-use Probolsas\Eventos\Domains\EventType\Infrastructure\WpdbEventTypeRepository;
+use Probolsas\Eventos\Domains\EventType\Infrastructure\CacheFlushingEventTypeRepository;
 use Probolsas\Eventos\Domains\EventType\Presentation\EventTypeRestController;
 use Probolsas\Eventos\Domains\EventType\Presentation\EventTypesPage;
 use Probolsas\Eventos\Shared\SharedServiceProvider;
@@ -83,7 +83,7 @@ final class EventTypesPageAndProviderTest extends UnitTestCase {
 
 		$this->assertInstanceOf( EventTypeService::class, $container->get( EventTypeService::class ) );
 		$this->assertInstanceOf( EventTypeRestController::class, $container->get( EventTypeRestController::class ) );
-		$this->assertInstanceOf( WpdbEventTypeRepository::class, $container->get( \Probolsas\Eventos\Domains\EventType\Domain\EventTypeRepository::class ) );
+		$this->assertInstanceOf( CacheFlushingEventTypeRepository::class, $container->get( \Probolsas\Eventos\Domains\EventType\Domain\EventTypeRepository::class ), 'El repositorio real va envuelto para invalidar la caché (H-401).' );
 		$this->assertSame( [ EventTypesPage::class ], array_map( 'get_class', $container->tagged( AdminMenu::PAGES_TAG, AdminPage::class ) ) );
 		$this->assertSame( [ SeedDefaultEventTypes::class ], array_map( 'get_class', $container->tagged( Migrator::MIGRATIONS_TAG, Migration::class ) ) );
 	}

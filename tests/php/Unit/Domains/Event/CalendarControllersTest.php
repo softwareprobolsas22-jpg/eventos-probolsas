@@ -26,12 +26,14 @@ use Probolsas\Eventos\Domains\Event\Presentation\IcsController;
 use Probolsas\Eventos\Domains\Event\Presentation\UpcomingController;
 use Probolsas\Eventos\Domains\EventType\Domain\EventType;
 use Probolsas\Eventos\Domains\Media\Domain\MediaPolicy;
+use Probolsas\Eventos\Shared\Cache\ResponseCache;
 use Probolsas\Eventos\Shared\Time\Clock;
 use Probolsas\Eventos\Shared\Time\DateFormatter;
 use Probolsas\Eventos\Shared\Ui\ColorContrast;
 use Probolsas\Eventos\Tests\Unit\Support\InMemoryAttachmentGateway;
 use Probolsas\Eventos\Tests\Unit\Support\InMemoryEventRepository;
 use Probolsas\Eventos\Tests\Unit\Support\InMemoryEventTypeRepository;
+use Probolsas\Eventos\Tests\Unit\Support\TransientStore;
 use Probolsas\Eventos\Tests\Unit\UnitTestCase;
 use WP_Error;
 use WP_REST_Request;
@@ -70,12 +72,28 @@ final class CalendarControllersTest extends UnitTestCase {
 	 */
 	private Clock $clock;
 
+	/**
+	 * Transients en memoria (caché de respuestas, H-401).
+	 *
+	 * @var TransientStore
+	 */
+	private TransientStore $store;
+
+	/**
+	 * Caché compartida por los controladores (en el plugin, una sola instancia del contenedor).
+	 *
+	 * @var ResponseCache
+	 */
+	private ResponseCache $cache;
+
 	protected function set_up(): void {
 		parent::set_up();
 		Functions\stubTranslationFunctions();
 		Functions\stubEscapeFunctions();
 		Functions\when( 'sanitize_text_field' )->alias( static fn( string $value ): string => trim( strip_tags( $value ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Simula sanitize_text_field.
 		Functions\when( 'get_userdata' )->justReturn( false );
+		$this->store = TransientStore::install();
+		$this->cache = new ResponseCache();
 
 		$this->clock  = new class() implements Clock {
 			public function now(): DateTimeImmutable {
@@ -262,6 +280,40 @@ final class CalendarControllersTest extends UnitTestCase {
 		$this->controllers()[2]->register();
 	}
 
+	public function test_the_feed_and_upcoming_answer_from_the_cache_until_a_write(): void {
+		$range               = [
+			'start' => '2026-10-01',
+			'end'   => '2026-11-01',
+		];
+		[ $feed, $upcoming ] = $this->controllers();
+
+		$first = $feed->index( new WP_REST_Request( $range ) )->get_data()['data'];
+		$this->add( 2, 'Nueva pausa', '2026-10-08', null );
+		$this->assertSame( $first, $feed->index( new WP_REST_Request( $range ) )->get_data()['data'], 'Sin invalidar, la respuesta sale de la caché.' );
+		$this->assertCount( 1, $this->store->transients );
+
+		$upcoming->index( new WP_REST_Request( [ 'limit' => '2' ] ) );
+		$this->assertCount( 2, $this->store->transients, 'Los próximos tienen su propia entrada (con «hoy» en la clave).' );
+
+		$this->cache->flush();
+		$this->assertCount( 4, $feed->index( new WP_REST_Request( $range ) )->get_data()['data'], 'Después de invalidar se lee otra vez.' );
+	}
+
+	public function test_an_invalid_range_is_not_cached(): void {
+		[ $feed ] = $this->controllers();
+
+		$feed->index(
+			new WP_REST_Request(
+				[
+					'start' => '2026-01-01',
+					'end'   => '2026-12-31',
+				]
+			)
+		);
+
+		$this->assertSame( 0, $this->store->writes );
+	}
+
 	public function test_the_provider_wires_the_calendar(): void {
 		Functions\when( 'home_url' )->justReturn( 'https://intranet.probolsas.com/' );
 		Functions\when( 'wp_parse_url' )->alias( 'parse_url' );
@@ -306,8 +358,8 @@ final class CalendarControllersTest extends UnitTestCase {
 		$calendar  = new CalendarService( $this->events, $dates );
 
 		return [
-			new CalendarFeedController( $calendar, $presenter, new ColorContrast() ),
-			new UpcomingController( $calendar, $presenter ),
+			new CalendarFeedController( $calendar, $presenter, new ColorContrast(), $this->cache ),
+			new UpcomingController( $calendar, $presenter, $this->cache, $dates ),
 			new IcsController( $service, $presenter, new IcsCalendar( new DateTimeZone( 'America/Bogota' ), 'intranet.probolsas.com' ), $this->clock ),
 		];
 	}

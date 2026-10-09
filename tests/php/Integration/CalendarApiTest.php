@@ -145,6 +145,47 @@ final class CalendarApiTest extends IntegrationTestCase {
 		$this->assertSame( 422, $this->request( 'GET', '/calendar' )->get_status() );
 	}
 
+	public function test_the_feed_is_cached_and_every_write_invalidates_it(): void {
+		global $wpdb;
+		$range = [
+			'start' => '2026-10-01',
+			'end'   => '2026-11-01',
+		];
+		$this->create( 'Reunión de planeación', '2026-10-07', '15:00', 'Reuniones laborales' );
+
+		$this->request( 'GET', '/calendar', [], $range );
+		$before = $wpdb->num_queries;
+		$cached = $this->request( 'GET', '/calendar', [], $range )->get_data()['data'];
+		$this->assertLessThanOrEqual( 2, $wpdb->num_queries - $before, 'La segunda petición sale de la caché (H-401).' );
+		$this->assertCount( 1, $cached );
+
+		// Crear un evento invalida.
+		$id = $this->create( 'Inducción', '2026-10-08', null, 'Pausas activas' );
+		$this->assertCount( 2, $this->request( 'GET', '/calendar', [], $range )->get_data()['data'] );
+
+		// Editar el tipo (color) invalida.
+		$type = $this->types['Pausas activas'];
+		$this->assertSame(
+			200,
+			$this->request(
+				'PUT',
+				"/event-types/{$type}",
+				[
+					'name'                => 'Pausas activas',
+					'color'               => '#1D4ED8',
+					'icon'                => 'mug-hot',
+					'requires_attachment' => false,
+				]
+			)->get_status()
+		);
+		$colors = array_column( $this->request( 'GET', '/calendar', [], $range )->get_data()['data'], 'backgroundColor', 'title' );
+		$this->assertSame( '#1D4ED8', $colors['Inducción'] );
+
+		// Eliminar un evento invalida.
+		$this->request( 'DELETE', "/events/{$id}" );
+		$this->assertCount( 1, $this->request( 'GET', '/calendar', [], $range )->get_data()['data'] );
+	}
+
 	public function test_the_ics_keeps_the_colombian_wall_time(): void {
 		$id = $this->create( 'Reunión de planeación', '2026-10-07', '15:00', 'Reuniones laborales' );
 		$this->collaborator();
