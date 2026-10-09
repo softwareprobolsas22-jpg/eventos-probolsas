@@ -383,7 +383,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 |---|---|---|---|
 | H-301 | Feed por rango, detalle con eventos del mismo día, `.ics`, próximos y las clases PHP de los shortcodes  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-301.md)); corrigió QA-045; integrada en `develop`* | B | 5 |
 | H-302 | `[eventos_calendario]` con FullCalendar: mes/lista, `es`, `firstDay` de WP, color e ícono por tipo, filtro de tipos, «hoy» desde el servidor; aviso de inicio de sesión para anónimos  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-302.md)); cerró QA-005; pruebas en el navegador con la zona de Tokio; integrada en `develop`* | F | 8 |
-| H-303 | Modal de detalle: fecha/hora es-CO, descripción, imagen ampliable o PDF (abrir/descargar), navegación entre eventos del mismo día, «Añadir a mi calendario» (sin eventos relacionados, D-6) | F | 5 |
+| H-303 | Modal de detalle: fecha/hora es-CO, descripción, imagen ampliable o PDF (abrir/descargar), navegación entre eventos del mismo día, «Añadir a mi calendario» (sin eventos relacionados, D-6)  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-303.md)); integrada en `develop`* | F | 5 |
 | H-304 | `[eventos_proximos]` | F | 3 |
 | H-305 | Pruebas de zona horaria (3 zonas y cambio de día 23:59 → 00:00 en Bogotá), responsive y accesibilidad | Q | 5 |
 
