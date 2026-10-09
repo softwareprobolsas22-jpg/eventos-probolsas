@@ -45,6 +45,20 @@ final class CalendarApiTest extends IntegrationTestCase {
 		$manager->add_cap( Capabilities::MANAGE );
 		wp_set_current_user( $manager->ID );
 
+		// De la semilla, solo «Reuniones laborales» no exige adjunto: un segundo tipo sin adjunto permite
+		// probar el filtro sin subir archivos.
+		$pauses = $this->request(
+			'POST',
+			'/event-types',
+			[
+				'name'                => 'Pausas activas',
+				'color'               => '#669F30',
+				'icon'                => 'mug-hot',
+				'requires_attachment' => false,
+			]
+		);
+		$this->assertSame( 201, $pauses->get_status(), (string) wp_json_encode( $pauses->get_data() ) );
+
 		foreach ( $this->request( 'GET', '/event-types' )->get_data()['data'] as $type ) {
 			$this->types[ $type['name'] ] = (int) $type['id'];
 		}
@@ -59,8 +73,8 @@ final class CalendarApiTest extends IntegrationTestCase {
 
 	public function test_the_feed_returns_the_visible_range_for_full_calendar(): void {
 		$meeting = $this->create( 'Reunión de planeación', '2026-10-07', '15:00', 'Reuniones laborales' );
-		$this->create( 'Inducción', '2026-10-31', null, 'Capacitaciones' );
-		$this->create( 'Fuera del rango', '2026-11-08', null, 'Capacitaciones' );
+		$this->create( 'Inducción', '2026-10-31', null, 'Pausas activas' );
+		$this->create( 'Fuera del rango', '2026-11-08', null, 'Pausas activas' );
 		$this->collaborator();
 
 		// Vista de mes de octubre de 2026 con la semana desde el lunes: 28 de septiembre a 8 de noviembre (exclusivo).
@@ -88,7 +102,7 @@ final class CalendarApiTest extends IntegrationTestCase {
 
 	public function test_the_feed_filters_by_type_and_rejects_invalid_ranges(): void {
 		$this->create( 'Reunión de planeación', '2026-10-07', '15:00', 'Reuniones laborales' );
-		$this->create( 'Inducción', '2026-10-07', null, 'Capacitaciones' );
+		$this->create( 'Inducción', '2026-10-07', null, 'Pausas activas' );
 
 		$filtered = $this->request(
 			'GET',
@@ -97,7 +111,7 @@ final class CalendarApiTest extends IntegrationTestCase {
 			[
 				'start' => '2026-10-01',
 				'end'   => '2026-11-01',
-				'types' => [ $this->types['Capacitaciones'] ],
+				'types' => [ $this->types['Pausas activas'] ],
 			]
 		);
 		$this->assertSame( [ 'Inducción' ], array_column( $filtered->get_data()['data'], 'title' ) );
@@ -152,9 +166,9 @@ final class CalendarApiTest extends IntegrationTestCase {
 		$today     = $this->plugin()->container()->get( DateFormatter::class )->today();
 		$yesterday = $this->shift( $today, '-1 day' );
 		$this->create( 'Ayer', $yesterday, '09:00', 'Reuniones laborales' );
-		$this->create( 'Hoy', $today, null, 'Capacitaciones' );
+		$this->create( 'Hoy', $today, null, 'Pausas activas' );
 		$this->create( 'Mañana', $this->shift( $today, '+1 day' ), '08:00', 'Reuniones laborales' );
-		$this->create( 'Pasado mañana', $this->shift( $today, '+2 days' ), '08:00', 'Capacitaciones' );
+		$this->create( 'Pasado mañana', $this->shift( $today, '+2 days' ), '08:00', 'Pausas activas' );
 		$this->collaborator();
 
 		$all = $this->request( 'GET', '/upcoming' )->get_data()['data'];
@@ -188,11 +202,11 @@ final class CalendarApiTest extends IntegrationTestCase {
 
 	public function test_the_shortcodes_mount_widgets_only_for_collaborators(): void {
 		$this->collaborator();
-		$content = '[eventos_calendario tipos="capacitaciones"] [eventos_calendario] [eventos_proximos limite="3"]';
+		$content = '[eventos_calendario tipos="pausas-activas"] [eventos_calendario] [eventos_proximos limite="3"]';
 		$html    = do_shortcode( $content );
 
 		$this->assertSame( 3, substr_count( $html, 'data-ep-widget=' ), 'RL-08: un contenedor por shortcode.' );
-		$this->assertStringContainsString( 'data-ep-widget="calendar" data-ep-props="{&quot;types&quot;:[' . $this->types['Capacitaciones'] . ']}"', $html );
+		$this->assertStringContainsString( 'data-ep-widget="calendar" data-ep-props="{&quot;types&quot;:[' . $this->types['Pausas activas'] . ']}"', $html );
 		$this->assertStringContainsString( 'data-ep-widget="upcoming"', $html );
 		$this->assertStringNotContainsString( ' id="', $html, 'RL-08: sin IDs que se puedan repetir.' );
 		$this->assertTrue( wp_script_is( 'ep-public', 'enqueued' ) );
