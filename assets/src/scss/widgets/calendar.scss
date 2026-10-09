@@ -125,8 +125,11 @@
 		background: var(--ep-color-primary);
 	}
 
+	// Días de otros meses: más tenues con el color de metadatos (≥ 4,5:1), no con opacidad, que dejaba el
+	// número en 3,76:1 (R-02, axe).
 	.fc .fc-day-other .fc-daygrid-day-top {
-		opacity: 0.55;
+		color: var(--ep-color-text-muted);
+		opacity: 1;
 	}
 
 	.fc .fc-daygrid-event {

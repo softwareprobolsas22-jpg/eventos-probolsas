@@ -48,6 +48,19 @@ export function calendarDate( date ) {
 }
 
 /**
+ * Oculta a los lectores de pantalla los íconos de FullCalendar (`.fc-icon`, con `role="img"` y sin
+ * nombre): son decorativos dentro de botones que ya tienen nombre.
+ *
+ * @param {HTMLElement} root Contenedor del calendario.
+ */
+export function hideDecorativeIcons( root ) {
+	root.querySelectorAll( '.fc-icon[role="img"]' ).forEach( ( iconElement ) => {
+		iconElement.removeAttribute( 'role' );
+		iconElement.setAttribute( 'aria-hidden', 'true' );
+	} );
+}
+
+/**
  * IDs válidos de una lista.
  *
  * @param {unknown} value Lista recibida.
@@ -152,6 +165,11 @@ export function createCalendar( element, props, { config, dates }, deps = {} ) {
 			onOpen?.( Number( info.event.id ), info.el );
 		},
 		loading: ( isLoading ) => element.setAttribute( 'aria-busy', String( isLoading ) ),
+		// Accesibilidad (R-16, axe): FullCalendar pone `aria-expanded` en el enlace «+N más», que solo es
+		// válido en un botón (y abre un panel, así que lo es), y deja sus íconos de flecha como imágenes
+		// sin nombre; el botón ya tiene el suyo.
+		moreLinkDidMount: ( arg ) => arg.el.setAttribute( 'role', 'button' ),
+		datesSet: () => hideDecorativeIcons( calendarHost ),
 	} );
 
 	calendar.render();
