@@ -1,0 +1,154 @@
+// Resumen de la pantalla «Eventos» (H-206, D-17): tarjetas que filtran la tabla y conteo por tipo.
+@use "../tools/mixins" as m;
+
+.ep-summary {
+	display: grid;
+	gap: var(--ep-space-3);
+
+	&__cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+		gap: var(--ep-space-3);
+
+		@include m.down(sm) {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: var(--ep-space-2);
+		}
+	}
+
+	&__types {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+		padding: 0;
+		margin: 0;
+		list-style: none;
+
+		li {
+			margin: 0;
+		}
+	}
+}
+
+.ep-summary-card {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-areas:
+		"icon value"
+		"icon label";
+	column-gap: var(--ep-space-3);
+	align-items: center;
+	min-height: 4.5rem;
+	padding: var(--ep-space-3) var(--ep-space-4);
+	color: var(--ep-color-text);
+	text-align: left;
+	cursor: pointer;
+	background: var(--ep-color-surface);
+	border: 1px solid var(--ep-color-border);
+	border-radius: var(--ep-radius-lg);
+	transition:
+		border-color var(--ep-duration-fast) var(--ep-easing-standard),
+		transform var(--ep-duration-fast) var(--ep-easing-standard);
+
+	&:hover {
+		border-color: var(--ep-color-primary);
+		transform: translateY(-1px);
+	}
+
+	&:focus-visible {
+		@include m.focus-ring;
+	}
+
+	&--loading {
+		cursor: default;
+		border: 0;
+	}
+
+	&__icon {
+		display: inline-grid;
+		grid-area: icon;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		font-size: var(--ep-font-size-lg);
+		color: var(--ep-color-primary);
+		background: var(--ep-color-primary-soft);
+		border-radius: var(--ep-radius-pill);
+	}
+
+	&__value {
+		grid-area: value;
+		font-size: var(--ep-font-size-2xl);
+		font-weight: var(--ep-font-weight-semibold);
+		line-height: var(--ep-line-height-tight);
+	}
+
+	&__label {
+		grid-area: label;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-subtle);
+	}
+
+	&.is-highlighted &__icon {
+		color: var(--ep-color-on-primary);
+		background: var(--ep-color-primary);
+	}
+
+	// En móvil, una fila de tres tarjetas compactas: la tabla no queda muy abajo.
+	@include m.down(sm) {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"value"
+			"label";
+		min-height: 0;
+		padding: var(--ep-space-2);
+		text-align: center;
+
+		&__icon {
+			display: none;
+		}
+
+		&__value {
+			font-size: var(--ep-font-size-xl);
+		}
+
+		&__label {
+			font-size: var(--ep-font-size-xs);
+		}
+	}
+
+	@include m.reduced-motion {
+		transition: none;
+
+		&:hover {
+			transform: none;
+		}
+	}
+}
+
+.ep-summary-type {
+	display: inline-flex;
+	gap: var(--ep-space-2);
+	align-items: center;
+	padding: var(--ep-space-1) var(--ep-space-2) var(--ep-space-1) var(--ep-space-1);
+	cursor: pointer;
+	background: var(--ep-color-surface);
+	border: 1px solid var(--ep-color-border);
+	border-radius: var(--ep-radius-pill);
+
+	&:hover {
+		border-color: var(--ep-color-primary);
+	}
+
+	&:focus-visible {
+		@include m.focus-ring;
+	}
+
+	&__count {
+		min-width: 1.5rem;
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+		text-align: center;
+	}
+}

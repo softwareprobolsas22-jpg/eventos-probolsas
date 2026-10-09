@@ -53,7 +53,7 @@ function emptyValue( field ) {
  *
  * @param {HTMLElement} container Contenedor.
  * @param {{ title?: string, fields: FilterField[], onChange: (values: Record<string, unknown>) => void, debounceMs?: number }} options Opciones.
- * @returns {{ element: HTMLElement, getValues: () => Record<string, unknown>, setOptions: (key: string, options: FilterOption[]) => void, reset: () => void, destroy: () => void }} API.
+ * @returns {{ element: HTMLElement, getValues: () => Record<string, unknown>, setOptions: (key: string, options: FilterOption[]) => void, setValues: (next: Record<string, unknown>) => void, reset: () => void, destroy: () => void }} API.
  */
 export function createFilterBar( container, { title = __( 'Filtros', 'eventos-probolsas' ), fields, onChange, debounceMs = 300 } ) {
 	const values = Object.fromEntries( fields.map( ( field ) => [ field.key, emptyValue( field ) ] ) );
@@ -148,6 +148,20 @@ export function createFilterBar( container, { title = __( 'Filtros', 'eventos-pr
 		/** Reemplaza las opciones de un campo (por ejemplo, cuando terminan de cargar los tipos). */
 		setOptions( key, options ) {
 			controls.get( key )?.setOptions?.( options );
+		},
+		/**
+		 * Aplica valores desde fuera de la barra (por ejemplo, una tarjeta del resumen) y avisa una sola vez.
+		 * Los campos que no se nombran conservan su valor.
+		 *
+		 * @param {Record<string, unknown>} next Valores por campo.
+		 */
+		setValues( next ) {
+			for ( const [ key, value ] of Object.entries( next ) ) {
+				if ( controls.has( key ) ) {
+					values[ key ] = controls.get( key ).set( value );
+				}
+			}
+			emit();
 		},
 		reset,
 		destroy() {

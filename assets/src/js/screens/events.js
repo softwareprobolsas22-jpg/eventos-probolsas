@@ -17,6 +17,7 @@ import { createFilterBar } from '../ui/filter-bar.js';
 import { loadError } from '../ui/load-state.js';
 import { showToast, toast } from '../ui/toast.js';
 import { openEventDetail } from './event-detail.js';
+import { createEventsSummary } from './events-summary.js';
 import { openEventForm } from './event-form.js';
 
 /** Ícono y nombre de cada clase de adjunto. */
@@ -64,6 +65,7 @@ export async function mount( screen, config, { api = createApi( config, { notify
 	// Solo se muestra la respuesta de la última petición: al escribir rápido, una anterior puede llegar después.
 	let requestId = 0;
 
+	const summarySlot = h( 'div' );
 	const filtersSlot = h( 'div' );
 	const toolbarSummary = h( 'p', { class: 'ep-table-toolbar__summary', attrs: { 'aria-live': 'polite' } } );
 	const exportButton = button( { label: __( 'Exportar CSV', 'eventos-probolsas' ), icon: 'fa-solid fa-file-csv', size: 'sm', onClick: () => exportCsv() } );
@@ -117,11 +119,14 @@ export async function mount( screen, config, { api = createApi( config, { notify
 		},
 	} );
 
+	// Tarjetas del resumen (H-206, D-17): cada una aplica su filtro a la tabla.
+	const summary = createEventsSummary( summarySlot, { api, onFilter: ( filter ) => filterBar.setValues( filter ) } );
+
 	const addButton = button( { label: __( 'Añadir evento', 'eventos-probolsas' ), icon: 'fa-solid fa-plus', variant: 'primary', onClick: () => openForm() } );
 	screen.querySelector( '[data-ep-header-actions]' )?.append( addButton );
 
 	root.removeAttribute( 'aria-busy' );
-	root.replaceChildren( filtersSlot, toolbar, tableSlot );
+	root.replaceChildren( summarySlot, filtersSlot, toolbar, tableSlot );
 
 	/**
 	 * Abre el formulario para crear (sin evento) o editar.
@@ -129,7 +134,7 @@ export async function mount( screen, config, { api = createApi( config, { notify
 	 * @param {Object|null} event Evento a editar.
 	 */
 	function openForm( event = null ) {
-		openEventForm( { event, types, config, api, openLibrary, onSaved: () => table.refresh(), onMissing: () => table.refresh() } );
+		openEventForm( { event, types, config, api, openLibrary, onSaved: () => refreshAll(), onMissing: () => refreshAll() } );
 	}
 
 	/**
@@ -215,10 +220,20 @@ export async function mount( screen, config, { api = createApi( config, { notify
 			toast.error( error.message );
 		}
 		// También si falló (por ejemplo, otra persona ya lo había eliminado): la tabla queda al día.
-		table.refresh();
+		refreshAll();
 	}
 
-	/** Tipos para el filtro: si fallan, el filtro queda solo con «Todos los tipos» (la API ya avisó). */
+	/** La tabla y las cifras del resumen, después de crear, editar o eliminar. */
+	function refreshAll() {
+		table.refresh();
+		summary.refresh();
+	}
+
+	/**
+	 * Tipos para el filtro: si fallan, el filtro queda solo con «Todos los tipos» (la API ya avisó).
+	 *
+	 * @returns {Promise<Object[]>} Tipos cargados (vacío si fallaron).
+	 */
 	async function loadTypes() {
 		try {
 			types = await api.get( 'event-types' );
@@ -229,10 +244,12 @@ export async function mount( screen, config, { api = createApi( config, { notify
 		} catch {
 			// Sin tipos el resto de la pantalla sigue funcionando.
 		}
+		return types;
 	}
 
 	table.setLoading( true );
-	await Promise.all( [ loadTypes(), load( table.getQuery() ) ] );
+	const typesLoaded = loadTypes();
+	await Promise.all( [ typesLoaded, load( table.getQuery() ), summary.refresh( typesLoaded ) ] );
 }
 
 /**
