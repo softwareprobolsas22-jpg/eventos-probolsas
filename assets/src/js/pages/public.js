@@ -23,6 +23,7 @@ import { initTooltips } from '../ui/tooltip.js';
  */
 const WIDGETS = {
 	calendar: () => import( '../public/calendar.js' ),
+	upcoming: () => import( '../public/upcoming.js' ),
 };
 
 const widgets = document.querySelectorAll( '[data-ep-widget]' );

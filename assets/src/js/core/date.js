@@ -75,6 +75,7 @@ export function createDateFormatter( ui ) {
 
 	// Fechas de calendario largas: se formatean en UTC porque se construyen con Date.UTC (sin zona del equipo).
 	const longDate = new Intl.DateTimeFormat( ui.locale || 'es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' } );
+	const shortDate = new Intl.DateTimeFormat( ui.locale || 'es-CO', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' } );
 
 	/**
 	 * Partes de un momento en la zona configurada.
@@ -153,6 +154,24 @@ export function createDateFormatter( ui ) {
 				throw new TypeError( `Fecha no válida: ${ value }` );
 			}
 			return longDate.format( Date.UTC( Number( match[ 1 ] ), Number( match[ 2 ] ) - 1, Number( match[ 3 ] ) ) );
+		},
+
+		/**
+		 * Partes cortas de una fecha de calendario para un chip de fecha. Ejemplo: `2026-10-07` →
+		 * `{ day: '7', month: 'oct', weekday: 'mié' }`. Sin conversión de zona (R-08).
+		 *
+		 * @param {string} value Fecha `YYYY-MM-DD`.
+		 * @returns {{ day: string, month: string, weekday: string }} Partes.
+		 */
+		calendarDateParts( value ) {
+			const match = CALENDAR_DATE.exec( value );
+			if ( ! match || ! isRealDate( Number( match[ 1 ] ), Number( match[ 2 ] ), Number( match[ 3 ] ) ) ) {
+				throw new TypeError( `Fecha no válida: ${ value }` );
+			}
+			const parts = Object.fromEntries(
+				shortDate.formatToParts( Date.UTC( Number( match[ 1 ] ), Number( match[ 2 ] ) - 1, Number( match[ 3 ] ) ) ).map( ( { type, value: part } ) => [ type, part ] )
+			);
+			return { day: parts.day, month: parts.month.replace( /\.$/, '' ), weekday: parts.weekday.replace( /\.$/, '' ) };
 		},
 
 		/**

@@ -1,0 +1,126 @@
+// Próximos eventos de [eventos_proximos] (H-304). Se descarga con el widget, no con la página (R-17).
+@use "../tools/mixins" as m;
+
+// Bajo .ep-public: así gana al reboot de Bootstrap encapsulado (márgenes de títulos y listas).
+.ep-public {
+	&.ep-upcoming {
+		min-width: 0;
+	}
+
+	.ep-upcoming__title {
+		margin: 0 0 var(--ep-space-3);
+		font-size: var(--ep-font-size-lg);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+	}
+
+	.ep-upcoming__list {
+		display: grid;
+		gap: var(--ep-space-2);
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	.ep-upcoming__item {
+		min-width: 0;
+		margin: 0;
+	}
+
+	.ep-upcoming__skeleton {
+		display: block;
+		height: 3.5rem;
+		border-radius: var(--ep-radius-lg);
+	}
+
+	.ep-upcoming__event {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: var(--ep-space-3);
+		align-items: center;
+		width: 100%;
+		padding: var(--ep-space-2) var(--ep-space-3);
+		color: var(--ep-color-text);
+		text-align: left;
+		cursor: pointer;
+		background: var(--ep-color-surface);
+		border: 1px solid var(--ep-color-border);
+		border-radius: var(--ep-radius-lg);
+		transition:
+			border-color var(--ep-duration-fast) var(--ep-easing-standard),
+			transform var(--ep-duration-fast) var(--ep-easing-standard);
+
+		&:hover {
+			border-color: var(--ep-color-primary);
+			transform: translateY(-1px);
+		}
+
+		&:focus-visible {
+			@include m.focus-ring;
+		}
+
+		@include m.reduced-motion {
+			transition: none;
+
+			&:hover {
+				transform: none;
+			}
+		}
+	}
+
+	.ep-upcoming__date {
+		display: grid;
+		place-items: center;
+		width: 3rem;
+		padding: var(--ep-space-1) 0;
+		line-height: 1.1;
+		color: var(--ep-color-primary);
+		background: var(--ep-color-primary-soft);
+		border-radius: var(--ep-radius-md);
+
+		&.is-today {
+			color: var(--ep-color-on-primary);
+			background: var(--ep-color-primary);
+		}
+	}
+
+	.ep-upcoming__day {
+		font-size: var(--ep-font-size-xl);
+		font-weight: var(--ep-font-weight-semibold);
+	}
+
+	.ep-upcoming__month {
+		font-size: var(--ep-font-size-xs);
+		font-weight: var(--ep-font-weight-semibold);
+		text-transform: uppercase;
+	}
+
+	.ep-upcoming__info {
+		display: grid;
+		gap: var(--ep-space-1);
+		min-width: 0;
+	}
+
+	.ep-upcoming__name {
+		--ep-truncate-width: 100%;
+
+		font-weight: var(--ep-font-weight-semibold);
+	}
+
+	.ep-upcoming__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-1) var(--ep-space-3);
+		align-items: center;
+		min-width: 0;
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text-subtle);
+	}
+
+	.ep-upcoming__time {
+		display: inline-flex;
+		gap: var(--ep-space-1);
+		align-items: center;
+		white-space: nowrap;
+	}
+}
