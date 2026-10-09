@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { calendarDate, createCalendar, MOBILE_QUERY } from '../../../assets/src/js/public/calendar.js';
+import { calendarDate, createCalendar, hideDecorativeIcons, MOBILE_QUERY } from '../../../assets/src/js/public/calendar.js';
 import { createDateFormatter } from '../../../assets/src/js/core/date.js';
 
 const UI = { timezone: 'America/Bogota', date_format: 'd/m/Y', time_format: 'h:i', meridiem: { am: 'a. m.', pm: 'p. m.' } };
@@ -276,6 +276,23 @@ describe( 'widget del calendario (H-302)', () => {
 		expect( calendar.calls.filter( ( [ name ] ) => 'updateSize' === name ) ).toHaveLength( 2 );
 		mounted.destroy();
 		expect( observer.disconnected ).toBe( true );
+	} );
+
+	it( 'accesibilidad de FullCalendar: «+N más» es un botón y los íconos de flecha son decorativos (R-16)', () => {
+		const { calendar } = setup();
+		const more = document.createElement( 'a' );
+		calendar.options.moreLinkDidMount( { el: more } );
+		expect( more.getAttribute( 'role' ) ).toBe( 'button' );
+
+		const host = document.createElement( 'div' );
+		const arrow = document.createElement( 'span' );
+		arrow.className = 'fc-icon fc-icon-chevron-left';
+		arrow.setAttribute( 'role', 'img' );
+		host.append( arrow );
+		hideDecorativeIcons( host );
+		expect( arrow.hasAttribute( 'role' ) ).toBe( false );
+		expect( arrow.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+		expect( typeof calendar.options.datesSet ).toBe( 'function' );
 	} );
 
 	it( 'anuncia la carga con aria-busy', () => {

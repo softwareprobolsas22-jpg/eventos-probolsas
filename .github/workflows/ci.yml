@@ -129,8 +129,10 @@ jobs:
         env:
           TZ: ${{ matrix.tz }}
 
-      - name: Pruebas de fechas
-        run: npx vitest run tests/js/core/date.test.js
+      # Fechas y widgets de la intranet (calendario, modal y próximos): el día, la hora y «hoy» no deben
+      # depender de la zona del equipo (R-08, H-305).
+      - name: Pruebas de fechas y del calendario
+        run: npx vitest run tests/js/core/date.test.js tests/js/public
         env:
           TZ: ${{ matrix.tz }}
 

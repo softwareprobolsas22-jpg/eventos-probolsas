@@ -55,15 +55,15 @@ Estado: ✅ verificación automática activa · 🟡 parcial (falta el component
 | R-05 `th` centrados | CSS compilado en las tres hojas | `layout-css.test.js` | ✅ |
 | R-06 Acciones primero y fija | Prueba de componente `data-table` | `tests/js/ui/data-table.test.js` | ⏳ H-103 |
 | R-07 Formato es-CO | Fixtures compartidos PHP/JS (auditoría, calendario, 12 h, «hoy») | `DateFormatterTest.php`, `date.test.js` | ✅ |
-| R-08 Sin desfases | ESLint (4 patrones) con prueba de la regla; fechas en 4 zonas en el CI; `today` del servidor | `date-rules.test.js`, CI `timezones`, `AssetsTest.php` | ✅ (FullCalendar: ⏳ H-302) |
+| R-08 Sin desfases | ESLint (4 patrones) con prueba de la regla; fechas en 4 zonas en el CI; `today` del servidor | `date-rules.test.js`, CI `timezones` (también `tests/js/public`), `AssetsTest.php`, e2e con el navegador en Asia/Tokyo | ✅ |
 | R-09 Imagen o PDF desde la biblioteca | `config/media.php`; validación del MIME real en el servidor; `wp.media` filtrado | `ConfigTest.php`; integración de la API | 🟡 H-202/H-204 |
 | R-10 Font Awesome | Los 56 íconos de `config/icons.php` existen en el CSS compilado; solo la fuente sólida | `IconCatalogTest.php`, `budget.test.js` | ✅ |
-| R-11 FullCalendar | Revisión de código y exploratorio | — | ⏳ H-302 |
+| R-11 FullCalendar | Mes y lista; lista por defecto en móvil | `calendar.test.js`, `tests/e2e/calendar.spec.js` | ✅ |
 | R-12 Animaciones ligeras | `prefersReducedMotion`; tokens de duración 150–250 ms | `timing.test.js`; exploratorio con reducción de movimiento | 🟡 H-103 |
 | R-13 Responsive | Exploratorio en 360/768/1024/1440 px | Informe de cada historia con UI | ⏳ H-103 en adelante |
 | R-14 Sin `<script>`/`<style>`/`alert` | ESLint `no-alert`; búsqueda en plantillas | `date-rules.test.js`; revisión | ✅ |
 | R-15 Seguridad | PHPCS (escape, sanitización, `prepare`); ESLint sin `innerHTML`; permisos en integración | `RestControllerTest.php`, `LifecycleTest.php` | ✅ base · 🟡 por endpoint |
-| R-16 Accesibilidad | axe-core sobre los componentes; teclado y lector en exploratorio | `tests/js/a11y/axe.test.js` | ⏳ H-103 |
+| R-16 Accesibilidad | axe-core sobre los componentes; teclado y lector en exploratorio | `tests/js/a11y/axe.test.js`; axe-core en el navegador sobre el calendario, el modal y los próximos (`calendar.spec.js`) | ✅ |
 | R-17 Rendimiento | Presupuesto de CSS y JS iniciales; feed por rango; paginación en servidor | `budget.test.js`; integración de la API | ✅ base |
 | R-18 Diseño sobrio | Revisión SM + PO en la Review | Review del sprint | ⏳ H-103 |
 | R-19 ≤ 6 columnas | Prueba de cada pantalla con tabla | `tests/js/screens/*.test.js` | ⏳ H-104/H-203 |
@@ -79,14 +79,14 @@ Cada caso se automatiza en la historia indicada y se vuelve a ejecutar al cierre
 
 | ID | Defecto del legado | Caso de prueba | Historia | Estado |
 |---|---|---|---|---|
-| RL-01 | Clic en el día 7 mostraba los eventos del día 6 | Con el proceso en `Pacific/Kiritimati` y en `America/Bogota`, un evento del 2026-10-07 aparece en la celda del 7 y su detalle dice «07/10/2026» | H-302, H-305 | Base ✅ (`date.test.js`) · calendario ⏳ |
-| RL-02 | «Hoy» era mañana después de las 7:00 p. m. | Con la hora simulada 2026-10-07 20:30 en Bogotá: `epConfig.today`, el filtro «Hoy» y el resaltado de FullCalendar marcan el 7 | H-302, H-305 | Base ✅ (`AssetsTest.php`, `date.test.js`) · calendario ⏳ |
-| RL-03 | `.ics` corrido 5 horas y descarga rota | Un evento a las 3:00 p. m. produce `DTSTART;TZID=America/Bogota:20261007T150000`; la descarga funciona con sesión | H-301 | ⏳ |
+| RL-01 | Clic en el día 7 mostraba los eventos del día 6 | Con el proceso en `Pacific/Kiritimati` y en `America/Bogota`, un evento del 2026-10-07 aparece en la celda del 7 y su detalle dice «07/10/2026» | H-302, H-305 | ✅ e2e en Asia/Tokyo + unitarias en 4 zonas |
+| RL-02 | «Hoy» era mañana después de las 7:00 p. m. | Con la hora simulada 2026-10-07 20:30 en Bogotá: `epConfig.today`, el filtro «Hoy» y el resaltado de FullCalendar marcan el 7 | H-302, H-305 | ✅ `now` de Bogotá, e2e y QA-005 |
+| RL-03 | `.ics` corrido 5 horas y descarga rota | Un evento a las 3:00 p. m. produce `DTSTART;TZID=America/Bogota:20261007T150000`; la descarga funciona con sesión | H-301 | ✅ unitarias, integración y descarga en el navegador |
 | RL-04 | «Subir imagen» no asociaba el archivo | Elegir o subir en la biblioteca → el evento guarda `attachment_id` y lo muestra | H-202, H-204 | ⏳ |
 | RL-05 | No se podían crear eventos en una instalación limpia | Activar en WordPress limpio → crear un evento de cada tipo | H-102, H-201 (integración) | ⏳ |
-| RL-06 | Grilla desalineada con la semana iniciando en lunes | Con `start_of_week` = 1 y = 0, el encabezado y las celdas coinciden | H-302 | Base ✅ (`epConfig.firstDay`) · calendario ⏳ |
+| RL-06 | Grilla desalineada con la semana iniciando en lunes | Con `start_of_week` = 1 y = 0, el encabezado y las celdas coinciden | H-302 | ✅ e2e con `start_of_week` 1 y 0 |
 | RL-07 | Borrar un evento borraba el archivo de la biblioteca | Eliminar un evento con adjunto → el adjunto sigue en la biblioteca; desinstalar → también | H-201 | Desinstalación ✅ (`LifecycleTest.php`) · evento ⏳ |
-| RL-08 | Calendario inicializado dos veces e IDs duplicados | Dos shortcodes en una página → cada uno hace una sola petición y no hay IDs repetidos | H-302 | ⏳ |
+| RL-08 | Calendario inicializado dos veces e IDs duplicados | Dos shortcodes en una página → cada uno hace una sola petición y no hay IDs repetidos | H-302 | ✅ e2e |
 
 ## 7. Lista de verificación exploratoria (historias con UI)
 
