@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Probolsas\Eventos\Core\Frontend;
 
 use Probolsas\Eventos\Core\Assets\Assets;
+use Probolsas\Eventos\Core\Security\Capabilities;
 use WP_Post;
 
 /**
@@ -72,12 +73,13 @@ final class ShortcodeRegistry {
 	}
 
 	/**
-	 * Encola los assets públicos si la página actual usa algún shortcode del plugin.
+	 * Encola los assets públicos si la página actual usa algún shortcode del plugin y el usuario puede ver
+	 * los eventos: a los demás se les muestra un aviso que no necesita el JS ni los estilos (R-17).
 	 */
 	public function enqueue_when_used(): void {
 		$post = get_post();
 
-		if ( is_singular() && $post instanceof WP_Post && $this->uses_shortcodes( $post->post_content ) ) {
+		if ( current_user_can( Capabilities::VIEW ) && is_singular() && $post instanceof WP_Post && $this->uses_shortcodes( $post->post_content ) ) {
 			$this->assets->enqueue_public();
 		}
 	}

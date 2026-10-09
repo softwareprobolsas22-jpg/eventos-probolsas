@@ -11,13 +11,9 @@ namespace Probolsas\Eventos\Domains\Event\Presentation;
 
 use Probolsas\Eventos\Domains\Event\Application\EventService;
 use Probolsas\Eventos\Domains\Event\Domain\Event;
-use Probolsas\Eventos\Domains\EventType\Domain\EventType;
-use Probolsas\Eventos\Domains\EventType\Domain\EventTypeRepository;
-use Probolsas\Eventos\Domains\Media\Domain\AttachmentGateway;
 use Probolsas\Eventos\Shared\Http\RestApi;
 use Probolsas\Eventos\Shared\Http\RestController;
 use Probolsas\Eventos\Shared\Time\DateFormatter;
-use Probolsas\Eventos\Shared\Ui\ColorContrast;
 use WP_Error;
 use WP_HTTP_Response;
 use WP_REST_Request;
@@ -26,7 +22,7 @@ use WP_REST_Server;
 
 /**
  * Endpoints `eventos/v1/events` de gestión y detalle (contrato en docs/api/events.md). El feed del
- * calendario, el .ics y los próximos eventos llegan en H-301.
+ * calendario, el .ics y los próximos eventos tienen sus propios controladores.
  */
 final class EventRestController extends RestController {
 
@@ -46,36 +42,18 @@ final class EventRestController extends RestController {
 	private const TEXT_FIELDS = [ 'title', 'type_id', 'start_date', 'start_time', 'attachment_id', 'end_date', 'end_time' ];
 
 	/**
-	 * Tipos ya leídos en esta petición.
-	 *
-	 * @var array<int, EventType|null>
-	 */
-	private array $types_cache = [];
-
-	/**
-	 * Nombres de usuario ya leídos en esta petición.
-	 *
-	 * @var array<int, array{id: int, name: string}|null>
-	 */
-	private array $users_cache = [];
-
-	/**
 	 * Crea el controlador.
 	 *
-	 * @param EventService        $service     Servicio de eventos.
-	 * @param EventTypeRepository $types       Tipos de evento.
-	 * @param AttachmentGateway   $attachments Biblioteca de Medios.
-	 * @param EventCsvExport      $csv         Exportación CSV.
-	 * @param DateFormatter       $dates       Fechas.
-	 * @param ColorContrast       $contrast    Tono de texto legible del tipo.
+	 * @param EventService   $service   Servicio de eventos.
+	 * @param EventPresenter $presenter Representación de los eventos.
+	 * @param EventCsvExport $csv       Exportación CSV.
+	 * @param DateFormatter  $dates     Fechas.
 	 */
 	public function __construct(
 		private readonly EventService $service,
-		private readonly EventTypeRepository $types,
-		private readonly AttachmentGateway $attachments,
+		private readonly EventPresenter $presenter,
 		private readonly EventCsvExport $csv,
-		private readonly DateFormatter $dates,
-		private readonly ColorContrast $contrast
+		private readonly DateFormatter $dates
 	) {}
 
 	/**
@@ -156,7 +134,7 @@ final class EventRestController extends RestController {
 		return $this->handle(
 			function () use ( $request ): WP_REST_Response {
 				$page     = $this->service->search( $this->service->query( $this->query_params( $request ) ) );
-				$response = $this->ok( array_map( [ $this, 'present' ], $page->events ) );
+				$response = $this->ok( array_map( [ $this->presenter, 'present' ], $page->events ) );
 				$response->header( 'X-WP-Total', (string) $page->total );
 				$response->header( 'X-WP-TotalPages', (string) $page->total_pages() );
 
@@ -187,7 +165,7 @@ final class EventRestController extends RestController {
 
 				return $this->ok(
 					[
-						...$this->present( $event ),
+						...$this->presenter->present( $event ),
 						'same_day' => $same_day,
 					]
 				);
@@ -203,7 +181,7 @@ final class EventRestController extends RestController {
 	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
 	 */
 	public function store( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		return $this->handle( fn(): WP_REST_Response => $this->ok( $this->present( $this->service->create( $this->input( $request ), get_current_user_id() ) ), 201 ) );
+		return $this->handle( fn(): WP_REST_Response => $this->ok( $this->presenter->present( $this->service->create( $this->input( $request ), get_current_user_id() ) ), 201 ) );
 	}
 
 	/**
@@ -214,7 +192,7 @@ final class EventRestController extends RestController {
 	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
 	 */
 	public function update( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		return $this->handle( fn(): WP_REST_Response => $this->ok( $this->present( $this->service->update( (int) $request['id'], $this->input( $request ), get_current_user_id() ) ) ) );
+		return $this->handle( fn(): WP_REST_Response => $this->ok( $this->presenter->present( $this->service->update( (int) $request['id'], $this->input( $request ), get_current_user_id() ) ) ) );
 	}
 
 	/**
@@ -253,8 +231,8 @@ final class EventRestController extends RestController {
 				$query = $this->service->query( $this->query_params( $request ) );
 				$body  = $this->csv->build(
 					$this->service->all_matching( $query ),
-					fn( int $id ): string => $this->type( $id )->name ?? '',
-					fn( int $id ): string => $this->user( $id )['name'] ?? ''
+					fn( int $id ): string => $this->presenter->type( $id )->name ?? '',
+					fn( int $id ): string => $this->presenter->user( $id )['name'] ?? ''
 				);
 
 				$response = new WP_REST_Response( $body, 200 );
@@ -285,44 +263,6 @@ final class EventRestController extends RestController {
 		echo $result->get_data(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Archivo CSV (text/csv), no HTML; las celdas se protegen contra fórmulas en EventCsvExport.
 
 		return true;
-	}
-
-	/**
-	 * Representación pública de un evento (docs/api/events.md).
-	 *
-	 * @param Event $event Evento.
-	 *
-	 * @return array<string, mixed>
-	 */
-	public function present( Event $event ): array {
-		$schedule   = $event->schedule;
-		$type       = $this->type( $event->type_id );
-		$attachment = null === $event->attachment_id ? null : $this->attachments->find( $event->attachment_id );
-
-		return [
-			'id'          => $event->id,
-			'title'       => $event->title,
-			'description' => $event->description,
-			'type'        => null === $type ? null : [
-				'id'        => $type->id,
-				'name'      => $type->name,
-				'slug'      => $type->slug,
-				'color'     => $type->color,
-				'text_tone' => $this->contrast->readable_tone( $type->color ),
-				'icon'      => $type->icon,
-			],
-			'start_date'  => $schedule->start_date,
-			'start_time'  => $schedule->start_time,
-			'end_date'    => $schedule->end_date,
-			'end_time'    => $schedule->end_time,
-			'all_day'     => $schedule->is_all_day(),
-			'is_past'     => $this->service->is_past( $event ),
-			'attachment'  => $attachment?->to_array(),
-			'created_by'  => $this->user( $event->created_by ),
-			'updated_by'  => $this->user( $event->updated_by ),
-			'created_at'  => $this->dates->to_iso( $event->created_at_gmt ),
-			'updated_at'  => $this->dates->to_iso( $event->updated_at_gmt ),
-		];
 	}
 
 	/**
@@ -365,37 +305,5 @@ final class EventRestController extends RestController {
 		$input['description'] = is_scalar( $body['description'] ?? null ) ? sanitize_textarea_field( (string) $body['description'] ) : '';
 
 		return $input;
-	}
-
-	/**
-	 * Tipo por ID, leído una sola vez por petición.
-	 *
-	 * @param int $id ID del tipo.
-	 */
-	private function type( int $id ): ?EventType {
-		if ( ! array_key_exists( $id, $this->types_cache ) ) {
-			$this->types_cache[ $id ] = $this->types->find( $id );
-		}
-
-		return $this->types_cache[ $id ];
-	}
-
-	/**
-	 * Usuario de WordPress por ID (`null` si fue eliminado), leído una sola vez por petición.
-	 *
-	 * @param int $id ID del usuario.
-	 *
-	 * @return array{id: int, name: string}|null
-	 */
-	private function user( int $id ): ?array {
-		if ( ! array_key_exists( $id, $this->users_cache ) ) {
-			$user                     = $id > 0 ? get_userdata( $id ) : false;
-			$this->users_cache[ $id ] = false === $user ? null : [
-				'id'   => $id,
-				'name' => (string) $user->display_name,
-			];
-		}
-
-		return $this->users_cache[ $id ];
 	}
 }

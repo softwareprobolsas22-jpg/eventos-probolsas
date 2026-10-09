@@ -49,6 +49,7 @@ final class ColorContrastTest extends UnitTestCase {
 		$contrast = new ColorContrast();
 
 		$this->assertSame( $sample['tone'], $contrast->readable_tone( $sample['color'] ) );
+		$this->assertSame( 'light' === $sample['tone'] ? '#FFFFFF' : '#000000', $contrast->readable_color( $sample['color'] ), 'textColor de FullCalendar.' );
 		$this->assertEqualsWithDelta( $sample['best_ratio'], $contrast->best_ratio( $sample['color'] ), 0.01 );
 	}
 

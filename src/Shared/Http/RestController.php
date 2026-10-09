@@ -108,6 +108,31 @@ abstract class RestController {
 	}
 
 	/**
+	 * Parámetro de texto saneado (vacío si no es un valor simple).
+	 *
+	 * @param mixed $value Valor recibido.
+	 */
+	protected static function text_param( mixed $value ): string {
+		return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+	}
+
+	/**
+	 * Parámetro de lista (`types[]=1&types[]=2`) con cada valor saneado. Un valor suelto llega como texto:
+	 * el servicio decide si lo acepta.
+	 *
+	 * @param mixed $value Valor recibido.
+	 *
+	 * @return list<string>|string
+	 */
+	protected static function list_param( mixed $value ): array|string {
+		if ( ! is_array( $value ) ) {
+			return self::text_param( $value );
+		}
+
+		return array_values( array_map( [ self::class, 'text_param' ], $value ) );
+	}
+
+	/**
 	 * Error con el formato estándar de WordPress y, si aplica, los errores por campo en `data.errors`.
 	 *
 	 * @param ErrorCode                   $code         Código del error.
