@@ -52,6 +52,14 @@ interface EventRepository {
 	public function in_range( string $from, string $to, array $type_ids = [], ?int $limit = null ): array;
 
 	/**
+	 * Cantidad de eventos que ocupan algún día del rango (por solapamiento, §5.5). La usa el dashboard.
+	 *
+	 * @param string $from Primer día `Y-m-d`.
+	 * @param string $to   Último día `Y-m-d` (incluido).
+	 */
+	public function count_in_range( string $from, string $to ): int;
+
+	/**
 	 * Guarda un evento nuevo y lo devuelve con su ID.
 	 *
 	 * @param Event $event Evento sin ID.

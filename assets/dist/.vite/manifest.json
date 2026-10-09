@@ -1,7 +1,7 @@
 {
-  "_bootstrap-DQJbggtE.css": {
-    "file": "css/bootstrap-DQJbggtE.css",
-    "src": "_bootstrap-DQJbggtE.css"
+  "_bootstrap-DU7YtIz-.css": {
+    "file": "css/bootstrap-DU7YtIz-.css",
+    "src": "_bootstrap-DU7YtIz-.css"
   },
   "_button-Zn7ZjNtw.js": {
     "file": "js/chunks/button-Zn7ZjNtw.js",
@@ -69,7 +69,7 @@
     ],
     "css": [
       "css/admin.css",
-      "css/bootstrap-DQJbggtE.css"
+      "css/bootstrap-DU7YtIz-.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -90,7 +90,7 @@
     ],
     "css": [
       "css/public.css",
-      "css/bootstrap-DQJbggtE.css"
+      "css/bootstrap-DU7YtIz-.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -139,7 +139,7 @@
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-B82gHHI_.js",
+    "file": "js/chunks/events-wLaNCqOs.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
