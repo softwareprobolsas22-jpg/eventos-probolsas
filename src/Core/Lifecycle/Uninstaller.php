@@ -11,11 +11,14 @@ namespace Probolsas\Eventos\Core\Lifecycle;
 
 use Probolsas\Eventos\Core\Database\Migrator;
 use Probolsas\Eventos\Core\Security\Capabilities;
+use Probolsas\Eventos\Core\Settings\PluginSettings;
 
 /**
- * Elimina todo lo que el plugin creó: la limpieza propia de cada dominio, las tablas, las opciones y
- * las capabilities. Los archivos se conservan en la Biblioteca de medios: los usan otras partes de la
- * empresa, no datos internos del plugin.
+ * Al desinstalar siempre quita las capabilities del plugin. Los datos (tablas de eventos y tipos, la
+ * versión del esquema, la limpieza propia de cada dominio y los ajustes) solo se borran si el gestor
+ * marcó «Borrar todos los datos al desinstalar» en «Ajustes»; si no, se conservan para una reinstalación
+ * (D-16). Los archivos se quedan siempre en la Biblioteca de Medios: los usan otras partes de la empresa
+ * (D-4).
  */
 final class Uninstaller {
 
@@ -29,24 +32,32 @@ final class Uninstaller {
 	 *
 	 * @param Migrator        $migrator     Migrador del esquema.
 	 * @param Capabilities    $capabilities Permisos del plugin.
+	 * @param PluginSettings  $settings     Ajustes (si se borran los datos).
 	 * @param UninstallTask[] $tasks        Limpieza propia de los dominios.
 	 * @phpstan-param list<UninstallTask> $tasks
 	 */
 	public function __construct(
 		private readonly Migrator $migrator,
 		private readonly Capabilities $capabilities,
+		private readonly PluginSettings $settings,
 		private readonly array $tasks = []
 	) {}
 
 	/**
-	 * Elimina los datos del plugin.
+	 * Desinstala: quita los permisos y, si así se configuró, los datos.
 	 */
 	public function uninstall(): void {
+		$this->capabilities->uninstall();
+
+		if ( ! $this->settings->delete_data_on_uninstall() ) {
+			return;
+		}
+
 		foreach ( $this->tasks as $task ) {
 			$task->run();
 		}
 
 		$this->migrator->reset();
-		$this->capabilities->uninstall();
+		$this->settings->forget();
 	}
 }

@@ -1,0 +1,22 @@
+// Pantalla «Ajustes» (H-402): una tarjeta por grupo de ajustes.
+.ep-settings {
+	display: grid;
+	gap: var(--ep-space-4);
+	max-width: 42rem;
+
+	.ep-card__title {
+		display: flex;
+		gap: var(--ep-space-2);
+		align-items: center;
+		margin: 0;
+
+		i {
+			color: var(--ep-color-primary);
+		}
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+	}
+}

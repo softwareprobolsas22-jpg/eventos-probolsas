@@ -394,8 +394,8 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
 | H-401 | Caché del feed por rango con invalidación al escribir  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-401.md)); la integración detectó QA-061, corregido; integrada en `develop`* | B | 3 |
-| H-402 | Desinstalación que conserva los datos salvo que se marque «Borrar todos los datos al desinstalar» en «Ajustes» (D-16); limpieza de capacidades | B+F | 3 |
-| H-403 | Auditoría de accesibilidad y rendimiento; ajustes | F | 3 |
+| H-402 | Desinstalación que conserva los datos salvo que se marque «Borrar todos los datos al desinstalar» en «Ajustes» (D-16); limpieza de capacidades  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-402.md)); integrada en `develop`* | B+F | 3 |
+| H-403 | Auditoría de accesibilidad y rendimiento; ajustes  — *✅ aprobada por QA ([informe](../qa/2026-10-09-H-403.md)); corrigió QA-063 y cerró QA-027; integrada en `develop`* | F | 3 |
 | H-404 | Prueba de aceptación con el PO en staging (WP 7.1.3 / PHP 8.3) y paquete `.zip` de release | SM+Q | 3 |
 
 ### EP-5 · Roadmap v1.1 (después de validar v1 en producción)

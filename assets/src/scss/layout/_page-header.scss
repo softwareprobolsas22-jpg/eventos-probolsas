@@ -49,7 +49,9 @@
 	&__subtitle {
 		margin: var(--ep-space-1) 0 0;
 		font-size: var(--ep-font-size-md);
-		color: var(--ep-color-text-muted);
+
+		// Va sobre el fondo de wp-admin: text-muted quedaba en 4,41:1 (H-403).
+		color: var(--ep-color-text-subtle);
 	}
 
 	&__actions {

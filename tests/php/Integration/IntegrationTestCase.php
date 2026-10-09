@@ -12,6 +12,7 @@ namespace Probolsas\Eventos\Tests\Integration;
 use Probolsas\Eventos\Core\Database\Migrator;
 use Probolsas\Eventos\Core\Database\Tables;
 use Probolsas\Eventos\Core\Plugin;
+use Probolsas\Eventos\Core\Settings\PluginSettings;
 use WP_UnitTestCase;
 
 /**
@@ -90,6 +91,8 @@ abstract class IntegrationTestCase extends WP_UnitTestCase {
 	 * Desinstala el plugin y confirma la transacción para que el ROLLBACK de la suite no lo revierta.
 	 */
 	private function reset_plugin(): void {
+		// Desinstalar conserva los datos por defecto (D-16): para dejar la base limpia se pide borrarlos.
+		( new PluginSettings() )->set_delete_data_on_uninstall( true );
 		Plugin::uninstall( $this->plugin_file() );
 		self::commit_transaction();
 	}
