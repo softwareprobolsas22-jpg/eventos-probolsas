@@ -117,6 +117,38 @@ final class WpdbEventRepository extends WpdbRepository implements EventRepositor
 	}
 
 	/**
+	 * Eventos que ocupan algún día del rango.
+	 *
+	 * @param string   $from     Primer día `Y-m-d`.
+	 * @param string   $to       Último día `Y-m-d` (incluido).
+	 * @param int[]    $type_ids Tipos de evento (vacío = todos).
+	 * @param int|null $limit    Máximo de eventos (null = sin límite).
+	 * @phpstan-param list<int> $type_ids
+	 *
+	 * @return list<Event>
+	 */
+	public function in_range( string $from, string $to, array $type_ids = [], ?int $limit = null ): array {
+		$wpdb   = $this->wpdb;
+		$sql    = 'SELECT * FROM %i WHERE start_date <= %s AND COALESCE(end_date, start_date) >= %s';
+		$values = [ $this->table, $to, $from ];
+
+		if ( [] !== $type_ids ) {
+			$sql   .= ' AND type_id IN (' . implode( ', ', array_fill( 0, count( $type_ids ), '%d' ) ) . ')';
+			$values = [ ...$values, ...$type_ids ];
+		}
+
+		$sql .= ' ORDER BY start_date ASC, start_time ASC, id ASC';
+
+		if ( null !== $limit ) {
+			$sql     .= ' LIMIT %d';
+			$values[] = $limit;
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql solo tiene marcadores; los valores van en prepare().
+		return $this->hydrate_all( $wpdb->get_results( $wpdb->prepare( $sql, ...$values ), ARRAY_A ) );
+	}
+
+	/**
 	 * Guarda un evento nuevo.
 	 *
 	 * @param Event $event Evento sin ID.
