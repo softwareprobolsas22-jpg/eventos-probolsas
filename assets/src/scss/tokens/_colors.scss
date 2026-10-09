@@ -31,6 +31,10 @@ $info: #175cd3;
 // Fondo oscuro detrás de los diálogos modales.
 $overlay: rgb(0 0 0 / 45%);
 
+// Fondo de las pantallas de wp-admin (no es de marca ni lo pinta el plugin): el texto que va directo
+// sobre él (subtítulo, resumen de la tabla) se prueba contra este color (H-403).
+$wp-admin-canvas: #f0f0f1;
+
 $colors: (
 	"primary": $brand-primary,
 	"primary-hover": color.mix(#000, $brand-primary, 18%),
@@ -59,6 +63,7 @@ $colors: (
 	"info": $info,
 	"info-soft": color.mix($info, $brand-white, 10%),
 	"overlay": $overlay,
+	"canvas": $wp-admin-canvas,
 );
 
 // Sombra con matiz de marca, para elevaciones (ver _elevation.scss).
