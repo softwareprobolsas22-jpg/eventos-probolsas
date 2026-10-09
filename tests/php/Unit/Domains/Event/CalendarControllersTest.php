@@ -299,6 +299,24 @@ final class CalendarControllersTest extends UnitTestCase {
 		$this->assertCount( 4, $feed->index( new WP_REST_Request( $range ) )->get_data()['data'], 'Después de invalidar se lee otra vez.' );
 	}
 
+	public function test_the_presenter_forgets_types_between_rest_requests(): void {
+		$config      = new Config( [ 'ui' => [ 'timezone' => 'America/Bogota' ] ] );
+		$dates       = DateFormatter::from_config( $config, $this->clock );
+		$attachments = new InMemoryAttachmentGateway();
+		$service     = new EventService( $this->events, $this->types, $attachments, new MediaPolicy( [ 'image/jpeg' ] ), $dates, $config );
+		$presenter   = new EventPresenter( $service, $this->types, $attachments, $dates, new ColorContrast() );
+		$event       = $this->events->find( 2 );
+		$this->assertNotNull( $event );
+
+		$this->assertSame( '#FDE68A', $presenter->present( $event )['type']['color'] );
+		$type                  = $this->types->types[2];
+		$this->types->types[2] = new EventType( 2, $type->name, $type->name_key, $type->slug, '#1D4ED8', $type->icon, false, '', 2, '', '' );
+		$this->assertSame( '#FDE68A', $presenter->present( $event )['type']['color'], 'Dentro de una petición, el tipo se lee una vez.' );
+
+		$this->assertSame( 'resultado', $presenter->forget( 'resultado' ), 'Como filtro rest_pre_dispatch, no cambia el resultado.' );
+		$this->assertSame( '#1D4ED8', $presenter->present( $event )['type']['color'] );
+	}
+
 	public function test_an_invalid_range_is_not_cached(): void {
 		[ $feed ] = $this->controllers();
 

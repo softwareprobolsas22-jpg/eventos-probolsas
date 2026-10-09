@@ -169,6 +169,9 @@ final class EventServiceProvider implements BootableProvider {
 		$cache = $container->get( ResponseCache::class );
 		add_action( 'edit_attachment', [ $cache, 'flush' ] );
 		add_action( 'delete_attachment', [ $cache, 'flush' ] );
+
+		// Tipos y usuarios leídos una vez por petición REST, no por proceso.
+		add_filter( 'rest_pre_dispatch', [ $container->get( EventPresenter::class ), 'forget' ] );
 	}
 
 	/**
