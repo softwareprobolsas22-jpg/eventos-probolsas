@@ -38,6 +38,20 @@ interface EventRepository {
 	public function on_date( string $date ): array;
 
 	/**
+	 * Eventos que ocupan algún día del rango (por solapamiento, §5.5), ordenados por fecha, hora (los de
+	 * todo el día primero) e ID. Lo usan el feed del calendario y los próximos eventos.
+	 *
+	 * @param string   $from     Primer día `Y-m-d`.
+	 * @param string   $to       Último día `Y-m-d` (incluido).
+	 * @param int[]    $type_ids Tipos de evento (vacío = todos).
+	 * @param int|null $limit    Máximo de eventos (null = sin límite).
+	 * @phpstan-param list<int> $type_ids
+	 *
+	 * @return list<Event>
+	 */
+	public function in_range( string $from, string $to, array $type_ids = [], ?int $limit = null ): array;
+
+	/**
 	 * Guarda un evento nuevo y lo devuelve con su ID.
 	 *
 	 * @param Event $event Evento sin ID.

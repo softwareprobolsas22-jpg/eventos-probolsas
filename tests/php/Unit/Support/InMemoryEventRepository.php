@@ -91,6 +91,28 @@ final class InMemoryEventRepository implements EventRepository {
 	}
 
 	/**
+	 * Eventos de un rango.
+	 *
+	 * @param string    $from     Primer día.
+	 * @param string    $to       Último día.
+	 * @param int[]     $type_ids Tipos (vacío = todos).
+	 * @param int|null  $limit    Máximo.
+	 * @phpstan-param list<int> $type_ids
+	 *
+	 * @return list<Event>
+	 */
+	public function in_range( string $from, string $to, array $type_ids = [], ?int $limit = null ): array {
+		$matches = array_values(
+			array_filter(
+				$this->sorted(),
+				static fn( Event $event ): bool => $event->schedule->overlaps( $from, $to ) && ( [] === $type_ids || in_array( $event->type_id, $type_ids, true ) )
+			)
+		);
+
+		return null === $limit ? $matches : array_slice( $matches, 0, $limit );
+	}
+
+	/**
 	 * Guarda un evento nuevo.
 	 *
 	 * @param Event $event Evento.
