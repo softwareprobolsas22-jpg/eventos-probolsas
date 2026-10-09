@@ -8,7 +8,7 @@ const dist = new URL( '../../../assets/dist/', import.meta.url );
 /**
  * Hojas de los widgets de la intranet que se descargan con su chunk (H-302), no con la página.
  */
-const WIDGET_SHEET = /^calendar-/;
+const WIDGET_SHEET = /^(calendar|event-modal|upcoming)-/;
 
 /**
  * CSS compilado de una entrada (`admin`, `public`), de las hojas compartidas que se cargan con la página

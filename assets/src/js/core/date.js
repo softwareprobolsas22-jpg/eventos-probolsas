@@ -73,6 +73,9 @@ export function createDateFormatter( ui ) {
 		hourCycle: 'h23',
 	} );
 
+	// Fechas de calendario largas: se formatean en UTC porque se construyen con Date.UTC (sin zona del equipo).
+	const longDate = new Intl.DateTimeFormat( ui.locale || 'es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' } );
+
 	/**
 	 * Partes de un momento en la zona configurada.
 	 *
@@ -135,6 +138,21 @@ export function createDateFormatter( ui ) {
 				throw new TypeError( `Fecha no válida: ${ value }` );
 			}
 			return applyFormat( dateFormat, { year: match[ 1 ], month: match[ 2 ], day: match[ 3 ] } );
+		},
+
+		/**
+		 * Fecha de calendario larga, con el día de la semana. Ejemplo: `2026-10-07` → `miércoles, 7 de
+		 * octubre de 2026`. Arma la fecha con `Date.UTC` y la formatea en UTC: nunca cambia de día (R-08).
+		 *
+		 * @param {string} value Fecha `YYYY-MM-DD`.
+		 * @returns {string} Fecha larga.
+		 */
+		formatLongCalendarDate( value ) {
+			const match = CALENDAR_DATE.exec( value );
+			if ( ! match || ! isRealDate( Number( match[ 1 ] ), Number( match[ 2 ] ), Number( match[ 3 ] ) ) ) {
+				throw new TypeError( `Fecha no válida: ${ value }` );
+			}
+			return longDate.format( Date.UTC( Number( match[ 1 ] ), Number( match[ 2 ] ) - 1, Number( match[ 3 ] ) ) );
 		},
 
 		/**

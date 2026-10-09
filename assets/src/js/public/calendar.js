@@ -20,6 +20,7 @@ import { createApi } from '../core/api.js';
 import { h, icon } from '../core/dom.js';
 import { __ } from '../core/i18n.js';
 import { showToast } from '../ui/toast.js';
+import { openEventModal } from './event-modal.js';
 import { createTypeFilter } from './type-filter.js';
 
 /** Ancho de móvil (breakpoint `sm` del sistema de diseño): la lista es la vista inicial (R-11). */
@@ -65,7 +66,12 @@ function ids( value ) {
  * @returns {Object} Calendario montado.
  */
 export function mount( element, props, ctx ) {
-	return createCalendar( element, props, ctx );
+	const api = createApi( ctx.config, { notify: showToast } );
+
+	return createCalendar( element, props, ctx, {
+		api,
+		onOpen: ( id, opener ) => openEventModal( { id, api, config: ctx.config, dates: ctx.dates, opener } ),
+	} );
 }
 
 /**
