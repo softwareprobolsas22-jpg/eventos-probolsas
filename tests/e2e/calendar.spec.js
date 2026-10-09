@@ -151,6 +151,8 @@ test.describe( 'Calendario de la intranet', () => {
 
 	test( 'axe sin problemas graves en el mes, la lista, el modal y los próximos (R-16, WCAG 2.2 AA)', async ( { page } ) => {
 		const audit = async ( where ) => {
+			// axe mide el contraste con la opacidad del momento: se audita con las animaciones terminadas.
+			await page.waitForFunction( () => globalThis.document.getAnimations().every( ( animation ) => 'running' !== animation.playState ) );
 			await page.addScriptTag( { path: AXE } );
 			const violations = await page.evaluate( async () => {
 				const result = await globalThis.axe.run( globalThis.document, { runOnly: { type: 'tag', values: [ 'wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa' ] } } );
@@ -160,6 +162,8 @@ test.describe( 'Calendario de la intranet', () => {
 			expect( violations.filter( ( text ) => /ep-|fc-|ts-/.test( text ) ), where ).toEqual( [] );
 		};
 
+		// Con «reducir movimiento» (R-12) el modal aparece sin animación.
+		await page.emulateMedia( { reducedMotion: 'reduce' } );
 		await page.setViewportSize( { width: 1280, height: 900 } );
 		await page.goto( pageUrl );
 		await expect( page.locator( `.fc-daygrid-day[data-date="${ today }"] .fc-event`, { hasText: afternoon } ) ).toBeVisible();
