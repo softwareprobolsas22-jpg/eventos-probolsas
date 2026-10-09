@@ -25,3 +25,4 @@
 /.stylelintrc.json export-ignore
 /tools export-ignore
 /README.md export-ignore
+/playwright.config.js export-ignore
