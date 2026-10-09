@@ -90,6 +90,53 @@ final class ShortcodeRegistryTest extends UnitTestCase {
 		$this->assertSame( [ 'eventos_calendario', 'eventos_proximos' ], $registry->tags() );
 	}
 
+	public function test_assets_load_only_on_pages_with_shortcodes_for_users_who_can_see_them(): void {
+		$enqueued = 0;
+		$can_view = true;
+		$content  = 'Intro [eventos_calendario]';
+		Functions\when( 'has_shortcode' )->alias( static fn( string $text, string $tag ): bool => str_contains( $text, "[{$tag}" ) );
+		Functions\when( 'is_singular' )->justReturn( true );
+		Functions\when( 'get_post' )->alias(
+			static function () use ( &$content ): \WP_Post {
+				$post               = new \WP_Post();
+				$post->post_content = $content;
+				return $post;
+			}
+		);
+		Functions\when( 'current_user_can' )->alias(
+			static function () use ( &$can_view ): bool {
+				return $can_view;
+			}
+		);
+		Functions\when( 'wp_script_is' )->justReturn( false );
+		Functions\when( 'wp_enqueue_style' )->justReturn( null );
+		Functions\when( 'wp_set_script_translations' )->justReturn( true );
+		Functions\when( 'wp_add_inline_script' )->justReturn( true );
+		Functions\when( 'rest_url' )->justReturn( 'https://intranet.test/wp-json/eventos/v1/' );
+		Functions\when( 'esc_url_raw' )->returnArg();
+		Functions\when( 'wp_create_nonce' )->justReturn( 'nonce' );
+		Functions\when( 'wp_login_url' )->justReturn( 'https://intranet.test/wp-login.php' );
+		Functions\when( 'get_option' )->justReturn( 1 );
+		Functions\when( 'wp_json_encode' )->alias( 'json_encode' );
+		Functions\when( 'wp_enqueue_script' )->alias(
+			static function () use ( &$enqueued ): void {
+				++$enqueued;
+			}
+		);
+
+		$this->registry()->enqueue_when_used();
+		$this->assertSame( 1, $enqueued );
+
+		$can_view = false;
+		$this->registry()->enqueue_when_used();
+		$this->assertSame( 1, $enqueued, 'Un visitante sin sesión ve un aviso que no necesita el JS (R-17).' );
+
+		$can_view = true;
+		$content  = 'Sin shortcodes';
+		$this->registry()->enqueue_when_used();
+		$this->assertSame( 1, $enqueued );
+	}
+
 	public function test_guides_describe_each_shortcode_for_the_browser(): void {
 		$guides = $this->registry()->guides();
 

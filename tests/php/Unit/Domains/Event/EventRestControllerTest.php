@@ -20,6 +20,7 @@ use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Domains\Event\Application\EventService;
 use Probolsas\Eventos\Domains\Event\EventServiceProvider;
 use Probolsas\Eventos\Domains\Event\Presentation\EventCsvExport;
+use Probolsas\Eventos\Domains\Event\Presentation\EventPresenter;
 use Probolsas\Eventos\Domains\Event\Presentation\EventRestController;
 use Probolsas\Eventos\Domains\Event\Presentation\EventsPage;
 use Probolsas\Eventos\Domains\EventType\Domain\EventType;
@@ -41,6 +42,7 @@ use WP_REST_Response;
  *
  * @covers \Probolsas\Eventos\Domains\Event\Presentation\EventRestController
  * @covers \Probolsas\Eventos\Domains\Event\Presentation\EventCsvExport
+ * @covers \Probolsas\Eventos\Domains\Event\Presentation\EventPresenter
  * @covers \Probolsas\Eventos\Domains\Event\Presentation\EventsPage
  * @covers \Probolsas\Eventos\Domains\Event\EventServiceProvider
  */
@@ -440,13 +442,13 @@ final class EventRestControllerTest extends UnitTestCase {
 		$dates  = DateFormatter::from_config( $config, $clock );
 		$policy = new MediaPolicy( [ 'image/jpeg', 'application/pdf' ] );
 
+		$service = new EventService( $this->events, $this->types, $this->attachments, $policy, $dates, $config );
+
 		return new EventRestController(
-			new EventService( $this->events, $this->types, $this->attachments, $policy, $dates, $config ),
-			$this->types,
-			$this->attachments,
+			$service,
+			new EventPresenter( $service, $this->types, $this->attachments, $dates, new ColorContrast() ),
 			new EventCsvExport( $dates, $config ),
-			$dates,
-			new ColorContrast()
+			$dates
 		);
 	}
 }

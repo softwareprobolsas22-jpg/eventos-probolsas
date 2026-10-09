@@ -110,6 +110,28 @@ final class WpdbEventRepositoryTest extends UnitTestCase {
 		$this->assertSame( "SELECT * FROM `wp_eventos_events` WHERE start_date <= '2026-10-07' AND COALESCE(end_date, start_date) >= '2026-10-07' ORDER BY start_time ASC, id ASC", $sql );
 	}
 
+	public function test_events_in_a_range_filter_by_overlap_types_and_limit(): void {
+		$sql = [];
+		$this->wpdb->shouldReceive( 'get_results' )->andReturnUsing(
+			static function ( string $query ) use ( &$sql ): array {
+				$sql[] = $query;
+				return [];
+			}
+		);
+
+		$repository = $this->repository();
+		$repository->in_range( '2026-09-28', '2026-11-08' );
+		$repository->in_range( '2026-10-07', '9999-12-31', [ 1, 3 ], 5 );
+
+		$this->assertSame(
+			[
+				"SELECT * FROM `wp_eventos_events` WHERE start_date <= '2026-11-08' AND COALESCE(end_date, start_date) >= '2026-09-28' ORDER BY start_date ASC, start_time ASC, id ASC",
+				"SELECT * FROM `wp_eventos_events` WHERE start_date <= '9999-12-31' AND COALESCE(end_date, start_date) >= '2026-10-07' AND type_id IN (1, 3) ORDER BY start_date ASC, start_time ASC, id ASC LIMIT 5",
+			],
+			$sql
+		);
+	}
+
 	public function test_find_hydrates_a_row(): void {
 		$this->wpdb->shouldReceive( 'get_row' )->andReturn( $this->row(), null );
 
