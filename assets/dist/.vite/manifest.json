@@ -1,21 +1,51 @@
 {
-  "_bootstrap-B5KRnI0P.css": {
-    "file": "css/bootstrap-B5KRnI0P.css",
-    "src": "_bootstrap-B5KRnI0P.css"
+  "_bootstrap-DQJbggtE.css": {
+    "file": "css/bootstrap-DQJbggtE.css",
+    "src": "_bootstrap-DQJbggtE.css"
   },
-  "_date-edoDXXf3.js": {
-    "file": "js/chunks/date-edoDXXf3.js",
-    "name": "date"
-  },
-  "_load-state-mh9lhawJ.js": {
-    "file": "js/chunks/load-state-mh9lhawJ.js",
-    "name": "load-state",
+  "_button-Zn7ZjNtw.js": {
+    "file": "js/chunks/button-Zn7ZjNtw.js",
+    "name": "button",
     "imports": [
-      "_runtime-B3gRtgAm.js"
+      "_runtime-DKPNw9Pd.js"
     ]
   },
-  "_runtime-B3gRtgAm.js": {
-    "file": "js/chunks/runtime-B3gRtgAm.js",
+  "_date-B6jkZ4Xu.js": {
+    "file": "js/chunks/date-B6jkZ4Xu.js",
+    "name": "date"
+  },
+  "_drawer-LQDyzTDl.js": {
+    "file": "js/chunks/drawer-LQDyzTDl.js",
+    "name": "drawer",
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_button-Zn7ZjNtw.js"
+    ]
+  },
+  "_event-modal-BM7CLY2r.css": {
+    "file": "css/event-modal-BM7CLY2r.css",
+    "src": "_event-modal-BM7CLY2r.css"
+  },
+  "_event-modal-Dld6g-eV.js": {
+    "file": "js/chunks/event-modal-Dld6g-eV.js",
+    "name": "event-modal",
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_button-Zn7ZjNtw.js"
+    ],
+    "css": [
+      "css/event-modal-BM7CLY2r.css"
+    ]
+  },
+  "_load-state-CHFTowJc.js": {
+    "file": "js/chunks/load-state-CHFTowJc.js",
+    "name": "load-state",
+    "imports": [
+      "_runtime-DKPNw9Pd.js"
+    ]
+  },
+  "_runtime-DKPNw9Pd.js": {
+    "file": "js/chunks/runtime-DKPNw9Pd.js",
     "name": "runtime",
     "css": [
       "css/runtime-DKrxL7Be.css"
@@ -31,7 +61,7 @@
     "src": "assets/src/js/pages/admin.js",
     "isEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js"
+      "_runtime-DKPNw9Pd.js"
     ],
     "dynamicImports": [
       "assets/src/js/screens/events.js",
@@ -39,7 +69,7 @@
     ],
     "css": [
       "css/admin.css",
-      "css/bootstrap-B5KRnI0P.css"
+      "css/bootstrap-DQJbggtE.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -51,37 +81,74 @@
     "src": "assets/src/js/pages/public.js",
     "isEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js",
-      "_date-edoDXXf3.js"
+      "_runtime-DKPNw9Pd.js",
+      "_date-B6jkZ4Xu.js"
+    ],
+    "dynamicImports": [
+      "assets/src/js/public/calendar.js",
+      "assets/src/js/public/upcoming.js"
     ],
     "css": [
       "css/public.css",
-      "css/bootstrap-B5KRnI0P.css"
+      "css/bootstrap-DQJbggtE.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
     ]
   },
+  "assets/src/js/public/calendar.js": {
+    "file": "js/chunks/calendar-l4ZzbRpR.js",
+    "name": "calendar",
+    "src": "assets/src/js/public/calendar.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_button-Zn7ZjNtw.js",
+      "_event-modal-Dld6g-eV.js"
+    ],
+    "css": [
+      "css/calendar-CWEXfaxd.css"
+    ]
+  },
+  "assets/src/js/public/upcoming.js": {
+    "file": "js/chunks/upcoming-UjN5LYQA.js",
+    "name": "upcoming",
+    "src": "assets/src/js/public/upcoming.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-DKPNw9Pd.js",
+      "_button-Zn7ZjNtw.js",
+      "_event-modal-Dld6g-eV.js",
+      "_load-state-CHFTowJc.js"
+    ],
+    "css": [
+      "css/upcoming-BJ3u2dOv.css"
+    ]
+  },
   "assets/src/js/screens/event-types.js": {
-    "file": "js/chunks/event-types-CgHFOpir.js",
+    "file": "js/chunks/event-types-DjFq8HvW.js",
     "name": "event-types",
     "src": "assets/src/js/screens/event-types.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js",
-      "_date-edoDXXf3.js",
-      "_load-state-mh9lhawJ.js"
+      "_runtime-DKPNw9Pd.js",
+      "_date-B6jkZ4Xu.js",
+      "_button-Zn7ZjNtw.js",
+      "_load-state-CHFTowJc.js",
+      "_drawer-LQDyzTDl.js"
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-BMEm_O6j.js",
+    "file": "js/chunks/events-B82gHHI_.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-B3gRtgAm.js",
-      "_date-edoDXXf3.js",
-      "_load-state-mh9lhawJ.js"
+      "_runtime-DKPNw9Pd.js",
+      "_date-B6jkZ4Xu.js",
+      "_button-Zn7ZjNtw.js",
+      "_load-state-CHFTowJc.js",
+      "_drawer-LQDyzTDl.js"
     ]
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {

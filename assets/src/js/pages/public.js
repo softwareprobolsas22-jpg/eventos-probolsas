@@ -17,8 +17,14 @@ import { createDateFormatter } from '../core/date.js';
 import { mountWidgets } from '../public/mount-widgets.js';
 import { initTooltips } from '../ui/tooltip.js';
 
-/** Widgets por nombre (`data-ep-widget`). */
-export const WIDGETS = {};
+/**
+ * Widgets por nombre (`data-ep-widget`). Cada uno se descarga solo si la página lo usa (R-17):
+ * FullCalendar no forma parte de la carga inicial.
+ */
+const WIDGETS = {
+	calendar: () => import( '../public/calendar.js' ),
+	upcoming: () => import( '../public/upcoming.js' ),
+};
 
 const widgets = document.querySelectorAll( '[data-ep-widget]' );
 

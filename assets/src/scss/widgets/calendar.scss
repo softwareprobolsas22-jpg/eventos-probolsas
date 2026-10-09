@@ -1,0 +1,329 @@
+// Calendario de [eventos_calendario] (H-302). Se descarga con el widget, fuera de la carga inicial de la
+// página (R-17). Tema de FullCalendar con sus variables --fc-* y estilos propios para Tom Select (su hoja
+// trae colores fuera de la paleta, R-01). Todo bajo .ep-calendar: el tema de la intranet no lo toca.
+@use "../tools/mixins" as m;
+
+.ep-calendar {
+	display: grid;
+
+	// Sin `minmax(0, …)` la columna crece hasta el ancho mínimo del contenido (títulos que no se parten) y
+	// el calendario se sale de la página en móvil (R-13).
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--ep-space-4);
+	min-width: 0;
+
+	&[aria-busy="true"] .fc-view-harness {
+		opacity: 0.6;
+		transition: opacity var(--ep-duration-base) var(--ep-easing-standard);
+
+		@include m.reduced-motion {
+			transition: none;
+		}
+	}
+
+	// ---------------------------------------------------------------- FullCalendar
+	.fc {
+		--fc-border-color: var(--ep-color-border);
+		--fc-page-bg-color: var(--ep-color-surface);
+		--fc-neutral-bg-color: var(--ep-color-surface-muted);
+		--fc-neutral-text-color: var(--ep-color-text-subtle);
+		--fc-today-bg-color: var(--ep-color-primary-soft);
+		--fc-list-event-hover-bg-color: var(--ep-color-surface-muted);
+		--fc-button-text-color: var(--ep-color-primary);
+		--fc-button-bg-color: var(--ep-color-surface);
+		--fc-button-border-color: var(--ep-color-border-strong);
+		--fc-button-hover-bg-color: var(--ep-color-primary-soft);
+		--fc-button-hover-border-color: var(--ep-color-primary);
+		--fc-button-active-bg-color: var(--ep-color-primary);
+		--fc-button-active-border-color: var(--ep-color-primary);
+		--fc-small-font-size: var(--ep-font-size-sm);
+		--fc-more-link-text-color: var(--ep-color-primary);
+
+		font-size: var(--ep-font-size-md);
+		color: var(--ep-color-text);
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		a:focus-visible,
+		.fc-event:focus-visible,
+		.fc-button:focus-visible {
+			@include m.focus-ring;
+
+			box-shadow: none;
+		}
+	}
+
+	.fc .fc-toolbar {
+		flex-wrap: wrap;
+		gap: var(--ep-space-3);
+	}
+
+	.fc .fc-toolbar-title {
+		font-size: var(--ep-font-size-xl);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+
+		&::first-letter {
+			text-transform: uppercase;
+		}
+	}
+
+	.fc .fc-button {
+		min-height: var(--ep-touch-target);
+		padding-inline: var(--ep-space-3);
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		border-radius: var(--ep-radius-md);
+		box-shadow: none;
+		transition:
+			background-color var(--ep-duration-fast) var(--ep-easing-standard),
+			border-color var(--ep-duration-fast) var(--ep-easing-standard);
+
+		@include m.reduced-motion {
+			transition: none;
+		}
+	}
+
+	.fc .fc-button-primary:not(:disabled).fc-button-active,
+	.fc .fc-button-primary:not(:disabled):active {
+		color: var(--ep-color-on-primary);
+	}
+
+	.fc .fc-button-primary:disabled {
+		color: var(--ep-color-text-muted);
+		background: var(--ep-color-surface-muted);
+		border-color: var(--ep-color-border);
+		opacity: 1;
+	}
+
+	.fc .fc-col-header-cell-cushion {
+		padding-block: var(--ep-space-2);
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text-subtle);
+	}
+
+	.fc .fc-daygrid-day-number {
+		min-width: 1.75rem;
+		padding: var(--ep-space-1);
+		margin: var(--ep-space-1);
+		font-size: var(--ep-font-size-sm);
+		text-align: center;
+		border-radius: var(--ep-radius-pill);
+
+		&:hover {
+			background: var(--ep-color-surface-sunken);
+		}
+	}
+
+	.fc .fc-day-today .fc-daygrid-day-number {
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-on-primary);
+		background: var(--ep-color-primary);
+	}
+
+	// Días de otros meses: más tenues con el color de metadatos (≥ 4,5:1), no con opacidad, que dejaba el
+	// número en 3,76:1 (R-02, axe).
+	.fc .fc-day-other .fc-daygrid-day-top {
+		color: var(--ep-color-text-muted);
+		opacity: 1;
+	}
+
+	.fc .fc-daygrid-event {
+		padding: 0.125rem var(--ep-space-1);
+		margin-top: 0.125rem;
+		font-size: var(--ep-font-size-sm);
+		border-radius: var(--ep-radius-sm);
+	}
+
+	.fc .fc-event[tabindex] {
+		cursor: pointer;
+	}
+
+	.fc .fc-list-day-cushion {
+		font-weight: var(--ep-font-weight-semibold);
+	}
+
+	.fc .fc-list-event-time {
+		white-space: nowrap;
+	}
+
+	.fc .fc-list-empty {
+		color: var(--ep-color-text-subtle);
+	}
+
+	@include m.down(sm) {
+		.fc .fc-toolbar-chunk:nth-child(2) {
+			flex-basis: 100%;
+			order: -1;
+		}
+
+		.fc .fc-toolbar-title {
+			font-size: var(--ep-font-size-lg);
+		}
+
+		.fc .fc-daygrid-event .ep-calendar__event-time {
+			display: none;
+		}
+	}
+
+	.fc .fc-event-main {
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	&__event {
+		display: flex;
+		gap: var(--ep-space-1);
+		align-items: center;
+		min-width: 0;
+	}
+
+	&__event-icon,
+	&__event-time {
+		flex-shrink: 0;
+	}
+
+	&__event-time {
+		font-weight: var(--ep-font-weight-semibold);
+		white-space: nowrap;
+	}
+
+	&__event-title {
+		--ep-truncate-width: 100%;
+
+		min-width: 0;
+	}
+
+	// ---------------------------------------------------------------- Filtro de tipos (Tom Select)
+	&__filters {
+		max-width: 36rem;
+	}
+}
+
+// El reboot de Bootstrap encapsulado deja las celdas sin borde (`td, th { border-width: 0 }`) y gana por
+// orden a la hoja que FullCalendar inyecta: se devuelven los de la grilla con la misma especificidad
+// (`:where()` no suma), para que las reglas de FullCalendar que quitan los bordes repetidos sigan ganando.
+:where(.ep-calendar) .fc-theme-standard td,
+:where(.ep-calendar) .fc-theme-standard th {
+	border: 1px solid var(--fc-border-color);
+}
+
+.ep-type-filter__label {
+	display: block;
+	margin-bottom: var(--ep-space-1);
+	font-size: var(--ep-font-size-sm);
+	font-weight: var(--ep-font-weight-semibold);
+	color: var(--ep-color-text-subtle);
+}
+
+// Estructura mínima que Tom Select espera de su hoja de estilos.
+.ep-calendar {
+	.ts-hidden-accessible {
+		@include m.visually-hidden;
+	}
+
+	.ts-wrapper {
+		position: relative;
+	}
+
+	.ts-control {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-1);
+		align-items: center;
+		min-height: var(--ep-touch-target);
+		padding: var(--ep-space-1) var(--ep-space-2);
+		cursor: text;
+		background: var(--ep-color-surface);
+		border: 1px solid var(--ep-color-border-strong);
+		border-radius: var(--ep-radius-md);
+
+		> input {
+			flex: 1 1 8rem;
+			min-width: 6rem;
+			min-height: 2rem;
+			padding: 0;
+			margin: 0;
+			color: var(--ep-color-text);
+			background: none;
+			border: 0;
+			box-shadow: none;
+
+			&:focus {
+				outline: none;
+			}
+
+			&::placeholder {
+				color: var(--ep-color-text-muted);
+			}
+		}
+	}
+
+	.ts-wrapper.focus .ts-control {
+		@include m.focus-ring;
+	}
+
+	.ts-control .item {
+		display: inline-flex;
+		gap: var(--ep-space-1);
+		align-items: center;
+		max-width: 100%;
+	}
+
+	.ts-control .item .remove {
+		display: inline-grid;
+		place-items: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		font-size: var(--ep-font-size-md);
+		line-height: 1;
+		color: var(--ep-color-text-subtle);
+		text-decoration: none;
+		border-radius: var(--ep-radius-pill);
+
+		&:hover {
+			color: var(--ep-color-error);
+			background: var(--ep-color-error-soft);
+		}
+	}
+
+	.ts-dropdown {
+		position: absolute;
+		top: calc(100% + var(--ep-space-1));
+		left: 0;
+		z-index: var(--ep-z-dropdown);
+		width: 100%;
+		overflow: hidden;
+		background: var(--ep-color-surface);
+		border: 1px solid var(--ep-color-border);
+		border-radius: var(--ep-radius-md);
+		box-shadow: var(--ep-shadow-md);
+	}
+
+	.ts-dropdown-content {
+		max-height: 16rem;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.ts-dropdown .option,
+	.ts-dropdown .no-results {
+		padding: var(--ep-space-2) var(--ep-space-3);
+	}
+
+	.ts-dropdown [data-selectable] {
+		cursor: pointer;
+	}
+
+	.ts-dropdown .active {
+		background: var(--ep-color-primary-soft);
+	}
+
+	.ts-dropdown .no-results {
+		color: var(--ep-color-text-subtle);
+	}
+}

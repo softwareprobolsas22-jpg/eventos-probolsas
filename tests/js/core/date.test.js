@@ -31,6 +31,24 @@ describe( 'createDateFormatter (casos compartidos con PHP)', () => {
 		expect( formatter.today( new Date( `${ nowUtc.replace( ' ', 'T' ) }Z` ) ) ).toBe( today );
 	} );
 
+	it( 'wallTime(): hora de pared de Bogotá sin zona, para el «ahora» de FullCalendar (RL-02)', () => {
+		expect( formatter.wallTime( new Date( '2026-10-08T01:30:00Z' ) ) ).toBe( '2026-10-07T20:30:00' );
+		expect( formatter.wallTime( new Date( '2026-10-08T04:59:59Z' ) ) ).toBe( '2026-10-07T23:59:59' );
+		expect( formatter.wallTime( new Date( '2026-10-08T05:00:00Z' ) ) ).toBe( '2026-10-08T00:00:00' );
+	} );
+
+	it( 'formatLongCalendarDate(): día de la semana y mes en español, sin cambiar de día (R-07, R-08)', () => {
+		expect( formatter.formatLongCalendarDate( '2026-10-07' ) ).toBe( 'miércoles, 7 de octubre de 2026' );
+		expect( formatter.formatLongCalendarDate( '2027-01-01' ) ).toBe( 'viernes, 1 de enero de 2027' );
+		expect( () => formatter.formatLongCalendarDate( '2026-02-30' ) ).toThrow( /Fecha no válida/ );
+	} );
+
+	it( 'calendarDateParts(): día, mes y día de la semana cortos, sin punto final', () => {
+		expect( formatter.calendarDateParts( '2026-10-07' ) ).toEqual( { day: '7', month: 'oct', weekday: 'mié' } );
+		expect( formatter.calendarDateParts( '2026-09-07' ) ).toEqual( { day: '7', month: 'sept', weekday: 'lun' } );
+		expect( () => formatter.calendarDateParts( '2026-13-01' ) ).toThrow( /Fecha no válida/ );
+	} );
+
 	it( 'rechaza momentos sin zona horaria (serían ambiguos)', () => {
 		expect( () => formatter.formatDateTime( '2026-10-01 10:00:00' ) ).toThrow( /zona horaria/ );
 	} );

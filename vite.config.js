@@ -21,8 +21,9 @@ const ENTRY_STYLES = new Set( Object.keys( ENTRIES ).map( ( entry ) => `${ entry
 /**
  * Módulos que importan las entradas (pages/*.js) y también las pantallas: forman el chunk `runtime`
  * (ver codeSplitting). tests/js/build/chunks.test.js verifica que ningún chunk importe una entrada.
+ * Incluye el cargador de Vite para `import()`, que usan las dos entradas (pantallas y widgets).
  */
-const ENTRY_RUNTIME = /[\\/](assets[\\/]src[\\/]js[\\/](core[\\/](config|dom|i18n|timing)|ui[\\/](toast|tooltip))\.js$|node_modules[\\/](notyf|tippy\.js|@popperjs)[\\/])/;
+const ENTRY_RUNTIME = /[\\/](assets[\\/]src[\\/]js[\\/](core[\\/](config|dom|i18n|timing)|ui[\\/](toast|tooltip))\.js$|node_modules[\\/](notyf|tippy\.js|@popperjs)[\\/])|vite[\\/]preload-helper/;
 
 const FONT_FILE = /\.(woff2?|ttf|otf|eot)$/;
 
