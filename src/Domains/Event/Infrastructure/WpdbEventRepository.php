@@ -149,6 +149,20 @@ final class WpdbEventRepository extends WpdbRepository implements EventRepositor
 	}
 
 	/**
+	 * Cantidad de eventos que ocupan algún día del rango.
+	 *
+	 * @param string $from Primer día `Y-m-d`.
+	 * @param string $to   Último día `Y-m-d` (incluido).
+	 */
+	public function count_in_range( string $from, string $to ): int {
+		$wpdb = $this->wpdb;
+
+		return (int) $wpdb->get_var(
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE start_date <= %s AND COALESCE(end_date, start_date) >= %s', $this->table, $to, $from )
+		);
+	}
+
+	/**
 	 * Guarda un evento nuevo.
 	 *
 	 * @param Event $event Evento sin ID.

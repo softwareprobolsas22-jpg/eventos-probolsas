@@ -124,4 +124,18 @@ final class EventPresenter {
 
 		return $this->users_cache[ $id ];
 	}
+
+	/**
+	 * Olvida los tipos y usuarios leídos. Se llama al empezar cada petición REST (`rest_pre_dispatch`):
+	 * varias peticiones pueden compartir el proceso de PHP (lotes `/batch/v1`, pruebas, WP-CLI) y un tipo
+	 * editado en una no debe verse con sus datos viejos en la siguiente.
+	 *
+	 * @param mixed $result Resultado del filtro (se devuelve sin cambios).
+	 */
+	public function forget( mixed $result = null ): mixed {
+		$this->types_cache = [];
+		$this->users_cache = [];
+
+		return $result;
+	}
 }

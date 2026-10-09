@@ -6,6 +6,8 @@
 #                 corresponde a assets/src (ADR-0001).
 # - timezones:    las pruebas de fechas en zonas con desplazamiento negativo y positivo (R-08, QA-012).
 # - integration:  pruebas de integración dentro de WordPress con wp-env (Docker del runner).
+# - e2e:          pruebas en el navegador (Playwright) sobre el sitio de desarrollo de wp-env.
+# - package:      arma y verifica el .zip de release (tools/package.mjs, H-404) y lo guarda como artefacto.
 name: CI
 
 on:
@@ -199,8 +201,31 @@ jobs:
 
       - name: Reporte de Playwright (fallos con captura y traza)
         if: failure()
-        uses: actions/upload-artifact@v4
+        # v6 en adelante corre en Node 24 (QA-044).
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: build/playwright-report
           retention-days: 7
+
+  package:
+    name: Paquete de release
+    runs-on: ubuntu-24.04
+    needs: [ js ]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      # Versión única, archivos necesarios y nada de desarrollo (H-404). No necesita npm ci: solo git y Node.
+      - name: Armar y verificar el .zip
+        run: node tools/package.mjs
+
+      - name: Guardar el .zip
+        uses: actions/upload-artifact@v7
+        with:
+          name: eventos-probolsas-zip
+          path: build/eventos-probolsas-*.zip
+          retention-days: 14

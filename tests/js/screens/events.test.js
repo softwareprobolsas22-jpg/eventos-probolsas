@@ -81,6 +81,9 @@ function fakeApi( events ) {
 	store = [ ...events ];
 	return {
 		get: vi.fn( async ( path ) => {
+			if ( 'dashboard' === path ) {
+				return dashboard();
+			}
 			const match = /^events\/(\d+)$/.exec( path );
 			if ( ! match ) {
 				return TYPES;
@@ -115,6 +118,23 @@ function fakeApi( events ) {
 			store = store.filter( ( item ) => `events/${ item.id }` !== path );
 			return { deleted: true };
 		} ),
+	};
+}
+
+/**
+ * Cifras del resumen como las calcula el servidor (hoy = 2026-10-07 en Colombia).
+ *
+ * @returns {Object} Respuesta de GET /dashboard.
+ */
+function dashboard() {
+	const count = ( from, to ) => store.filter( ( item ) => item.start_date >= from && item.start_date <= to ).length;
+	return {
+		today: count( '2026-10-07', '2026-10-07' ),
+		next_30_days: count( '2026-10-07', '2026-11-05' ),
+		by_type: TYPES.map( ( type ) => ( { type_id: type.id, count: store.filter( ( item ) => item.type.id === type.id ).length } ) ),
+		total: store.length,
+		date_from: '2026-10-07',
+		date_to: '2026-11-05',
 	};
 }
 
@@ -184,6 +204,65 @@ describe( 'pantalla Eventos: tabla', () => {
 
 		await mountWith( [ event() ], { get: vi.fn( async () => Promise.reject( new ApiError( 'x' ) ) ) } );
 		expect( screen.querySelectorAll( '.ep-filter-bar select option' ) ).toHaveLength( 1 );
+		expect( rows() ).toHaveLength( 1 );
+	} );
+} );
+
+describe( 'pantalla Eventos: resumen (H-206, D-17)', () => {
+	const cardValue = ( label ) => [ ...screen.querySelectorAll( '.ep-summary-card' ) ].find( ( card ) => card.querySelector( '.ep-summary-card__label' ).textContent === label );
+
+	it( 'muestra hoy, próximos 30 días, total y el conteo por tipo arriba de la tabla', () => {
+		const summary = screen.querySelector( '.ep-summary' );
+		expect( screen.querySelector( '#ep-events' ).firstElementChild.contains( summary ) ).toBe( true );
+		expect( summary.hasAttribute( 'aria-busy' ) ).toBe( false );
+		expect( cardValue( 'Hoy' ).querySelector( '.ep-summary-card__value' ).textContent ).toBe( '1' );
+		expect( cardValue( 'Hoy' ).getAttribute( 'aria-label' ) ).toBe( '1 evento hoy. Ver en la tabla.' );
+		expect( cardValue( 'Próximos 30 días' ).querySelector( '.ep-summary-card__value' ).textContent ).toBe( '3' );
+		expect( cardValue( 'Total' ).querySelector( '.ep-summary-card__value' ).textContent ).toBe( '3' );
+		const types = [ ...summary.querySelectorAll( '.ep-summary-type' ) ];
+		expect( types.map( ( item ) => item.textContent ) ).toEqual( [ 'Cumpleaños1', 'Reuniones laborales2' ] );
+		expect( types[ 1 ].getAttribute( 'aria-label' ) ).toBe( 'Reuniones laborales: 2 eventos. Filtrar la tabla.' );
+	} );
+
+	it( '«Hoy» y «Próximos 30 días» filtran la tabla con el rango del servidor (R-08)', async () => {
+		cardValue( 'Hoy' ).click();
+		await flush();
+		expect( api.getPage ).toHaveBeenLastCalledWith( 'events?date_from=2026-10-07&date_to=2026-10-07&page=1&per_page=25' );
+		expect( screen.querySelector( '.ep-filter-bar input[type="date"]' ).value ).toBe( '2026-10-07' );
+
+		cardValue( 'Próximos 30 días' ).click();
+		await flush();
+		expect( api.getPage ).toHaveBeenLastCalledWith( 'events?date_from=2026-10-07&date_to=2026-11-05&page=1&per_page=25' );
+
+		cardValue( 'Total' ).click();
+		await flush();
+		expect( api.getPage ).toHaveBeenLastCalledWith( 'events?page=1&per_page=25' );
+	} );
+
+	it( 'un tipo filtra la tabla por ese tipo', async () => {
+		screen.querySelectorAll( '.ep-summary-type' )[ 1 ].click();
+		await flush();
+
+		expect( api.getPage ).toHaveBeenLastCalledWith( 'events?type=2&page=1&per_page=25' );
+		expect( rows() ).toHaveLength( 2 );
+	} );
+
+	it( 'se actualiza después de eliminar', async () => {
+		rows()[ 0 ].querySelector( '[aria-label="Eliminar"]' ).click();
+		await flush();
+		buttonIn( dialog(), 'Eliminar' ).click();
+		await flush();
+
+		expect( api.get.mock.calls.filter( ( [ path ] ) => 'dashboard' === path ) ).toHaveLength( 2 );
+		expect( cardValue( 'Total' ).querySelector( '.ep-summary-card__value' ).textContent ).toBe( '2' );
+	} );
+
+	it( 'si el resumen falla, se oculta y la tabla sigue', async () => {
+		const failing = fakeApi( [ event() ] );
+		const get = failing.get;
+		await mountWith( [ event() ], { get: vi.fn( ( path ) => ( 'dashboard' === path ? Promise.reject( new ApiError( 'x' ) ) : get( path ) ) ) } );
+
+		expect( screen.querySelector( '.ep-summary' ).hidden ).toBe( true );
 		expect( rows() ).toHaveLength( 1 );
 	} );
 } );

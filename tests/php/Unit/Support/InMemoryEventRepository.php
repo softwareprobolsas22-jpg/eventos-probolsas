@@ -113,6 +113,16 @@ final class InMemoryEventRepository implements EventRepository {
 	}
 
 	/**
+	 * Cantidad de eventos de un rango.
+	 *
+	 * @param string $from Primer día.
+	 * @param string $to   Último día.
+	 */
+	public function count_in_range( string $from, string $to ): int {
+		return count( $this->in_range( $from, $to ) );
+	}
+
+	/**
 	 * Guarda un evento nuevo.
 	 *
 	 * @param Event $event Evento.

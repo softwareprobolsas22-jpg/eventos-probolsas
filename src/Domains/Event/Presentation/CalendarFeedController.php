@@ -14,6 +14,7 @@ use DateTimeZone;
 use Probolsas\Eventos\Domains\Event\Application\CalendarService;
 use Probolsas\Eventos\Domains\Event\Domain\Event;
 use Probolsas\Eventos\Domains\Event\Domain\EventSchedule;
+use Probolsas\Eventos\Shared\Cache\ResponseCache;
 use Probolsas\Eventos\Shared\Http\RestController;
 use Probolsas\Eventos\Shared\Ui\ColorContrast;
 use WP_Error;
@@ -39,11 +40,13 @@ final class CalendarFeedController extends RestController {
 	 * @param CalendarService $calendar  Consultas del calendario.
 	 * @param EventPresenter  $presenter Tipos de los eventos, leídos una vez por petición.
 	 * @param ColorContrast   $contrast  Color de texto legible.
+	 * @param ResponseCache   $cache     Caché del feed por rango y tipos (H-401).
 	 */
 	public function __construct(
 		private readonly CalendarService $calendar,
 		private readonly EventPresenter $presenter,
-		private readonly ColorContrast $contrast
+		private readonly ColorContrast $contrast,
+		private readonly ResponseCache $cache
 	) {}
 
 	/**
@@ -75,18 +78,16 @@ final class CalendarFeedController extends RestController {
 	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
 	 */
 	public function index( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$params = [
+			'start' => self::text_param( $request->get_param( 'start' ) ),
+			'end'   => self::text_param( $request->get_param( 'end' ) ),
+			'types' => self::list_param( $request->get_param( 'types' ) ),
+		];
+
+		// Un rango no válido lanza la excepción dentro de remember(): el 422 no se guarda.
 		return $this->handle(
 			fn(): WP_REST_Response => $this->ok(
-				array_map(
-					[ $this, 'event_input' ],
-					$this->calendar->feed(
-						[
-							'start' => self::text_param( $request->get_param( 'start' ) ),
-							'end'   => self::text_param( $request->get_param( 'end' ) ),
-							'types' => self::list_param( $request->get_param( 'types' ) ),
-						]
-					)
-				)
+				$this->cache->remember( 'calendar', $params, fn(): array => array_map( [ $this, 'event_input' ], $this->calendar->feed( $params ) ) )
 			)
 		);
 	}

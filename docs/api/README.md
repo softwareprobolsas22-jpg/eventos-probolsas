@@ -7,7 +7,7 @@
 - **Namespace:** `/wp-json/eventos/v1/` (`RestApi::NAMESPACE_V1`). El navegador lo recibe ya armado en `epConfig.restUrl`.
 - **Autenticación:** cookie de sesión de WordPress más la cabecera `X-WP-Nonce` con `epConfig.restNonce` (acción `wp_rest`). Sin un nonce válido WordPress trata la petición como anónima.
 - **Formato:** JSON en el cuerpo de las peticiones (`Content-Type: application/json`) y en las respuestas.
-- **Caché:** todas las respuestas llevan `Cache-Control: no-store, private` (y la señal equivalente para LiteSpeed): los datos cambian con cada guardado.
+- **Caché:** todas las respuestas llevan `Cache-Control: no-store, private` (y la señal equivalente para LiteSpeed): los datos cambian con cada guardado. En el servidor, el feed del calendario y los próximos se guardan ya armados (`Shared/Cache/ResponseCache`, H-401): la clave lleva el rango, los tipos (y «hoy» de Colombia en los próximos) y una versión que cambia al crear, editar o eliminar eventos o tipos, al reordenar tipos y al editar o borrar un adjunto en la Biblioteca de Medios. Las respuestas de error (422) no se guardan.
 
 ## Permisos
 
@@ -96,3 +96,4 @@ La inyecta `Core\Assets\Assets::client_config()` antes del script de cada pantal
 |---|---|---|
 | [`event-types.md`](event-types.md) | Tipos de evento: catálogo gestionable, reglas de validación y tipos iniciales | H-101, H-102, H-104 |
 | [`events.md`](events.md) | Eventos: gestión, exportación, panel, calendario (FullCalendar), detalle, `.ics` y próximos | H-201 a H-206, H-301 a H-304 |
+| [`settings.md`](settings.md) | Ajustes: conservar o borrar los datos al desinstalar (D-16) | H-402 |

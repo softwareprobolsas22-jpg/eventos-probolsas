@@ -38,6 +38,21 @@ describe( 'createFilterBar', () => {
 		expect( clear().disabled ).toBe( true );
 	} );
 
+	it( 'setValues() aplica valores desde fuera, conserva los demás y avisa una sola vez (H-206)', () => {
+		input( 'input[type="search"]' ).value = 'ana';
+		input( 'input[type="search"]' ).dispatchEvent( new Event( 'input' ) );
+		vi.advanceTimersByTime( 300 );
+		onChange.mockClear();
+
+		bar.setValues( { type: '1', dates: { from: '2026-10-07', to: '2026-10-07' }, desconocido: 'x' } );
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith( { search: 'ana', type: '1', dates: { from: '2026-10-07', to: '2026-10-07' } } );
+		expect( input( 'select' ).value ).toBe( '1' );
+		expect( container.querySelector( 'input[type="date"]' ).value ).toBe( '2026-10-07' );
+		expect( clear().disabled ).toBe( false );
+	} );
+
 	it( 'la búsqueda espera a que el usuario deje de escribir', () => {
 		input( 'input[type="search"]' ).value = 'ana';
 		input( 'input[type="search"]' ).dispatchEvent( new Event( 'input' ) );
