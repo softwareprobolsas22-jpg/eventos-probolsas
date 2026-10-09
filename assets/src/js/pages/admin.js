@@ -21,6 +21,7 @@ import { initTooltips } from '../ui/tooltip.js';
 export const SCREENS = {
 	'eventos-probolsas': () => import( '../screens/events.js' ),
 	'eventos-probolsas-tipos': () => import( '../screens/event-types.js' ),
+	'eventos-probolsas-ajustes': () => import( '../screens/settings.js' ),
 };
 
 initTooltips( document.body );
