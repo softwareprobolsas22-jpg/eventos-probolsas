@@ -109,6 +109,7 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | D-15 | Un evento con hora y sin hora de fin dura **1 hora** en el `.ics` (planning del Sprint 4, 2026-10-09; cierra QA-047). | ✅ Cerrada | Se mantiene lo de H-301 (`IcsCalendar::DEFAULT_DURATION`). |
 | D-16 | Desinstalar **conserva los datos por defecto**; la pantalla «Ajustes» tiene la casilla «Borrar todos los datos al desinstalar», desmarcada. | ✅ Cerrada | Opción `eventos_delete_data_on_uninstall` (falsa por defecto); `GET/PUT /settings`; H-402 pasa de 2 a 3 puntos (pantalla). Los archivos de la Biblioteca de Medios nunca se borran (D-4). |
 | D-17 | El **dashboard** son tarjetas arriba de la tabla de **Eventos**; un clic filtra la tabla. | ✅ Cerrada | Sin pantalla nueva; H-206 reutiliza los filtros de H-203. |
+| D-18 | **No hay staging**: la aceptación de la v1 se hace en producción, en una página de pruebas y después de un respaldo completo (2026-10-09). | ✅ Cerrada | `docs/qa/aceptacion-v1.md` con la sección «Antes de empezar»; la desinstalación se prueba solo antes de cargar eventos reales. El `.zip` sale de `main` con `npm run package`. |
 
 ---
 
@@ -463,3 +464,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.23 | 2026-10-09 | H-301 a H-305 aprobadas e integradas. Pruebas en el navegador con la zona de Tokio y axe-core, que detectaron QA-056 a QA-058; QA-005 cerrado. Cierre del Sprint 3 (26/26 puntos, [informe](../qa/2026-10-09-cierre-sprint-3.md)) |
 | 2.24 | 2026-10-09 | PR #4 del Sprint 3 fusionado en `main`. Planning del Sprint 4 ([plan](sprint-4.md)): decisiones D-15 (`.ics` de 1 hora, cierra QA-047), D-16 (conservar datos al desinstalar, pantalla «Ajustes»; H-402 pasa a 3 puntos) y D-17 (dashboard en «Eventos»); staging de H-404 por definir |
 | 2.25 | 2026-10-09 | H-206, H-401 a H-404 aprobadas e integradas: resumen en «Eventos», caché del feed (la integración detectó QA-061), «Ajustes» con conservar datos al desinstalar, auditoría con axe de wp-admin (QA-063) y paquete `.zip` verificado en el CI. Cierre del Sprint 4 (17/17, [informe](../qa/2026-10-09-cierre-sprint-4.md)); la v1 queda lista para la aceptación del PO |
+| 2.26 | 2026-10-09 | PR #5 del Sprint 4 fusionado en `main` (`160cdd5`). D-18: sin staging, la aceptación se hace en producción en una página de pruebas; `.zip` 2.0.0 entregado al PO |
