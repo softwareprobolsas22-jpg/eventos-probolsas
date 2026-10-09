@@ -2,6 +2,7 @@
  * `[eventos_calendario]` en WordPress real (H-302, H-305): FullCalendar cargado bajo demanda por la
  * página pública, sin desfases aunque el navegador esté en otra zona horaria.
  */
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { bogotaToday, createEvent, createPage, deleteEvent, deletePage, restNonce, typeId, updateSettings } from './helpers.js';
 
@@ -77,6 +78,44 @@ test.describe( 'Calendario de la intranet', () => {
 		await day.locator( '.fc-daygrid-day-number' ).click();
 		await expect( page.locator( '.fc-list-event', { hasText: afternoon } ) ).toContainText( '03:00 p. m.' );
 		await expect( page.locator( '.fc-list-event', { hasText: allDay } ) ).toContainText( 'Todo el día' );
+	} );
+
+	test( 'el modal muestra el detalle, pasa entre los eventos del día y descarga el .ics (H-303, RL-03, R-16)', async ( { page } ) => {
+		await page.setViewportSize( { width: 1280, height: 900 } );
+		await page.goto( pageUrl );
+		const [ year, month, dayOfMonth ] = today.split( '-' ).map( Number );
+		const longDate = new Intl.DateTimeFormat( 'es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' } ).format( Date.UTC( year, month - 1, dayOfMonth ) );
+		const compact = today.replaceAll( '-', '' );
+
+		// Se abre con el teclado.
+		const event = page.locator( `.fc-daygrid-day[data-date="${ today }"] .fc-event`, { hasText: afternoon } );
+		await event.focus();
+		await page.keyboard.press( 'Enter' );
+
+		const modal = page.locator( 'dialog.ep-event-modal[open]' );
+		await expect( modal.locator( '.ep-event-modal__title' ) ).toHaveText( afternoon );
+		await expect( modal.locator( '.ep-event-modal__title' ) ).toBeFocused();
+		await expect( modal.locator( '.ep-event-modal__date' ) ).toHaveText( longDate );
+		await expect( modal.locator( '.ep-event-modal__time' ) ).toHaveText( '03:00 p. m.' );
+		await expect( modal.locator( '.ep-badge' ) ).toHaveText( 'Reuniones laborales' );
+
+		// .ics con la hora de Colombia, sin la «Z» del legado (RL-03).
+		const [ timed ] = await Promise.all( [ page.waitForEvent( 'download' ), modal.getByRole( 'link', { name: 'Añadir a mi calendario' } ).click() ] );
+		const timedIcs = readFileSync( await timed.path(), 'utf8' );
+		expect( timedIcs ).toContain( `DTSTART;TZID=America/Bogota:${ compact }T150000\r\n` );
+		expect( timedIcs ).not.toContain( `${ compact }T150000Z` );
+
+		// El evento de todo el día va antes (los eventos del día se ordenan por hora).
+		await modal.getByRole( 'button', { name: 'Evento anterior del mismo día' } ).click();
+		await expect( modal.locator( '.ep-event-modal__title' ) ).toHaveText( allDay );
+		await expect( modal.locator( '.ep-event-modal__time' ) ).toHaveText( 'Todo el día' );
+		const [ fullDay ] = await Promise.all( [ page.waitForEvent( 'download' ), modal.getByRole( 'link', { name: 'Añadir a mi calendario' } ).click() ] );
+		expect( readFileSync( await fullDay.path(), 'utf8' ) ).toContain( `DTSTART;VALUE=DATE:${ compact }\r\n` );
+
+		// Esc cierra y el foco vuelve al evento que lo abrió.
+		await page.keyboard.press( 'Escape' );
+		await expect( modal ).toHaveCount( 0 );
+		await expect( event ).toBeFocused();
 	} );
 
 	test( 'en móvil empieza en la lista y no hay scroll horizontal (R-11, R-13)', async ( { page } ) => {
