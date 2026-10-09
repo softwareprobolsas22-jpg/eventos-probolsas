@@ -37,6 +37,12 @@ describe( 'createDateFormatter (casos compartidos con PHP)', () => {
 		expect( formatter.wallTime( new Date( '2026-10-08T05:00:00Z' ) ) ).toBe( '2026-10-08T00:00:00' );
 	} );
 
+	it( 'formatLongCalendarDate(): día de la semana y mes en español, sin cambiar de día (R-07, R-08)', () => {
+		expect( formatter.formatLongCalendarDate( '2026-10-07' ) ).toBe( 'miércoles, 7 de octubre de 2026' );
+		expect( formatter.formatLongCalendarDate( '2027-01-01' ) ).toBe( 'viernes, 1 de enero de 2027' );
+		expect( () => formatter.formatLongCalendarDate( '2026-02-30' ) ).toThrow( /Fecha no válida/ );
+	} );
+
 	it( 'rechaza momentos sin zona horaria (serían ambiguos)', () => {
 		expect( () => formatter.formatDateTime( '2026-10-01 10:00:00' ) ).toThrow( /zona horaria/ );
 	} );
