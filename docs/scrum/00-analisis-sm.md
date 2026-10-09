@@ -106,6 +106,9 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | D-12 | Las tablas tienen **máximo 6 columnas, contando Acciones** (confirmado: columnas). Lo demás va en la página del evento o en el modal de detalle. | ✅ Cerrada | Regla R-19. Columnas definidas en §6.3. |
 | D-13 | **Colores de los tipos iniciales aprobados** (Review del Sprint 1, 2026-10-08): Cumpleaños `#9D174D`, Capacitaciones `#155728`, Reuniones especiales `#B45309`, Reuniones laborales `#1D4ED8`. | ✅ Cerrada | La semilla (H-102) queda como está; se pueden cambiar desde «Tipos de evento». |
 | D-14 | **El plugin sale a producción cuando esté terminada la primera versión** (v1, Sprints 2 a 4), para verificar cualquier eventualidad en conjunto. Los PR por fase llevan el código a `main`, pero no se despliega hasta el cierre de v1. | ✅ Cerrada | El despliegue en Hostinger se hace en H-404 (prueba de aceptación en staging y paquete de release), no al cerrar cada fase. |
+| D-15 | Un evento con hora y sin hora de fin dura **1 hora** en el `.ics` (planning del Sprint 4, 2026-10-09; cierra QA-047). | ✅ Cerrada | Se mantiene lo de H-301 (`IcsCalendar::DEFAULT_DURATION`). |
+| D-16 | Desinstalar **conserva los datos por defecto**; la pantalla «Ajustes» tiene la casilla «Borrar todos los datos al desinstalar», desmarcada. | ✅ Cerrada | Opción `eventos_delete_data_on_uninstall` (falsa por defecto); `GET/PUT /settings`; H-402 pasa de 2 a 3 puntos (pantalla). Los archivos de la Biblioteca de Medios nunca se borran (D-4). |
+| D-17 | El **dashboard** son tarjetas arriba de la tabla de **Eventos**; un clic filtra la tabla. | ✅ Cerrada | Sin pantalla nueva; H-206 reutiliza los filtros de H-203. |
 
 ---
 
@@ -375,7 +378,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-203 | Pantalla «Eventos»: tabla paginada en servidor (R-04/05/06/19/23), búsqueda con *debounce*, filtros (tipo, rango de fechas), exportar  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-203.md)); corrigió QA-038 (doble carga de `admin.js` en WordPress), QA-039 y QA-040; integrada en `develop`* | F | 8 |
 | H-204 | Formulario de evento (drawer o página): validación en tiempo real (R-24), `media-field` imagen/PDF con vista previa, `textarea` sin resize, aviso de fecha pasada, bloque «Cuándo» preparado para D-7, errores por campo desde la API  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-204.md)); integrada en `develop`. QA-041 cubierta por las pruebas en el navegador de H-207* | F | 8 |
 | H-205 | Detalle del evento (todo lo que no cabe en la tabla)  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-205.md)); integrada en `develop`* | F | 3 |
-| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
+| H-206 | Dashboard: estadísticas (hoy, próximos 30 días, por tipo) como tarjetas arriba de «Eventos» que filtran la tabla (D-17)  — *pasa al Sprint 4 (decisión del PO, 2026-10-08)* | B+F | 5 |
 | H-207 | Pruebas del CRUD, permisos, adjuntos no permitidos y exportación  — *✅ aprobada por QA ([informe](../qa/2026-10-08-H-207.md)); agrega pruebas en el navegador sobre WordPress real en el CI; detectó QA-043; integrada en `develop`* | Q | 5 |
 
 ### EP-3 · Calendario para colaboradores
@@ -391,7 +394,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
 | H-401 | Caché del feed por rango con invalidación al escribir | B | 3 |
-| H-402 | Desinstalación con opción «conservar datos»; limpieza de capacidades | B | 2 |
+| H-402 | Desinstalación que conserva los datos salvo que se marque «Borrar todos los datos al desinstalar» en «Ajustes» (D-16); limpieza de capacidades | B+F | 3 |
 | H-403 | Auditoría de accesibilidad y rendimiento; ajustes | F | 3 |
 | H-404 | Prueba de aceptación con el PO en staging (WP 7.1.3 / PHP 8.3) y paquete `.zip` de release | SM+Q | 3 |
 
@@ -411,7 +414,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | **1** | «Los tipos de evento se gestionan y la UI tiene identidad» — ✅ cerrado, 27/27 ([plan](sprint-1.md), [cierre](../qa/2026-10-08-cierre-sprint-1.md)) | H-101 … H-105 | 27 |
 | **2** | «El gestor administra eventos sin errores» — ✅ cerrado, 35/35 ([plan](sprint-2.md), [cierre](../qa/2026-10-08-cierre-sprint-2.md)) | H-201 … H-205, H-207 | 35 |
 | **3** | «Los colaboradores ven el calendario sin desfases» — ✅ cerrado, 26/26 ([plan](sprint-3.md), [cierre](../qa/2026-10-09-cierre-sprint-3.md)) | H-301 … H-305 | 26 |
-| **4** | «Listo para producción» | H-401 … H-404, H-206 | 16 |
+| **4** | «Listo para producción» — en curso ([plan](sprint-4.md)) | H-401 … H-404, H-206 | 17 |
 
 Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Sprint 4 (Review del Sprint 1, 2026-10-08).
 
@@ -458,3 +461,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.21 | 2026-10-08 | H-204, H-207 y H-205 aprobadas. Pruebas en el navegador sobre WordPress real en el CI (H-207), que detectaron QA-043. Cierre del Sprint 2 (35/35 puntos, [informe](../qa/2026-10-08-cierre-sprint-2.md)) |
 | 2.22 | 2026-10-09 | PR #3 del Sprint 2 fusionado en `main`. Planning del Sprint 3 ([plan](sprint-3.md)): 26 puntos; las clases PHP de `[eventos_calendario]` y `[eventos_proximos]` van en H-301 (Backend); QA-005 se cierra en H-302 |
 | 2.23 | 2026-10-09 | H-301 a H-305 aprobadas e integradas. Pruebas en el navegador con la zona de Tokio y axe-core, que detectaron QA-056 a QA-058; QA-005 cerrado. Cierre del Sprint 3 (26/26 puntos, [informe](../qa/2026-10-09-cierre-sprint-3.md)) |
+| 2.24 | 2026-10-09 | PR #4 del Sprint 3 fusionado en `main`. Planning del Sprint 4 ([plan](sprint-4.md)): decisiones D-15 (`.ics` de 1 hora, cierra QA-047), D-16 (conservar datos al desinstalar, pantalla «Ajustes»; H-402 pasa a 3 puntos) y D-17 (dashboard en «Eventos»); staging de H-404 por definir |
