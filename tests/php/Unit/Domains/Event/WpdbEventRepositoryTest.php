@@ -132,6 +132,19 @@ final class WpdbEventRepositoryTest extends UnitTestCase {
 		);
 	}
 
+	public function test_counting_a_range_uses_the_overlap_condition(): void {
+		$sql = null;
+		$this->wpdb->shouldReceive( 'get_var' )->andReturnUsing(
+			static function ( string $query ) use ( &$sql ): string {
+				$sql = $query;
+				return '4';
+			}
+		);
+
+		$this->assertSame( 4, $this->repository()->count_in_range( '2026-10-07', '2026-11-05' ) );
+		$this->assertSame( "SELECT COUNT(*) FROM `wp_eventos_events` WHERE start_date <= '2026-11-05' AND COALESCE(end_date, start_date) >= '2026-10-07'", $sql );
+	}
+
 	public function test_find_hydrates_a_row(): void {
 		$this->wpdb->shouldReceive( 'get_row' )->andReturn( $this->row(), null );
 
