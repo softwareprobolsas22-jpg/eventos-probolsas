@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Probolsas\Eventos\Domains\Settings\Presentation;
 
+use Probolsas\Eventos\Core\Frontend\ShortcodeRegistry;
 use Probolsas\Eventos\Core\Settings\PluginSettings;
 use Probolsas\Eventos\Shared\Http\RestController;
 use Probolsas\Eventos\Shared\Validation\Validator;
@@ -18,7 +19,8 @@ use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * `GET/PUT eventos/v1/settings` (docs/api/settings.md). Solo gestores.
+ * `GET/PUT eventos/v1/settings` y `GET eventos/v1/settings/shortcodes` (docs/api/settings.md). Solo
+ * gestores.
  */
 final class SettingsRestController extends RestController {
 
@@ -35,9 +37,13 @@ final class SettingsRestController extends RestController {
 	/**
 	 * Crea el controlador.
 	 *
-	 * @param PluginSettings $settings Ajustes.
+	 * @param PluginSettings    $settings   Ajustes.
+	 * @param ShortcodeRegistry $shortcodes Shortcodes del plugin, para su guía (H-406).
 	 */
-	public function __construct( private readonly PluginSettings $settings ) {}
+	public function __construct(
+		private readonly PluginSettings $settings,
+		private readonly ShortcodeRegistry $shortcodes
+	) {}
 
 	/**
 	 * Segmento base.
@@ -65,6 +71,24 @@ final class SettingsRestController extends RestController {
 				],
 			]
 		);
+
+		$this->add_route(
+			'/shortcodes',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'permission_callback' => [ $this, 'can_manage' ],
+					'callback'            => [ $this, 'shortcodes' ],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Guía de cada shortcode del plugin (H-406): título, descripción, atributos y ejemplo.
+	 */
+	public function shortcodes(): WP_REST_Response|WP_Error {
+		return $this->handle( fn(): WP_REST_Response => $this->ok( $this->shortcodes->guides() ) );
 	}
 
 	/**

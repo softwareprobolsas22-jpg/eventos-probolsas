@@ -12,6 +12,7 @@ namespace Probolsas\Eventos\Domains\Settings;
 use Probolsas\Eventos\Core\Admin\AdminMenu;
 use Probolsas\Eventos\Core\BootableProvider;
 use Probolsas\Eventos\Core\Container;
+use Probolsas\Eventos\Core\Frontend\ShortcodeRegistry;
 use Probolsas\Eventos\Core\Settings\PluginSettings;
 use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Domains\Settings\Presentation\SettingsPage;
@@ -29,7 +30,7 @@ final class SettingsServiceProvider implements BootableProvider {
 	 * @param Container $container Contenedor del plugin.
 	 */
 	public function register( Container $container ): void {
-		$container->set( SettingsRestController::class, static fn( Container $c ): SettingsRestController => new SettingsRestController( $c->get( PluginSettings::class ) ) );
+		$container->set( SettingsRestController::class, static fn( Container $c ): SettingsRestController => new SettingsRestController( $c->get( PluginSettings::class ), $c->get( ShortcodeRegistry::class ) ) );
 		$container->set( SettingsPage::class, static fn( Container $c ): SettingsPage => new SettingsPage( $c->get( View::class ) ) );
 		$container->tag( AdminMenu::PAGES_TAG, SettingsPage::class );
 	}

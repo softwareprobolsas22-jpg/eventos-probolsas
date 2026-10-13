@@ -15,7 +15,7 @@ use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * `GET/PUT /settings` contra WordPress real (H-402, D-16).
+ * `GET/PUT /settings` (H-402, D-16) y `GET /settings/shortcodes` (H-406) contra WordPress real.
  *
  * @coversNothing
  */
@@ -55,25 +55,38 @@ final class SettingsApiTest extends IntegrationTestCase {
 		$this->assertArrayHasKey( 'delete_data_on_uninstall', $invalid->get_data()['data']['errors'] );
 	}
 
+	public function test_the_shortcodes_guide_lists_the_plugin_shortcodes(): void {
+		$response = $this->request( 'GET', [], '/shortcodes' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$guides = $response->get_data()['data'];
+		$this->assertSame( [ 'eventos_calendario', 'eventos_proximos' ], array_column( $guides, 'tag' ) );
+		$this->assertSame( [ 'limite', 'tipos', 'titulo' ], array_column( $guides[1]['attributes'], 'name' ) );
+		$this->assertSame( 'event_types', $guides[1]['attributes'][1]['values'] );
+	}
+
 	public function test_permissions(): void {
 		wp_set_current_user( 0 );
 		$this->assertSame( 401, $this->request( 'GET' )->get_status(), 'Visitante (D-1).' );
 		$this->assertSame( 401, $this->request( 'PUT', [ 'delete_data_on_uninstall' => true ] )->get_status() );
+		$this->assertSame( 401, $this->request( 'GET', [], '/shortcodes' )->get_status() );
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 		$this->assertSame( 403, $this->request( 'GET' )->get_status(), 'Sin eventos_manage (R-22).' );
 		$this->assertSame( 403, $this->request( 'PUT', [ 'delete_data_on_uninstall' => true ] )->get_status() );
+		$this->assertSame( 403, $this->request( 'GET', [], '/shortcodes' )->get_status() );
 		$this->assertFalse( get_option( 'eventos_delete_data_on_uninstall', false ) );
 	}
 
 	/**
-	 * Petición a `/settings`.
+	 * Petición a `/settings` o a una ruta debajo.
 	 *
 	 * @param string               $method Método HTTP.
 	 * @param array<string, mixed> $body   Cuerpo JSON.
+	 * @param string               $path   Ruta debajo de `/settings`, por ejemplo `/shortcodes`.
 	 */
-	private function request( string $method, array $body = [] ): WP_REST_Response {
-		$request = new WP_REST_Request( $method, '/eventos/v1/settings' );
+	private function request( string $method, array $body = [], string $path = '' ): WP_REST_Response {
+		$request = new WP_REST_Request( $method, '/eventos/v1/settings' . $path );
 
 		if ( [] !== $body ) {
 			$request->set_header( 'Content-Type', 'application/json' );
