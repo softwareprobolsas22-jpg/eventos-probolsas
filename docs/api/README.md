@@ -96,4 +96,5 @@ La inyecta `Core\Assets\Assets::client_config()` antes del script de cada pantal
 |---|---|---|
 | [`event-types.md`](event-types.md) | Tipos de evento: catálogo gestionable, reglas de validación y tipos iniciales | H-101, H-102, H-104 |
 | [`events.md`](events.md) | Eventos: gestión, exportación, panel, calendario (FullCalendar), detalle, `.ics` y próximos | H-201 a H-206, H-301 a H-304 |
+| [`media.md`](media.md) | Subida del adjunto al soltar un archivo en el formulario (`POST /wp/v2/media` con revisión previa) | H-411 |
 | [`settings.md`](settings.md) | Ajustes: conservar o borrar los datos al desinstalar (D-16) y la guía de los shortcodes | H-402, H-406 |

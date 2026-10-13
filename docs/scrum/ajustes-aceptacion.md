@@ -16,7 +16,9 @@
 
 **Lote 1:** H-405, H-407, H-408 y H-409 — ✅ aprobado ([informe](../qa/2026-10-13-ajustes-aceptacion-1.md)), 5 pts.
 **Lote 2:** H-406 y H-410, con D-19 — ✅ aprobado ([informe](../qa/2026-10-13-ajustes-aceptacion-2.md)), 6 pts.
-**Lote 3 (siguiente):** H-411 (5 pts).
+**Lote 3:** H-411 — ✅ aprobado ([informe](../qa/2026-10-13-H-411.md)), 5 pts. La subida usa `wp/v2/media` con una revisión previa en el servidor ([contrato](../api/media.md)).
+
+**EP-4b completa (16/16 pts).** Sigue la aceptación del PO con la [lista de aceptación](../qa/aceptacion-v1.md).
 
 ## Reglas que aplican
 
