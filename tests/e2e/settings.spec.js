@@ -1,5 +1,6 @@
 /**
- * «Ajustes» en WordPress real (H-402, D-16): conservar o borrar los datos al desinstalar.
+ * «Ajustes» en WordPress real (H-402, D-16): conservar o borrar los datos al desinstalar, y la guía de
+ * los shortcodes (H-406).
  */
 import { expect, test } from '@playwright/test';
 import { openScreen, toastWith } from './helpers.js';
@@ -35,5 +36,20 @@ test.describe( 'Ajustes', () => {
 				await expect( toastWith( page, 'al desinstalar se conservarán los datos' ) ).toBeVisible();
 			}
 		}
+	} );
+
+	test( 'la guía de los shortcodes muestra los dos shortcodes, los slugs de los tipos y copia el ejemplo (H-406)', async ( { page, context } ) => {
+		await context.grantPermissions( [ 'clipboard-read', 'clipboard-write' ] );
+		await openScreen( page, 'eventos-probolsas-ajustes' );
+		const section = page.locator( 'section.ep-shortcodes' );
+
+		await expect( section.getByRole( 'heading', { name: 'Shortcodes' } ) ).toBeVisible();
+		await expect( section.locator( '.ep-shortcode__code' ) ).toHaveText( [ '[eventos_calendario]', '[eventos_proximos limite="5"]' ] );
+		// Los tipos sembrados al activar el plugin aparecen como valores de `tipos`.
+		await expect( section.locator( '.ep-shortcode__values code', { hasText: 'cumpleanos' } ).first() ).toBeVisible();
+
+		await section.getByRole( 'button', { name: 'Copiar el shortcode «Próximos eventos»' } ).click();
+		await expect( toastWith( page, 'Shortcode copiado' ) ).toBeVisible();
+		expect( await page.evaluate( () => navigator.clipboard.readText() ) ).toBe( '[eventos_proximos limite="5"]' );
 	} );
 } );

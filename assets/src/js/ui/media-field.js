@@ -4,7 +4,8 @@
  * - El plugin no sube archivos por su cuenta: el selector `wp.media` permite elegir uno de la biblioteca
  *   o subirlo a ella, filtrado a imágenes y PDF (`epConfig.media.library_types`).
  * - Vista previa: miniatura de la imagen o ícono del PDF con su nombre, y enlace para abrirlo.
- * - Obligatorio o no según el tipo de evento (setRequired). El servidor revalida el tipo MIME real.
+ * - Obligatorio o no según el tipo de evento (setRequired): la etiqueta muestra « *» o « (opcional)»
+ *   (D-19). El servidor revalida el tipo MIME real.
  * - Cumple la interfaz FormField (ui/form.js). Su valor es el ID del adjunto como texto ('' sin adjunto).
  */
 import { h, icon, suspendModal, uid } from '../core/dom.js';
@@ -92,6 +93,8 @@ export function createMediaField( {
 	let isRequired = required;
 
 	const requiredMark = h( 'span', { class: 'ep-field__required', text: ' *', attrs: { 'aria-hidden': 'true' } } );
+	// D-19: si no es obligatorio, la etiqueta lo dice («Adjunto (opcional)»).
+	const optionalMark = h( 'span', { class: 'ep-field__optional', text: ` ${ __( '(opcional)', 'eventos-probolsas' ) }` } );
 	const preview = h( 'div', { class: 'ep-media-field__preview', attrs: { 'aria-live': 'polite' } } );
 	const chooseButton = h( 'button', { type: 'button', class: 'ep-button ep-button--secondary ep-button--sm', attrs: { 'aria-describedby': `${ hintId } ${ errorId }` }, on: { click: choose } } );
 	const removeButton = h(
@@ -106,7 +109,7 @@ export function createMediaField( {
 	const element = h(
 		'div',
 		{ class: 'ep-field ep-media-field', attrs: { role: 'group', 'aria-labelledby': labelId } },
-		h( 'span', { class: 'ep-field__label', id: labelId }, label, requiredMark ),
+		h( 'span', { class: 'ep-field__label', id: labelId }, label, requiredMark, optionalMark ),
 		preview,
 		h( 'div', { class: 'ep-media-field__actions' }, chooseButton, removeButton ),
 		h( 'p', { class: 'ep-field__hint', id: hintId, text: hint } ),
@@ -127,6 +130,7 @@ export function createMediaField( {
 
 	function render() {
 		requiredMark.hidden = ! isRequired;
+		optionalMark.hidden = isRequired;
 		removeButton.hidden = ! attachment;
 		chooseButton.replaceChildren(
 			icon( attachment ? 'fa-solid fa-arrows-rotate' : 'fa-solid fa-photo-film' ),

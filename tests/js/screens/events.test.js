@@ -392,25 +392,61 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 		expect( field( 'description' ).tagName ).toBe( 'TEXTAREA' );
 	} );
 
-	it( 'no envía si faltan datos: título corto, tipo y adjunto que el tipo exige', () => {
+	it( 'no envía si faltan datos: tipo, título corto y adjunto que el tipo exige', () => {
 		header( 'Añadir evento' ).click();
-		type( 'title', 'Ab' );
 		submit();
 
 		expect( api.post ).not.toHaveBeenCalled();
-		expect( errorOf( 'title' ).textContent ).toBe( 'El campo «Título» debe tener al menos 3 caracteres.' );
 		expect( errorOf( 'type_id' ).textContent ).toBe( 'El campo «Tipo» es obligatorio.' );
+		expect( errorOf( 'title' ).hidden ).toBe( true );
 
 		type( 'type_id', '1', 'change' );
+		type( 'title', 'Ab' );
 		submit();
+		expect( api.post ).not.toHaveBeenCalled();
+		expect( errorOf( 'title' ).textContent ).toBe( 'El campo «Título» debe tener al menos 3 caracteres.' );
 		expect( mediaError().textContent ).toBe( 'Este tipo de evento requiere una imagen o un PDF.' );
 
 		type( 'type_id', '2', 'change' );
 		expect( mediaError().hidden ).toBe( true );
 	} );
 
+	it( 'crear es progresivo: primero el tipo y después los demás campos (H-410)', () => {
+		header( 'Añadir evento' ).click();
+		const visible = () => [ ...drawer().querySelectorAll( 'form > *' ) ].filter( ( element ) => ! element.hidden );
+
+		expect( visible() ).toEqual( [ field( 'type_id' ).closest( '.ep-field' ) ] );
+		expect( drawer().querySelector( 'form .ep-field' ).contains( field( 'type_id' ) ) ).toBe( true );
+		expect( field( 'type_id' ).closest( '.ep-field' ).textContent ).toContain( 'Al elegirlo aparecen los demás datos del evento.' );
+
+		type( 'type_id', '2', 'change' );
+		expect( visible() ).toHaveLength( 5 );
+		expect( drawer().querySelector( 'fieldset' ).hidden ).toBe( false );
+
+		// Volver a «Selecciona un tipo» no oculta lo que ya se escribió.
+		type( 'title', 'Reunión' );
+		type( 'type_id', '', 'change' );
+		expect( field( 'title' ).closest( '.ep-field' ).hidden ).toBe( false );
+	} );
+
+	it( 'el adjunto dice «(opcional)» o «*» según el tipo (D-19)', () => {
+		header( 'Añadir evento' ).click();
+		const label = () => drawer().querySelector( '.ep-media-field .ep-field__label' );
+		const shown = ( selector ) => ! label().querySelector( selector ).hidden;
+
+		type( 'type_id', '2', 'change' );
+		expect( shown( '.ep-field__optional' ) ).toBe( true );
+		expect( shown( '.ep-field__required' ) ).toBe( false );
+		expect( label().firstChild.textContent + label().querySelector( '.ep-field__optional' ).textContent ).toBe( 'Adjunto (opcional)' );
+
+		type( 'type_id', '1', 'change' );
+		expect( shown( '.ep-field__optional' ) ).toBe( false );
+		expect( shown( '.ep-field__required' ) ).toBe( true );
+	} );
+
 	it( 'el aviso de fecha pasada no bloquea (D-3) y compara con «hoy» del servidor', () => {
 		header( 'Añadir evento' ).click();
+		type( 'type_id', '2', 'change' );
 		const notice = drawer().querySelector( '.ep-notice' );
 		expect( notice.hidden ).toBe( true );
 
@@ -424,8 +460,8 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 
 	it( 'crea un evento con adjunto de la biblioteca, confirma con un toast y recarga la tabla', async () => {
 		header( 'Añadir evento' ).click();
-		type( 'title', '  Cumpleaños de Carlos ' );
 		type( 'type_id', '1', 'change' );
+		type( 'title', '  Cumpleaños de Carlos ' );
 		type( 'start_time', '15:00' );
 		buttonIn( drawer(), 'Elegir archivo' ).click();
 		await flush();
@@ -450,6 +486,8 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 		expect( drawer().querySelector( '.ep-drawer__title' ).textContent ).toBe( 'Editar evento' );
 		expect( field( 'title' ).value ).toBe( 'Cumpleaños de Ana María' );
 		expect( field( 'type_id' ).value ).toBe( '1' );
+		expect( [ ...drawer().querySelectorAll( 'form > *' ) ].every( ( element ) => ! element.hidden ) ).toBe( true );
+		expect( field( 'type_id' ).closest( '.ep-field' ).querySelector( '.ep-field__hint' ) ).toBeNull();
 		expect( field( 'start_time' ).value ).toBe( '15:00' );
 		expect( drawer().querySelector( '.ep-media-field img' ).getAttribute( 'src' ) ).toBe( 'https://intranet.test/uploads/ana-150x150.jpg' );
 
@@ -466,8 +504,8 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 			new ApiError( 'Revisa los campos marcados.', { status: 422, fieldErrors: { attachment_id: [ 'El archivo debe ser una imagen o un PDF.' ], start_date: [ 'El campo «Fecha» debe ser una fecha válida.' ] } } )
 		);
 		header( 'Añadir evento' ).click();
-		type( 'title', 'Reunión de planeación' );
 		type( 'type_id', '2', 'change' );
+		type( 'title', 'Reunión de planeación' );
 		submit();
 		await flush();
 

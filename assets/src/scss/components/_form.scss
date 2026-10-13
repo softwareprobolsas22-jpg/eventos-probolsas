@@ -17,6 +17,12 @@
 		color: var(--ep-color-error);
 	}
 
+	// «(opcional)» junto a la etiqueta de un campo que el tipo de evento no exige (D-19).
+	&__optional {
+		font-weight: var(--ep-font-weight-regular);
+		color: var(--ep-color-text-muted);
+	}
+
 	&__meta {
 		display: flex;
 		gap: var(--ep-space-3);
