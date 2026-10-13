@@ -53,7 +53,7 @@ const eventType = ( overrides ) => ( {
 } );
 
 const SEED = [
-	eventType( { id: 4, name: 'Reuniones laborales', slug: 'reuniones-laborales', color: '#1D4ED8', icon: 'briefcase', requires_attachment: false, sort_order: 4, events_count: 3 } ),
+	eventType( { id: 4, name: 'Reuniones laborales', slug: 'reuniones-laborales', color: '#1D4ED8', icon: 'briefcase', requires_attachment: false, sort_order: 4, events_count: 3, description: 'Comités, reuniones de área y de seguimiento de los procesos.' } ),
 	eventType(),
 	eventType( { id: 2, name: 'Capacitaciones', slug: 'capacitaciones', color: '#FDE68A', text_tone: 'dark', icon: 'graduation-cap', sort_order: 2, events_count: 1 } ),
 ];
@@ -102,7 +102,7 @@ beforeEach( async () => {
 describe( 'pantalla Tipos de evento: tabla', () => {
 	it( 'tiene 5 columnas con Acciones primero (R-06, R-19) y ordena por posición', () => {
 		const headers = [ ...screen.querySelectorAll( 'thead th' ) ].map( ( th ) => th.textContent );
-		expect( headers ).toEqual( [ 'Acciones', 'Tipo', 'Requiere adjunto', 'Eventos', 'Orden' ] );
+		expect( headers ).toEqual( [ 'Acciones', 'Tipo', 'Requiere adjunto', 'Eventos', 'Descripción' ] );
 
 		const names = [ ...screen.querySelectorAll( 'tbody .ep-badge' ) ].map( ( badge ) => badge.textContent );
 		expect( names ).toEqual( [ 'Cumpleaños', 'Capacitaciones', 'Reuniones laborales' ] );
@@ -118,9 +118,11 @@ describe( 'pantalla Tipos de evento: tabla', () => {
 		expect( training.classList.contains( 'ep-badge--dark-text' ) ).toBe( true );
 	} );
 
-	it( 'muestra Sí/No con ícono, el conteo de eventos y el orden', () => {
+	it( 'muestra Sí/No con ícono, el conteo de eventos y la descripción truncable con tooltip (H-408)', () => {
 		const cells = [ ...screen.querySelectorAll( 'tbody tr:last-child td' ) ].slice( 1 ).map( ( td ) => td.textContent );
-		expect( cells ).toEqual( [ 'Reuniones laborales', 'No', '3', '4' ] );
+		expect( cells ).toEqual( [ 'Reuniones laborales', 'No', '3', 'Comités, reuniones de área y de seguimiento de los procesos.' ] );
+		expect( screen.querySelector( 'tbody tr:last-child td:last-child .ep-truncate' ) ).not.toBeNull();
+		expect( screen.querySelector( 'tbody tr:first-child td:last-child' ).textContent ).toBe( '—', 'Sin descripción.' );
 		expect( screen.querySelector( 'tbody tr:first-child .ep-flag' ).classList.contains( 'is-on' ) ).toBe( true );
 	} );
 

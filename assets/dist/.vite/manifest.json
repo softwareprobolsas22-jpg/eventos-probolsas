@@ -144,7 +144,7 @@
     ]
   },
   "assets/src/js/screens/event-types.js": {
-    "file": "js/chunks/event-types-6U4SN1sK.js",
+    "file": "js/chunks/event-types-CmFmE8uu.js",
     "name": "event-types",
     "src": "assets/src/js/screens/event-types.js",
     "isDynamicEntry": true,
@@ -159,7 +159,7 @@
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-BtATzXZC.js",
+    "file": "js/chunks/events-BbKurYyN.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,

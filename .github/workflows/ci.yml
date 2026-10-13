@@ -159,6 +159,14 @@ jobs:
       - run: composer install --no-interaction --no-progress --prefer-dist
       - run: npm ci --no-audit --no-fund
 
+      # Las imágenes de wp-env (MariaDB, phpMyAdmin, WordPress) vienen de Docker Hub, que limita las
+      # descargas anónimas por IP y los runners comparten IP (QA-065). El espejo público de Google sirve
+      # las mismas imágenes oficiales sin ese límite; si no tiene una, Docker la pide a Docker Hub.
+      - name: Docker con el espejo de Docker Hub
+        run: |
+          echo '{ "registry-mirrors": [ "https://mirror.gcr.io" ] }' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+
       - name: Iniciar WordPress (wp-env)
         run: npx wp-env start
 
@@ -189,6 +197,14 @@ jobs:
 
       - name: Chromium para Playwright
         run: npx playwright install --with-deps chromium
+
+      # Las imágenes de wp-env (MariaDB, phpMyAdmin, WordPress) vienen de Docker Hub, que limita las
+      # descargas anónimas por IP y los runners comparten IP (QA-065). El espejo público de Google sirve
+      # las mismas imágenes oficiales sin ese límite; si no tiene una, Docker la pide a Docker Hub.
+      - name: Docker con el espejo de Docker Hub
+        run: |
+          echo '{ "registry-mirrors": [ "https://mirror.gcr.io" ] }' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
 
       - name: Iniciar WordPress (wp-env)
         run: npx wp-env start
