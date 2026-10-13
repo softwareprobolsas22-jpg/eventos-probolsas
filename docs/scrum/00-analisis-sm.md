@@ -409,7 +409,7 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 | H-408 | Tabla de tipos: «Descripción» truncada con tooltip en lugar de «Orden»  — *✅ lote 1* | F | 1 |
 | H-409 | Filtro de fechas en dos campos («Desde», «Hasta»), tres por fila en escritorio  — *✅ lote 1* | F | 2 |
 | H-410 | Formulario de evento progresivo: primero el tipo, luego los campos según el tipo  — *✅ lote 2, con D-19* | F | 3 |
-| H-411 | Adjunto con arrastrar y soltar (sube a la Biblioteca de Medios y valida antes de guardar) | B+F | 5 |
+| H-411 | Adjunto con arrastrar y soltar (sube a la Biblioteca de Medios y valida antes de guardar)  — *✅ lote 3 ([informe](../qa/2026-10-13-H-411.md)): `wp/v2/media` con revisión previa ([contrato](../api/media.md))* | B+F | 5 |
 
 ### EP-5 · Roadmap v1.1 (después de validar v1 en producción)
 | ID | Historia | Rama | Pts |
@@ -480,3 +480,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.27 | 2026-10-09 | Observaciones del PO en la aceptación (producción): EP-4b, H-405 a H-411 ([plan](ajustes-aceptacion.md)); lote 1 (H-405, H-407, H-408, H-409) en curso |
 | 2.28 | 2026-10-13 | Lote 1 de los ajustes (H-405, H-407, H-408, H-409) aprobado e integrado; D-19 (adjunto opcional en H-410); QA-065 abierto (límite de Docker Hub en el CI) |
 | 2.29 | 2026-10-13 | Lote 2 de los ajustes (H-406 guía de shortcodes en «Ajustes», H-410 formulario de evento progresivo con D-19) aprobado e integrado; QA-066 (auditoría R-17 desactualizada) corregido en la rama |
+| 2.30 | 2026-10-13 | Lote 3 de los ajustes (H-411 adjunto con arrastrar y soltar: `wp/v2/media` con la marca `X-Eventos-Upload` y revisión del contenido real antes de guardar, D-4) aprobado e integrado; EP-4b completa (16/16 puntos), pendiente la aceptación del PO |
