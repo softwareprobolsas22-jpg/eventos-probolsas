@@ -1,8 +1,16 @@
-// Pantalla «Ajustes» (H-402): una tarjeta por grupo de ajustes.
+// Pantalla «Ajustes» (H-402): una tarjeta por grupo de ajustes y la guía de los shortcodes (H-406).
+@use "../tools/mixins" as m;
+
+// Las tarjetas ocupan todo el ancho del área de contenido, como las demás pantallas.
+.ep-settings-screen {
+	display: grid;
+	gap: var(--ep-space-5);
+}
+
 .ep-settings {
 	display: grid;
 	gap: var(--ep-space-4);
-	max-width: 42rem;
+	min-width: 0;
 
 	.ep-card__title {
 		display: flex;
@@ -18,5 +26,125 @@
 	&__actions {
 		display: flex;
 		justify-content: flex-end;
+	}
+}
+
+.ep-shortcodes__intro {
+	margin: 0;
+	color: var(--ep-color-text-muted);
+}
+
+// Un shortcode: título, descripción, ejemplo copiable y atributos.
+.ep-shortcode {
+	display: grid;
+	gap: var(--ep-space-2);
+	min-width: 0;
+	padding-top: var(--ep-space-4);
+	border-top: 1px solid var(--ep-color-border);
+
+	p {
+		margin: 0;
+	}
+
+	code {
+		padding: 0.0625rem var(--ep-space-1);
+		font-size: var(--ep-font-size-sm);
+		color: var(--ep-color-text);
+		background: var(--ep-color-surface-sunken);
+		border-radius: var(--ep-radius-sm);
+		overflow-wrap: anywhere;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: var(--ep-font-size-md);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text);
+	}
+
+	&__description {
+		color: var(--ep-color-text-subtle);
+	}
+
+	// El código ocupa el ancho disponible y el botón baja a otra fila si no cabe.
+	&__example {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ep-space-2);
+		align-items: center;
+		padding: var(--ep-space-2) var(--ep-space-3);
+		background: var(--ep-color-surface-muted);
+		border: 1px solid var(--ep-color-border);
+		border-radius: var(--ep-radius-md);
+
+		.ep-shortcode__code {
+			flex: 1 1 12rem;
+			padding: 0;
+			font-size: var(--ep-font-size-md);
+			background: none;
+			user-select: all;
+		}
+	}
+
+	&__subtitle {
+		margin: var(--ep-space-2) 0 0;
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-semibold);
+		color: var(--ep-color-text-subtle);
+	}
+
+	&__attributes {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--ep-space-1) var(--ep-space-4);
+		margin: 0;
+
+		@include m.up(sm) {
+			grid-template-columns: 9rem minmax(0, 1fr);
+		}
+
+		dt {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--ep-space-1) var(--ep-space-2);
+			align-items: baseline;
+		}
+
+		dd {
+			display: grid;
+			gap: var(--ep-space-1);
+			margin: 0 0 var(--ep-space-3);
+			color: var(--ep-color-text);
+		}
+	}
+
+	&__required,
+	&__default,
+	&__values-note {
+		font-size: var(--ep-font-size-sm);
+		font-weight: var(--ep-font-weight-regular);
+		color: var(--ep-color-text-muted);
+	}
+
+	&__values {
+		display: grid;
+		gap: var(--ep-space-1);
+		font-size: var(--ep-font-size-sm);
+
+		ul {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--ep-space-1) var(--ep-space-3);
+			padding: 0;
+			margin: 0;
+			list-style: none;
+		}
+
+		li {
+			display: inline-flex;
+			gap: var(--ep-space-1);
+			align-items: baseline;
+			margin: 0;
+		}
 	}
 }

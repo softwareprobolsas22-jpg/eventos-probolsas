@@ -2,7 +2,9 @@
  * Formulario de evento en panel lateral (H-204): crear y editar con validación en tiempo real (R-24)
  * a partir de `epConfig.rules.event`, el bloque «Cuándo» y el adjunto de la Biblioteca de Medios (R-09).
  *
- * - El tipo define si el adjunto es obligatorio (`requires_attachment`).
+ * - Formulario progresivo (H-410): al crear, primero se elige el tipo y después aparecen los demás campos.
+ *   El tipo define si el adjunto es obligatorio (`requires_attachment`): «Adjunto *» o «Adjunto
+ *   (opcional)» (D-19). Los campos ocultos no se validan (createForm).
  * - Una fecha pasada se permite, con un aviso que no bloquea (D-3). «Hoy» es el del servidor (R-08).
  * - Sin hora, el evento dura todo el día. El bloque «Cuándo» deja el lugar para la hora de fin y los
  *   eventos de varios días (D-7, v1.1).
@@ -15,7 +17,7 @@ import { button } from '../ui/button.js';
 import { confirmDialog } from '../ui/confirm-dialog.js';
 import { openDrawer } from '../ui/drawer.js';
 import { createField, createForm, ruleOptions } from '../ui/form.js';
-import { createMediaField, openMediaLibrary } from '../ui/media-field.js';
+import { createMediaField, fromRestAttachment, openMediaLibrary } from '../ui/media-field.js';
 import { toast } from '../ui/toast.js';
 
 /**
@@ -58,8 +60,13 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 		options: types.map( ( type ) => ( { value: type.id, label: type.name } ) ),
 		value: initialType?.id ?? '',
 		placeholder: __( 'Selecciona un tipo', 'eventos-probolsas' ),
+		hint: isNew ? __( 'Al elegirlo aparecen los demás datos del evento.', 'eventos-probolsas' ) : undefined,
 		onInput: ( value ) => {
-			mediaField.setRequired( Boolean( typeOf( value )?.requires_attachment ) );
+			const type = typeOf( value );
+			mediaField.setRequired( Boolean( type?.requires_attachment ) );
+			if ( type ) {
+				showDetails();
+			}
 			renderPreview();
 		},
 	} );
@@ -87,17 +94,34 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 		type: 'textarea',
 		...ruleOptions( rules.description ),
 		value: event?.description ?? '',
+		placeholder: __( 'Ej.: Nos reunimos en la sala de juntas del segundo piso. Habrá torta y café.', 'eventos-probolsas' ),
 		hint: __( 'Opcional.', 'eventos-probolsas' ),
 	} );
 
+	// H-411: soltar el archivo en el campo lo sube a la Biblioteca de Medios (docs/api/media.md). Solo si el
+	// usuario puede subir archivos (`upload_files`); si no, queda «Elegir archivo».
+	const media = config.media ?? {};
+	const canUpload = Boolean( config.can?.upload && media.upload_url && 'function' === typeof api.upload );
 	const mediaField = createMediaField( {
 		name: 'attachment_id',
 		label: __( 'Adjunto', 'eventos-probolsas' ),
 		value: event?.attachment ?? null,
 		required: Boolean( initialType?.requires_attachment ),
-		allowedMimes: config.media?.allowed_mimes ?? [],
-		libraryTypes: config.media?.library_types,
+		allowedMimes: media.allowed_mimes ?? [],
+		libraryTypes: media.library_types,
 		openLibrary,
+		maxUploadBytes: Number( media.max_upload_bytes ) || 0,
+		uploadFile: canUpload
+			? async ( file, onProgress ) =>
+					fromRestAttachment(
+						await api.upload( media.upload_url, file, {
+							onProgress,
+							silent: true,
+							envelope: false,
+							headers: { [ media.upload_header ?? 'X-Eventos-Upload' ]: media.upload_context ?? 'event-attachment' },
+						} )
+					)
+			: null,
 	} );
 
 	const pastNotice = h(
@@ -114,7 +138,7 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 	}
 
 	const form = createForm( {
-		fields: [ titleField, typeField, dateField, timeField, descriptionField, mediaField ],
+		fields: [ typeField, titleField, dateField, timeField, descriptionField, mediaField ],
 		onSubmit: async ( values ) => {
 			try {
 				const saved = isNew ? await api.post( 'events', values, { silent: true } ) : await api.put( `events/${ event.id }`, values, { silent: true } );
@@ -148,6 +172,18 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 	);
 	form.element.insertBefore( when, descriptionField.element );
 
+	// Los campos que dependen del tipo esperan a que se elija uno (H-410). Al editar ya hay tipo.
+	const details = [ titleField.element, when, dateField.element, timeField.element, descriptionField.element, mediaField.element ];
+	/** Muestra los campos que siguen al tipo. Una vez visibles no se vuelven a ocultar. */
+	function showDetails() {
+		details.forEach( ( element ) => {
+			element.hidden = false;
+		} );
+	}
+	details.forEach( ( element ) => {
+		element.hidden = isNew;
+	} );
+
 	renderPreview();
 	updatePastNotice();
 
@@ -177,6 +213,17 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 				cancelLabel: __( 'Seguir editando', 'eventos-probolsas' ),
 			} ),
 	} );
+
+	// Un archivo soltado fuera de la zona del adjunto no debe abrirse en la pestaña: se perdería el formulario.
+	const keepFileDrops = ( dragEvent ) => {
+		// La zona del adjunto ya lo atendió (y marcó «copiar»); aquí solo el resto del panel.
+		if ( ! dragEvent.defaultPrevented && [ ...( dragEvent.dataTransfer?.types ?? [] ) ].includes( 'Files' ) ) {
+			dragEvent.preventDefault();
+			dragEvent.dataTransfer.dropEffect = 'none';
+		}
+	};
+	drawer.element.addEventListener( 'dragover', keepFileDrops );
+	drawer.element.addEventListener( 'drop', keepFileDrops );
 
 	return drawer;
 }

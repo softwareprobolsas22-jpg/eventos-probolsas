@@ -1,6 +1,13 @@
 # Prueba de aceptación de la v1 (H-404)
 
-> Para el PO, antes de llevar la v1 (2.0.0) a producción (D-14). Se hace en staging o, si no hay staging, en producción después de un respaldo completo (base de datos y `wp-content/uploads`). Entorno esperado: WordPress 7.1.3 con PHP 8.3 (Hostinger).
+> Para el PO, antes de dar por lista la v1 (2.0.0) (D-14). **No hay staging (D-18):** se hace en producción (intranet.probolsas.com, WordPress 7.1.3 con PHP 8.3), en una página de pruebas, después de un respaldo completo (base de datos y `wp-content/uploads`).
+
+## 0. Antes de empezar (producción)
+
+- [ ] Respaldo completo en Hostinger (hPanel → Copias de seguridad) o con el plugin de respaldos del sitio, y anotar la fecha y hora.
+- [ ] Crear una página **«Pruebas eventos»** (sin agregarla al menú) para los shortcodes. Como el calendario solo se ve con sesión (D-1), un visitante solo vería el aviso de inicio de sesión.
+- [ ] Usar títulos que se reconozcan como prueba (por ejemplo, «PRUEBA – Comité»), para borrarlos al terminar.
+- [ ] Al terminar: borrar los eventos y la página de prueba; dejar «Borrar todos los datos al desinstalar» **desactivado**.
 
 **Paquete:** el `.zip` lo arma el CI en cada push (trabajo «Paquete de release», artefacto `eventos-probolsas-zip`) o localmente con `npm run package` → `build/eventos-probolsas-2.0.0.zip`. Contiene solo lo que WordPress necesita (PHP, plantillas, configuración y `assets/dist` compilado); nada de pruebas, fuentes ni herramientas de desarrollo.
 
@@ -52,7 +59,7 @@ Marca cada casilla; si algo falla, anota el paso, lo que esperabas y lo que pas�
 
 ## 6. Desinstalación (D-16)
 
-> Hacer esto en staging, no en producción.
+> En producción solo se puede probar **antes de cargar los eventos reales** (el plugin es nuevo y empieza vacío). Si ya hay eventos reales, omite esta sección: las pruebas de integración del CI ya cubren los dos casos en WordPress 7.1.3.
 
 - [ ] Con «Borrar todos los datos al desinstalar» **desactivado**: desactivar y borrar el plugin, volver a instalarlo y activarlo → los eventos y tipos siguen ahí.
 - [ ] Con la casilla **activada**: desinstalar → al reinstalar no hay eventos y aparecen solo los 4 tipos iniciales.

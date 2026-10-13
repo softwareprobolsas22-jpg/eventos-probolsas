@@ -78,10 +78,84 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 		public function __construct( private array $params = [], private string $route = '' ) {}
 
 		/**
+		 * Método HTTP.
+		 *
+		 * @var string
+		 */
+		private string $method = 'GET';
+
+		/**
+		 * Cabeceras, con el nombre normalizado como WordPress (minúsculas y `_` en lugar de `-`).
+		 *
+		 * @var array<string, string>
+		 */
+		private array $headers = [];
+
+		/**
+		 * Archivos recibidos ($_FILES).
+		 *
+		 * @var array<string, mixed>
+		 */
+		private array $files = [];
+
+		/**
 		 * Ruta pedida.
 		 */
 		public function get_route(): string {
 			return $this->route;
+		}
+
+		/**
+		 * Método HTTP.
+		 */
+		public function get_method(): string {
+			return $this->method;
+		}
+
+		/**
+		 * Cambia el método HTTP.
+		 *
+		 * @param string $method Método.
+		 */
+		public function set_method( string $method ): void {
+			$this->method = strtoupper( $method );
+		}
+
+		/**
+		 * Una cabecera, o null si no viene.
+		 *
+		 * @param string $key Nombre.
+		 */
+		public function get_header( string $key ): ?string {
+			return $this->headers[ str_replace( '-', '_', strtolower( $key ) ) ] ?? null;
+		}
+
+		/**
+		 * Cambia una cabecera.
+		 *
+		 * @param string $key   Nombre.
+		 * @param string $value Valor.
+		 */
+		public function set_header( string $key, string $value ): void {
+			$this->headers[ str_replace( '-', '_', strtolower( $key ) ) ] = $value;
+		}
+
+		/**
+		 * Archivos recibidos.
+		 *
+		 * @return array<string, mixed>
+		 */
+		public function get_file_params(): array {
+			return $this->files;
+		}
+
+		/**
+		 * Cambia los archivos recibidos.
+		 *
+		 * @param array<string, mixed> $files Archivos.
+		 */
+		public function set_file_params( array $files ): void {
+			$this->files = $files;
 		}
 
 		/**

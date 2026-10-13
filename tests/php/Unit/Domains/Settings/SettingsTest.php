@@ -13,24 +13,35 @@ use Brain\Monkey\Functions;
 use Mockery;
 use Probolsas\Eventos\Core\Admin\AdminMenu;
 use Probolsas\Eventos\Core\Admin\AdminPage;
+use Probolsas\Eventos\Core\Assets\Assets;
+use Probolsas\Eventos\Core\Config;
 use Probolsas\Eventos\Core\Container;
 use Probolsas\Eventos\Core\Database\Migrator;
 use Probolsas\Eventos\Core\Database\Tables;
+use Probolsas\Eventos\Core\Frontend\Shortcode;
+use Probolsas\Eventos\Core\Frontend\ShortcodeAttribute;
+use Probolsas\Eventos\Core\Frontend\ShortcodeGuide;
+use Probolsas\Eventos\Core\Frontend\ShortcodeRegistry;
 use Probolsas\Eventos\Core\Lifecycle\Uninstaller;
 use Probolsas\Eventos\Core\Lifecycle\UninstallTask;
+use Probolsas\Eventos\Core\PluginContext;
 use Probolsas\Eventos\Core\Security\Capabilities;
 use Probolsas\Eventos\Core\Settings\PluginSettings;
 use Probolsas\Eventos\Core\View\View;
 use Probolsas\Eventos\Domains\Settings\Presentation\SettingsPage;
 use Probolsas\Eventos\Domains\Settings\Presentation\SettingsRestController;
 use Probolsas\Eventos\Domains\Settings\SettingsServiceProvider;
+use Probolsas\Eventos\Shared\Time\DateFormatter;
+use Probolsas\Eventos\Shared\Time\SystemClock;
+use Probolsas\Eventos\Shared\Ui\IconCatalog;
 use Probolsas\Eventos\Tests\Unit\Support\FakeWpdb;
 use Probolsas\Eventos\Tests\Unit\UnitTestCase;
 use WP_Error;
 use WP_REST_Request;
 
 /**
- * «Borrar todos los datos al desinstalar» (H-402, D-16): falso por defecto, su API y el desinstalador.
+ * «Borrar todos los datos al desinstalar» (H-402, D-16): falso por defecto, su API y el desinstalador. La
+ * guía de los shortcodes (H-406).
  *
  * @covers \Probolsas\Eventos\Core\Settings\PluginSettings
  * @covers \Probolsas\Eventos\Core\Lifecycle\Uninstaller
@@ -105,7 +116,7 @@ final class SettingsTest extends UnitTestCase {
 	}
 
 	public function test_the_api_reads_and_saves_the_setting(): void {
-		$controller = new SettingsRestController( new PluginSettings() );
+		$controller = $this->controller();
 
 		$this->assertSame( [ 'delete_data_on_uninstall' => false ], $controller->show()->get_data()['data'] );
 
@@ -140,7 +151,7 @@ final class SettingsTest extends UnitTestCase {
 	 */
 	public function test_the_api_rejects_values_that_are_not_yes_or_no( mixed $value ): void {
 		( new PluginSettings() )->set_delete_data_on_uninstall( true );
-		$controller = new SettingsRestController( new PluginSettings() );
+		$controller = $this->controller();
 
 		$response = $controller->update( new WP_REST_Request( null === $value ? [] : [ 'delete_data_on_uninstall' => $value ] ) );
 
@@ -159,11 +170,12 @@ final class SettingsTest extends UnitTestCase {
 				}
 			}
 		);
-		( new SettingsRestController( new PluginSettings() ) )->register_routes();
-		$this->assertSame( [ 'GET /eventos/v1/settings → can_manage', 'PUT /eventos/v1/settings → can_manage' ], $routes );
+		$this->controller()->register_routes();
+		$this->assertSame( [ 'GET /eventos/v1/settings → can_manage', 'PUT /eventos/v1/settings → can_manage', 'GET /eventos/v1/settings/shortcodes → can_manage' ], $routes );
 
 		$container = new Container();
 		$container->set( PluginSettings::class, static fn(): PluginSettings => new PluginSettings() );
+		$container->set( ShortcodeRegistry::class, fn(): ShortcodeRegistry => $this->registry() );
 		$container->set( View::class, fn(): View => new View( $this->plugin_dir() . 'templates' ) );
 		( new SettingsServiceProvider() )->register( $container );
 		$pages = $container->tagged( AdminMenu::PAGES_TAG, AdminPage::class );
@@ -172,6 +184,55 @@ final class SettingsTest extends UnitTestCase {
 
 		Functions\expect( 'add_action' )->once()->with( 'rest_api_init', Mockery::type( 'array' ) );
 		( new SettingsServiceProvider() )->boot( $container );
+	}
+
+	public function test_the_api_lists_the_guide_of_each_shortcode(): void {
+		$guides = $this->controller()->shortcodes()->get_data()['data'];
+
+		$this->assertSame( [ 'eventos_proximos' ], array_column( $guides, 'tag' ) );
+		$this->assertSame( '[eventos_proximos limite="5"]', $guides[0]['example'] );
+		$this->assertSame(
+			[
+				'name'        => 'tipos',
+				'description' => 'Tipos que se muestran.',
+				'required'    => false,
+				'default'     => 'Todos',
+				'values'      => ShortcodeAttribute::EVENT_TYPES,
+			],
+			$guides[0]['attributes'][0]
+		);
+	}
+
+	/**
+	 * Controlador con los ajustes guardados en memoria y un shortcode de prueba.
+	 */
+	private function controller(): SettingsRestController {
+		return new SettingsRestController( new PluginSettings(), $this->registry() );
+	}
+
+	/**
+	 * Registro con un shortcode de prueba que tiene un atributo `tipos`.
+	 */
+	private function registry(): ShortcodeRegistry {
+		$config    = new Config( [] );
+		$shortcode = new class() implements Shortcode {
+			public function tag(): string {
+				return 'eventos_proximos';
+			}
+
+			public function render( array $atts ): string {
+				return '';
+			}
+
+			public function guide(): ShortcodeGuide {
+				return new ShortcodeGuide( 'Próximos eventos', 'Lista de los eventos que vienen.', '[eventos_proximos limite="5"]', [ new ShortcodeAttribute( 'tipos', 'Tipos que se muestran.', false, 'Todos', ShortcodeAttribute::EVENT_TYPES ) ] );
+			}
+		};
+
+		return new ShortcodeRegistry(
+			[ $shortcode ],
+			new Assets( new PluginContext( '/tmp/eventos-probolsas.php', '/tmp/', 'https://intranet.test/', '0.1.0' ), $config, new IconCatalog( $config ), DateFormatter::from_config( $config, new SystemClock() ) )
+		);
 	}
 
 	/**

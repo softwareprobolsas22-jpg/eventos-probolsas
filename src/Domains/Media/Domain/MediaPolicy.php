@@ -52,7 +52,16 @@ final class MediaPolicy {
 	 * @param Attachment $attachment Adjunto.
 	 */
 	public function allows( Attachment $attachment ): bool {
-		return in_array( strtolower( $attachment->mime ), $this->allowed_mimes, true );
+		return $this->allows_mime( $attachment->mime );
+	}
+
+	/**
+	 * Indica si un tipo MIME está permitido.
+	 *
+	 * @param string $mime Tipo MIME.
+	 */
+	public function allows_mime( string $mime ): bool {
+		return in_array( strtolower( $mime ), $this->allowed_mimes, true );
 	}
 
 	/**

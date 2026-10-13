@@ -148,6 +148,19 @@ describe( 'createApi().upload', () => {
 		vi.unstubAllGlobals();
 	} );
 
+	it( 'sube a una dirección completa de WordPress con cabeceras propias y sin el sobre data (H-411)', async () => {
+		vi.stubGlobal( 'XMLHttpRequest', FakeXhr );
+		const pending = createApi( config ).upload( 'https://intranet.test/wp-json/wp/v2/media', file, { headers: { 'X-Eventos-Upload': 'event-attachment' }, envelope: false } );
+		const xhr = FakeXhr.last;
+
+		expect( xhr.url ).toBe( 'https://intranet.test/wp-json/wp/v2/media' );
+		expect( xhr.headers ).toMatchObject( { 'X-WP-Nonce': 'nonce-123', 'X-Eventos-Upload': 'event-attachment' } );
+
+		xhr.respond( 201, { id: 77, mime_type: 'application/pdf' } );
+		await expect( pending ).resolves.toEqual( { id: 77, mime_type: 'application/pdf' } );
+		vi.unstubAllGlobals();
+	} );
+
 	it( 'convierte un 422 en ApiError con los errores del campo file', async () => {
 		vi.stubGlobal( 'XMLHttpRequest', FakeXhr );
 		const notify = vi.fn();

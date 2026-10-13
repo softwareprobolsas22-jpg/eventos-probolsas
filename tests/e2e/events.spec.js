@@ -17,8 +17,11 @@ test.describe( 'Eventos', () => {
 		// Crear.
 		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
 		const panel = drawer( page );
-		await panel.getByLabel( 'Título' ).fill( title );
+		// Formulario progresivo (H-410): sin tipo solo se ve ese campo.
+		await expect( panel.getByLabel( 'Título' ) ).toBeHidden();
 		await panel.getByLabel( 'Tipo' ).selectOption( { label: 'Reuniones laborales' } );
+		await expect( panel.getByRole( 'group', { name: 'Adjunto (opcional)' } ) ).toBeVisible();
+		await panel.getByLabel( 'Título' ).fill( title );
 		await panel.getByLabel( 'Fecha' ).fill( '2026-10-07' );
 		await panel.getByLabel( 'Hora' ).fill( '09:30' );
 		await panel.getByRole( 'button', { name: 'Crear evento' } ).click();
@@ -60,8 +63,8 @@ test.describe( 'Eventos', () => {
 
 		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
 		const form = drawer( page );
-		await form.getByLabel( 'Título' ).fill( title );
 		await form.getByLabel( 'Tipo' ).selectOption( { label: 'Reuniones laborales' } );
+		await form.getByLabel( 'Título' ).fill( title );
 		await form.getByLabel( 'Fecha' ).fill( '2026-10-08' );
 		await form.getByLabel( 'Descripción' ).fill( 'Revisión de indicadores.\nTraer el informe.' );
 		await form.getByRole( 'button', { name: 'Crear evento' } ).click();
@@ -90,8 +93,8 @@ test.describe( 'Eventos', () => {
 
 		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
 		const panel = drawer( page );
-		await panel.getByLabel( 'Título' ).fill( title );
 		await panel.getByLabel( 'Tipo' ).selectOption( { label: 'Cumpleaños' } );
+		await panel.getByLabel( 'Título' ).fill( title );
 
 		// Cumpleaños exige adjunto: sin él no se envía.
 		await panel.getByRole( 'button', { name: 'Crear evento' } ).click();
@@ -116,5 +119,55 @@ test.describe( 'Eventos', () => {
 		await page.getByLabel( 'Buscar' ).fill( title );
 		const row = page.locator( 'tbody tr', { hasText: title } );
 		await expect( row.locator( '.ep-attachment-kind[data-ep-tooltip="Imagen"]' ) ).toHaveCount( 1 );
+	} );
+
+	test( 'soltar un archivo en el adjunto lo sube a la Biblioteca de Medios; lo que no es imagen ni PDF no se guarda (H-411)', async ( { page } ) => {
+		const title = unique( 'Cumpleaños soltado E2E' );
+		await openScreen( page, 'eventos-probolsas' );
+		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
+		const panel = drawer( page );
+		await panel.getByLabel( 'Tipo' ).selectOption( { label: 'Cumpleaños' } );
+		await panel.getByLabel( 'Título' ).fill( title );
+		const zone = panel.locator( '.ep-media-field__dropzone' );
+
+		/**
+		 * Suelta un archivo en la zona del adjunto, como al arrastrarlo desde el equipo.
+		 *
+		 * @param {string} name Nombre.
+		 * @param {Buffer} contents Contenido.
+		 * @param {string} mime Tipo que informa el navegador.
+		 */
+		const dropFile = async ( name, contents, mime ) => {
+			const dataTransfer = await page.evaluateHandle(
+				( file ) => {
+					const transfer = new globalThis.DataTransfer();
+					const bytes = Uint8Array.from( atob( file.base64 ), ( char ) => char.charCodeAt( 0 ) );
+					transfer.items.add( new File( [ bytes ], file.name, { type: file.mime } ) );
+					return transfer;
+				},
+				{ name, base64: contents.toString( 'base64' ), mime }
+			);
+			await zone.dispatchEvent( 'drop', { dataTransfer } );
+		};
+
+		// Un ejecutable que se hace pasar por PDF: el servidor lo rechaza antes de guardarlo (D-4).
+		const libraryCount = () =>
+			page.evaluate( async () => {
+				const { epConfig } = globalThis;
+				const url = new URL( epConfig.media.upload_url, globalThis.location.href );
+				url.searchParams.set( 'per_page', '1' );
+				return ( await fetch( url, { headers: { 'X-WP-Nonce': epConfig.restNonce } } ) ).headers.get( 'X-WP-Total' );
+			} );
+		const before = await libraryCount();
+		await dropFile( 'manual.pdf', Buffer.from( `MZ${ '\0'.repeat( 62 ) }This program cannot be run in DOS mode.` ), 'application/pdf' );
+		await expect( panel.getByText( 'El archivo debe ser una imagen o un PDF.' ) ).toBeVisible();
+		expect( await libraryCount() ).toBe( before );
+
+		// Una imagen: se sube, se ve en la vista previa y queda como adjunto del evento.
+		await dropFile( 'foto-soltada-e2e.png', PNG, 'image/png' );
+		await expect( panel.locator( '.ep-media-field__name' ) ).toContainText( 'foto-soltada-e2e' );
+		await expect( panel.getByText( 'El archivo debe ser una imagen o un PDF.' ) ).toBeHidden();
+		await panel.getByRole( 'button', { name: 'Crear evento' } ).click();
+		await expect( toastWith( page, `Evento «${ title }» creado.` ) ).toBeVisible();
 	} );
 } );

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { suspendModal } from '../../../assets/src/js/core/dom.js';
-import { createMediaField, fromWpAttachment, openMediaLibrary } from '../../../assets/src/js/ui/media-field.js';
+import { createMediaField, fromRestAttachment, fromWpAttachment, openMediaLibrary } from '../../../assets/src/js/ui/media-field.js';
 
 const PHOTO = { id: 315, mime: 'image/jpeg', url: 'https://intranet.test/uploads/ana.jpg', thumbnail_url: 'https://intranet.test/uploads/ana-150x150.jpg', filename: 'ana.jpg', title: 'ana' };
 const PDF = { id: 316, mime: 'application/pdf', url: 'https://intranet.test/uploads/acta.pdf', thumbnail_url: null, filename: 'acta.pdf', title: 'acta' };
@@ -88,12 +88,17 @@ describe( 'createMediaField', () => {
 		const field = build( { required: true } );
 		const error = field.element.querySelector( '.ep-field__error' );
 
+		const optional = field.element.querySelector( '.ep-field__optional' );
+
 		expect( field.element.querySelector( '.ep-field__required' ).hidden ).toBe( false );
+		expect( optional.hidden ).toBe( true );
 		expect( field.validate() ).toBe( 'Este tipo de evento requiere una imagen o un PDF.' );
 		expect( error.hidden ).toBe( false );
 
 		field.setRequired( false );
 		expect( field.element.querySelector( '.ep-field__required' ).hidden ).toBe( true );
+		expect( optional.hidden ).toBe( false );
+		expect( optional.textContent ).toBe( ' (opcional)' );
 		expect( error.hidden ).toBe( true );
 	} );
 
@@ -192,5 +197,142 @@ describe( 'suspendModal', () => {
 		await suspendModal( anchor, async () => dialog.remove() );
 
 		expect( dialog.isConnected ).toBe( false );
+	} );
+} );
+
+describe( 'createMediaField: arrastrar y soltar (H-411)', () => {
+	const pdfFile = ( size = 2048 ) => new File( [ 'x'.repeat( size ) ], 'acta.pdf', { type: 'application/pdf' } );
+
+	/**
+	 * Evento de arrastre con archivos.
+	 *
+	 * @param {string} type Tipo de evento.
+	 * @param {File[]} files Archivos.
+	 * @returns {Event} Evento.
+	 */
+	function dragEvent( type, files = [] ) {
+		const event = new Event( type, { bubbles: true, cancelable: true } );
+		Object.defineProperty( event, 'dataTransfer', { value: { types: [ 'Files' ], files, dropEffect: 'none' } } );
+		return event;
+	}
+
+	/**
+	 * Subida que se resuelve cuando la prueba lo indica.
+	 *
+	 * @returns {{ uploadFile: Function, finish: (value: Object) => void, fail: (error: Error) => void, progress: (percent: number) => void }} Control.
+	 */
+	function controlledUpload() {
+		const control = {};
+		control.uploadFile = vi.fn(
+			( file, onProgress ) =>
+				new Promise( ( resolve, reject ) => {
+					Object.assign( control, { finish: resolve, fail: reject, progress: onProgress } );
+				} )
+		);
+		return control;
+	}
+
+	it( 'sin uploadFile no acepta archivos soltados y conserva la ayuda de la biblioteca', () => {
+		const field = build();
+
+		expect( field.element.querySelector( '.ep-media-field__dropzone' ) ).toBeNull();
+		expect( field.element.querySelector( '.ep-field__hint' ).textContent ).toContain( 'de la Biblioteca de Medios' );
+	} );
+
+	it( 'soltar un PDF lo sube con progreso, muestra la vista previa y confirma con un toast', async () => {
+		const upload = controlledUpload();
+		const field = build( { uploadFile: upload.uploadFile, maxUploadBytes: 10 * 1024 * 1024 } );
+		const zone = field.element.querySelector( '.ep-media-field__dropzone' );
+		const progress = field.element.querySelector( '.ep-media-field__progress' );
+
+		expect( zone.textContent ).toContain( 'Suelta aquí una imagen o un PDF' );
+		expect( field.element.querySelector( '.ep-field__hint' ).textContent ).toContain( 'Arrastra aquí' );
+
+		const over = dragEvent( 'dragover' );
+		zone.dispatchEvent( over );
+		expect( over.defaultPrevented ).toBe( true );
+		expect( zone.classList.contains( 'is-dragover' ) ).toBe( true );
+
+		const file = pdfFile();
+		zone.dispatchEvent( dragEvent( 'drop', [ file ] ) );
+		expect( zone.classList.contains( 'is-dragover' ) ).toBe( false );
+		expect( upload.uploadFile ).toHaveBeenCalledWith( file, expect.any( Function ) );
+		expect( progress.hidden ).toBe( false );
+		expect( buttonByText( field, 'Elegir archivo' ).disabled ).toBe( true );
+		expect( field.validate() ).toBe( 'Espera a que termine de subir el archivo.' );
+
+		upload.progress( 40 );
+		expect( progress.textContent ).toContain( 'Subiendo «acta.pdf»… 40 %' );
+		expect( progress.querySelector( '[role="progressbar"]' ).getAttribute( 'aria-valuenow' ) ).toBe( '40' );
+
+		upload.finish( PDF );
+		await flush();
+
+		expect( progress.hidden ).toBe( true );
+		expect( field.getValue() ).toBe( '316' );
+		expect( field.element.querySelector( '.ep-media-field__name' ).textContent ).toBe( 'acta.pdf' );
+		expect( field.validate() ).toBeNull();
+		expect( document.querySelector( '.notyf' ).textContent ).toContain( 'Archivo «acta.pdf» subido a la Biblioteca de Medios.' );
+	} );
+
+	it( 'valida antes de subir: tipo, tamaño y un solo archivo (D-4: no se sube lo que se rechazaría)', async () => {
+		const upload = controlledUpload();
+		const field = build( { uploadFile: upload.uploadFile, maxUploadBytes: 1024 * 1024 } );
+		const error = () => field.element.querySelector( '.ep-field__error' );
+
+		await field.uploadDropped( [ new File( [ 'texto' ], 'notas.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' } ) ] );
+		expect( error().textContent ).toBe( 'El archivo debe ser una imagen o un PDF.' );
+
+		await field.uploadDropped( [ pdfFile( 2 * 1024 * 1024 ) ] );
+		expect( error().textContent ).toBe( 'El archivo supera el tamaño máximo permitido (1 MB).' );
+
+		await field.uploadDropped( [ pdfFile(), pdfFile() ] );
+		expect( error().textContent ).toBe( 'Suelta un solo archivo.' );
+
+		expect( upload.uploadFile ).not.toHaveBeenCalled();
+		expect( field.getValue() ).toBe( '' );
+	} );
+
+	it( 'si el servidor rechaza el archivo, muestra su mensaje y conserva el adjunto anterior', async () => {
+		const upload = controlledUpload();
+		const field = build( { value: PHOTO, uploadFile: upload.uploadFile } );
+
+		const pending = field.uploadDropped( [ pdfFile() ] );
+		upload.fail( Object.assign( new Error( 'Revisa el archivo.' ), { fieldErrors: { file: [ 'La extensión del archivo no corresponde a su contenido.' ] } } ) );
+		await pending;
+
+		expect( field.element.querySelector( '.ep-field__error' ).textContent ).toBe( 'La extensión del archivo no corresponde a su contenido.' );
+		expect( field.getValue() ).toBe( '315' );
+		expect( buttonByText( field, 'Cambiar archivo' ).disabled ).toBe( false );
+		expect( field.element.getAttribute( 'aria-busy' ) ).toBe( 'false' );
+	} );
+
+	it( 'ignora lo que no son archivos (texto o enlaces arrastrados)', () => {
+		const upload = controlledUpload();
+		const field = build( { uploadFile: upload.uploadFile } );
+		const zone = field.element.querySelector( '.ep-media-field__dropzone' );
+		const text = new Event( 'drop', { bubbles: true, cancelable: true } );
+		Object.defineProperty( text, 'dataTransfer', { value: { types: [ 'text/plain' ], files: [] } } );
+
+		zone.dispatchEvent( text );
+
+		expect( text.defaultPrevented ).toBe( false );
+		expect( upload.uploadFile ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'fromRestAttachment', () => {
+	it( 'convierte la respuesta de wp/v2/media en el adjunto del plugin', () => {
+		expect(
+			fromRestAttachment( {
+				id: 88,
+				mime_type: 'image/png',
+				source_url: 'https://intranet.test/uploads/foto%20ana.png',
+				title: { raw: 'foto ana', rendered: 'foto ana' },
+				media_details: { sizes: { thumbnail: { source_url: 'https://intranet.test/uploads/foto-ana-150x150.png' } } },
+			} )
+		).toEqual( { id: 88, mime: 'image/png', url: 'https://intranet.test/uploads/foto%20ana.png', thumbnail_url: 'https://intranet.test/uploads/foto-ana-150x150.png', filename: 'foto ana.png', title: 'foto ana' } );
+
+		expect( fromRestAttachment( { id: 89, mime_type: 'application/pdf', source_url: 'https://intranet.test/uploads/acta.pdf', media_details: {} } ) ).toMatchObject( { thumbnail_url: null, filename: 'acta.pdf', title: '' } );
 	} );
 } );

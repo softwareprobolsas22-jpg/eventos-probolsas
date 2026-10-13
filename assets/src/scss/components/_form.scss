@@ -17,6 +17,12 @@
 		color: var(--ep-color-error);
 	}
 
+	// «(opcional)» junto a la etiqueta de un campo que el tipo de evento no exige (D-19).
+	&__optional {
+		font-weight: var(--ep-font-weight-regular);
+		color: var(--ep-color-text-muted);
+	}
+
 	&__meta {
 		display: flex;
 		gap: var(--ep-space-3);
@@ -155,6 +161,9 @@
 // y perilla dibujadas. La perilla se mueve con transform (R-12).
 .ep-switch {
 	&__label {
+		// Ancla la casilla oculta dentro de la etiqueta: sin esto quedaba arriba del panel y, al recibir el
+		// foco con el clic, el navegador desplazaba el panel hasta ella (H-407).
+		position: relative;
 		display: inline-flex;
 		gap: var(--ep-space-3);
 		align-items: center;
@@ -168,6 +177,8 @@
 
 	&__input {
 		position: absolute;
+		top: 50%;
+		left: 0;
 		width: 1px;
 		height: 1px;
 		margin: 0;
