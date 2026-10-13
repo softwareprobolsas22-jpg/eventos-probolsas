@@ -6,9 +6,9 @@
       "_runtime-B1nseNsq.js"
     ]
   },
-  "_bootstrap-CoLDHkJW.css": {
-    "file": "css/bootstrap-CoLDHkJW.css",
-    "src": "_bootstrap-CoLDHkJW.css"
+  "_bootstrap-DaMGmPHj.css": {
+    "file": "css/bootstrap-DaMGmPHj.css",
+    "src": "_bootstrap-DaMGmPHj.css"
   },
   "_button-JjcB3iJR.js": {
     "file": "js/chunks/button-JjcB3iJR.js",
@@ -85,7 +85,7 @@
     ],
     "css": [
       "css/admin.css",
-      "css/bootstrap-CoLDHkJW.css"
+      "css/bootstrap-DaMGmPHj.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -106,7 +106,7 @@
     ],
     "css": [
       "css/public.css",
-      "css/bootstrap-CoLDHkJW.css"
+      "css/bootstrap-DaMGmPHj.css"
     ],
     "assets": [
       "fonts/fa-solid-900.woff2"
@@ -159,7 +159,7 @@
     ]
   },
   "assets/src/js/screens/events.js": {
-    "file": "js/chunks/events-BbKurYyN.js",
+    "file": "js/chunks/events-DCMpQWHF.js",
     "name": "events",
     "src": "assets/src/js/screens/events.js",
     "isDynamicEntry": true,
@@ -174,7 +174,7 @@
     ]
   },
   "assets/src/js/screens/settings.js": {
-    "file": "js/chunks/settings-D0htUwWx.js",
+    "file": "js/chunks/settings-BAKPfrcB.js",
     "name": "settings",
     "src": "assets/src/js/screens/settings.js",
     "isDynamicEntry": true,

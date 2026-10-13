@@ -88,12 +88,17 @@ describe( 'createMediaField', () => {
 		const field = build( { required: true } );
 		const error = field.element.querySelector( '.ep-field__error' );
 
+		const optional = field.element.querySelector( '.ep-field__optional' );
+
 		expect( field.element.querySelector( '.ep-field__required' ).hidden ).toBe( false );
+		expect( optional.hidden ).toBe( true );
 		expect( field.validate() ).toBe( 'Este tipo de evento requiere una imagen o un PDF.' );
 		expect( error.hidden ).toBe( false );
 
 		field.setRequired( false );
 		expect( field.element.querySelector( '.ep-field__required' ).hidden ).toBe( true );
+		expect( optional.hidden ).toBe( false );
+		expect( optional.textContent ).toBe( ' (opcional)' );
 		expect( error.hidden ).toBe( true );
 	} );
 

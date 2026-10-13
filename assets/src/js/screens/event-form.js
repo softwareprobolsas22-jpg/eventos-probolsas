@@ -2,7 +2,9 @@
  * Formulario de evento en panel lateral (H-204): crear y editar con validación en tiempo real (R-24)
  * a partir de `epConfig.rules.event`, el bloque «Cuándo» y el adjunto de la Biblioteca de Medios (R-09).
  *
- * - El tipo define si el adjunto es obligatorio (`requires_attachment`).
+ * - Formulario progresivo (H-410): al crear, primero se elige el tipo y después aparecen los demás campos.
+ *   El tipo define si el adjunto es obligatorio (`requires_attachment`): «Adjunto *» o «Adjunto
+ *   (opcional)» (D-19). Los campos ocultos no se validan (createForm).
  * - Una fecha pasada se permite, con un aviso que no bloquea (D-3). «Hoy» es el del servidor (R-08).
  * - Sin hora, el evento dura todo el día. El bloque «Cuándo» deja el lugar para la hora de fin y los
  *   eventos de varios días (D-7, v1.1).
@@ -58,8 +60,13 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 		options: types.map( ( type ) => ( { value: type.id, label: type.name } ) ),
 		value: initialType?.id ?? '',
 		placeholder: __( 'Selecciona un tipo', 'eventos-probolsas' ),
+		hint: isNew ? __( 'Al elegirlo aparecen los demás datos del evento.', 'eventos-probolsas' ) : undefined,
 		onInput: ( value ) => {
-			mediaField.setRequired( Boolean( typeOf( value )?.requires_attachment ) );
+			const type = typeOf( value );
+			mediaField.setRequired( Boolean( type?.requires_attachment ) );
+			if ( type ) {
+				showDetails();
+			}
 			renderPreview();
 		},
 	} );
@@ -114,7 +121,7 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 	}
 
 	const form = createForm( {
-		fields: [ titleField, typeField, dateField, timeField, descriptionField, mediaField ],
+		fields: [ typeField, titleField, dateField, timeField, descriptionField, mediaField ],
 		onSubmit: async ( values ) => {
 			try {
 				const saved = isNew ? await api.post( 'events', values, { silent: true } ) : await api.put( `events/${ event.id }`, values, { silent: true } );
@@ -147,6 +154,18 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 		pastNotice
 	);
 	form.element.insertBefore( when, descriptionField.element );
+
+	// Los campos que dependen del tipo esperan a que se elija uno (H-410). Al editar ya hay tipo.
+	const details = [ titleField.element, when, dateField.element, timeField.element, descriptionField.element, mediaField.element ];
+	/** Muestra los campos que siguen al tipo. Una vez visibles no se vuelven a ocultar. */
+	function showDetails() {
+		details.forEach( ( element ) => {
+			element.hidden = false;
+		} );
+	}
+	details.forEach( ( element ) => {
+		element.hidden = isNew;
+	} );
 
 	renderPreview();
 	updatePastNotice();

@@ -17,8 +17,11 @@ test.describe( 'Eventos', () => {
 		// Crear.
 		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
 		const panel = drawer( page );
-		await panel.getByLabel( 'Título' ).fill( title );
+		// Formulario progresivo (H-410): sin tipo solo se ve ese campo.
+		await expect( panel.getByLabel( 'Título' ) ).toBeHidden();
 		await panel.getByLabel( 'Tipo' ).selectOption( { label: 'Reuniones laborales' } );
+		await expect( panel.getByRole( 'group', { name: 'Adjunto (opcional)' } ) ).toBeVisible();
+		await panel.getByLabel( 'Título' ).fill( title );
 		await panel.getByLabel( 'Fecha' ).fill( '2026-10-07' );
 		await panel.getByLabel( 'Hora' ).fill( '09:30' );
 		await panel.getByRole( 'button', { name: 'Crear evento' } ).click();
@@ -60,8 +63,8 @@ test.describe( 'Eventos', () => {
 
 		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
 		const form = drawer( page );
-		await form.getByLabel( 'Título' ).fill( title );
 		await form.getByLabel( 'Tipo' ).selectOption( { label: 'Reuniones laborales' } );
+		await form.getByLabel( 'Título' ).fill( title );
 		await form.getByLabel( 'Fecha' ).fill( '2026-10-08' );
 		await form.getByLabel( 'Descripción' ).fill( 'Revisión de indicadores.\nTraer el informe.' );
 		await form.getByRole( 'button', { name: 'Crear evento' } ).click();
@@ -90,8 +93,8 @@ test.describe( 'Eventos', () => {
 
 		await page.getByRole( 'button', { name: 'Añadir evento' } ).click();
 		const panel = drawer( page );
-		await panel.getByLabel( 'Título' ).fill( title );
 		await panel.getByLabel( 'Tipo' ).selectOption( { label: 'Cumpleaños' } );
+		await panel.getByLabel( 'Título' ).fill( title );
 
 		// Cumpleaños exige adjunto: sin él no se envía.
 		await panel.getByRole( 'button', { name: 'Crear evento' } ).click();
