@@ -18,7 +18,16 @@
 **Lote 2:** H-406 y H-410, con D-19 — ✅ aprobado ([informe](../qa/2026-10-13-ajustes-aceptacion-2.md)), 6 pts.
 **Lote 3:** H-411 — ✅ aprobado ([informe](../qa/2026-10-13-H-411.md)), 5 pts. La subida usa `wp/v2/media` con una revisión previa en el servidor ([contrato](../api/media.md)).
 
-**EP-4b completa (16/16 pts).** Sigue la aceptación del PO con la [lista de aceptación](../qa/aceptacion-v1.md).
+**Lote 4** (observaciones del PO al probar los lotes 2 y 3 en producción, 2026-10-13):
+
+| ID | Observación del PO | Rol | Pts |
+|---|---|---|---|
+| H-412 | La «Descripción» del formulario de evento no tiene un ejemplo (placeholder) | F | 0,5 |
+| H-413 | «Ajustes» no ocupa todo el ancho: el contenedor tenía `max-width: 48rem` | F | 0,5 |
+
+✅ aprobado ([informe](../qa/2026-10-13-ajustes-aceptacion-4.md)), 1 pt.
+
+**EP-4b completa (17/17 pts).** Sigue la aceptación del PO con la [lista de aceptación](../qa/aceptacion-v1.md).
 
 ## Reglas que aplican
 

@@ -94,6 +94,7 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 		type: 'textarea',
 		...ruleOptions( rules.description ),
 		value: event?.description ?? '',
+		placeholder: __( 'Ej.: Nos reunimos en la sala de juntas del segundo piso. Habrá torta y café.', 'eventos-probolsas' ),
 		hint: __( 'Opcional.', 'eventos-probolsas' ),
 	} );
 

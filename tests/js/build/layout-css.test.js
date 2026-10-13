@@ -44,6 +44,14 @@ describe( 'reglas transversales en el CSS compilado', () => {
 		expect( lastValue( source, '.ep-app .ep-switch__input', 'position' ) ).toBe( 'absolute' );
 	} );
 
+	it( '«Ajustes» ocupa todo el ancho del área de contenido, como las demás pantallas (observación del PO)', () => {
+		const source = css( 'admin' );
+
+		expect( lastValue( source, '.ep-app .ep-settings-screen', 'display' ) ).toBe( 'grid' );
+		expect( lastValue( source, '.ep-app .ep-settings-screen', 'max-width' ) ).toBeUndefined();
+		expect( lastValue( source, '.ep-app .ep-settings', 'max-width' ) ).toBeUndefined();
+	} );
+
 	it( 'en móvil (< 576 px) la paginación queda en anterior / «Página x de y» / siguiente, con botones de 44 px (R-23)', () => {
 		const source = css( 'admin' );
 		const mobile = /@media not \(min-width:576px\)\{([^@]*)\}/.exec( source.slice( source.indexOf( '.ep-pagination__compact{' ) ) );
