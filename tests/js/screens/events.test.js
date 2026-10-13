@@ -416,7 +416,7 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 		const visible = () => [ ...drawer().querySelectorAll( 'form > *' ) ].filter( ( element ) => ! element.hidden );
 
 		expect( visible() ).toEqual( [ field( 'type_id' ).closest( '.ep-field' ) ] );
-		expect( drawer().querySelector( 'form .ep-field' ).contains( field( 'type_id' ) ) ).toBe( true );
+		expect( document.activeElement ).toBe( field( 'type_id' ) );
 		expect( field( 'type_id' ).closest( '.ep-field' ).textContent ).toContain( 'Al elegirlo aparecen los demás datos del evento.' );
 
 		type( 'type_id', '2', 'change' );
