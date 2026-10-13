@@ -22,6 +22,6 @@
 
 | ID | Sev. | Observación | Acción |
 |---|---|---|---|
-| QA-065 | Media | El CI depende de descargas anónimas de Docker Hub (imágenes de wp-env) y los runners comparten IP: con el límite agotado, la integración y el navegador no arrancan. El espejo `mirror.gcr.io` (`bf69ef6`) no lo evitó. | Abierto. Solución recomendada: `docker/login-action` con un token de Docker Hub guardado como secreto del repositorio (el PO debe crearlo). Mientras tanto, reejecutar los trabajos fallidos |
+| QA-065 | Media | El CI depende de descargas anónimas de Docker Hub (imágenes de wp-env) y los runners comparten IP: con el límite agotado, la integración y el navegador no arrancan. El espejo `mirror.gcr.io` (`bf69ef6`) no lo evitó. | ✅ Cerrado el 2026-10-13 (`feature/QA-065-docker-login`): `docker/login-action` con el token de Docker Hub guardado como secreto del repositorio; run `38427773494` en verde con el login ejecutado |
 
 **Veredicto:** ✅ aprobado. Se integra en `develop`.
