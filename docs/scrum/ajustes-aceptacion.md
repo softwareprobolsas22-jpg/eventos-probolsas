@@ -11,11 +11,11 @@
 | H-407 | En el panel de «Nuevo tipo», al activar «Requiere adjunto» el contenido salta hacia arriba | **Defecto:** el `input` del interruptor es `position: absolute` y su etiqueta no es `position: relative`; queda anclado arriba del panel y, al recibir el foco con el clic, el navegador desplaza el panel hasta él | ✅ | F | 1 | 1 |
 | H-408 | En la tabla de tipos, cambiar «Orden» por «Descripción» truncada con tooltip | El orden ya se ve en el orden de las filas y se cambia con «Ordenar»; la descripción ya llega en la API. Sigue en 5 columnas (R-19) | ✅ | F | 1 | 1 |
 | H-409 | Filtro de fechas: «Desde» y «Hasta» como campos separados, tres campos por fila en escritorio, responsive | El rango era un solo grupo de dos columnas. Se separan en dos campos de la grilla y conservan el límite mutuo (uno no puede quedar después del otro) | ✅ | F | 2 | 1 |
-| H-410 | El formulario de evento muestra todos los campos, incluido el adjunto, antes de elegir el tipo | Hoy el formulario es estático y solo marca el adjunto como obligatorio al elegir un tipo que lo exige. Se puede mostrar primero el tipo y después el resto según el tipo. **Decisión del PO pendiente:** en un tipo que no exige adjunto, ¿el adjunto se ofrece como opcional o no se muestra? (el modelo lo permite, R-09) | ✅ con decisión | F | 3 | 2 |
+| H-410 | El formulario de evento muestra todos los campos, incluido el adjunto, antes de elegir el tipo | Hoy el formulario es estático y solo marca el adjunto como obligatorio al elegir un tipo que lo exige. Se puede mostrar primero el tipo y después el resto según el tipo. **D-19:** en un tipo que no exige adjunto, el campo se muestra como «Adjunto (opcional)» | ✅ con decisión | F | 3 | 2 |
 | H-411 | El campo de adjunto con arrastrar y soltar | Hoy se elige en `wp.media` (que ya permite arrastrar dentro de su ventana). Soltar el archivo directamente en el campo exige subirlo a la Biblioteca de Medios (`wp/v2/media`, el gestor necesita `upload_files`), validar imagen o PDF **antes** de guardarlo (D-4: el plugin nunca borra archivos, así que uno rechazado no debe quedar subido), mostrar el progreso y los errores | ✅ más grande | B+F | 5 | 3 |
 
-**Lote 1 (este):** H-405, H-407, H-408 y H-409 — solo Frontend, cortos (5 pts).
-**Lote 2:** H-406 y H-410 (6 pts), con la decisión del PO sobre el adjunto opcional.
+**Lote 1:** H-405, H-407, H-408 y H-409 — ✅ aprobado ([informe](../qa/2026-10-13-ajustes-aceptacion-1.md)), 5 pts.
+**Lote 2 (siguiente):** H-406 y H-410 (6 pts).
 **Lote 3:** H-411 (5 pts).
 
 ## Reglas que aplican

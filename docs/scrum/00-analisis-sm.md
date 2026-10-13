@@ -110,6 +110,7 @@ El plugin legado funcionaba de forma parcial y **no era mantenible ni confiable*
 | D-16 | Desinstalar **conserva los datos por defecto**; la pantalla «Ajustes» tiene la casilla «Borrar todos los datos al desinstalar», desmarcada. | ✅ Cerrada | Opción `eventos_delete_data_on_uninstall` (falsa por defecto); `GET/PUT /settings`; H-402 pasa de 2 a 3 puntos (pantalla). Los archivos de la Biblioteca de Medios nunca se borran (D-4). |
 | D-17 | El **dashboard** son tarjetas arriba de la tabla de **Eventos**; un clic filtra la tabla. | ✅ Cerrada | Sin pantalla nueva; H-206 reutiliza los filtros de H-203. |
 | D-18 | **No hay staging**: la aceptación de la v1 se hace en producción, en una página de pruebas y después de un respaldo completo (2026-10-09). | ✅ Cerrada | `docs/qa/aceptacion-v1.md` con la sección «Antes de empezar»; la desinstalación se prueba solo antes de cargar eventos reales. El `.zip` sale de `main` con `npm run package`. |
+| D-19 | En el formulario de evento (H-410), un tipo que **no** exige adjunto muestra el campo como «Adjunto (opcional)»; uno que lo exige, «Adjunto *» (2026-10-09). | ✅ Cerrada | El formulario muestra los campos después de elegir el tipo. |
 
 ---
 
@@ -402,11 +403,11 @@ Puntos en Fibonacci. **B** = Backend · **F** = Frontend · **Q** = QA.
 ### EP-4b · Ajustes de la aceptación de la v1 ([plan](ajustes-aceptacion.md))
 | ID | Historia | Rama | Pts |
 |---|---|---|---|
-| H-405 | Tarjetas del resumen en varias filas en pantallas pequeñas | F | 1 |
+| H-405 | Tarjetas del resumen en varias filas en pantallas pequeñas  — *✅ lote 1 ([informe](../qa/2026-10-13-ajustes-aceptacion-1.md))* | F | 1 |
 | H-406 | Sección «Shortcodes» en «Ajustes» con su guía (atributos, slugs de los tipos, ejemplo para copiar) | B+F | 3 |
-| H-407 | El interruptor de «Requiere adjunto» desplazaba el panel (defecto) | F | 1 |
-| H-408 | Tabla de tipos: «Descripción» truncada con tooltip en lugar de «Orden» | F | 1 |
-| H-409 | Filtro de fechas en dos campos («Desde», «Hasta»), tres por fila en escritorio | F | 2 |
+| H-407 | El interruptor de «Requiere adjunto» desplazaba el panel (defecto)  — *✅ lote 1* | F | 1 |
+| H-408 | Tabla de tipos: «Descripción» truncada con tooltip en lugar de «Orden»  — *✅ lote 1* | F | 1 |
+| H-409 | Filtro de fechas en dos campos («Desde», «Hasta»), tres por fila en escritorio  — *✅ lote 1* | F | 2 |
 | H-410 | Formulario de evento progresivo: primero el tipo, luego los campos según el tipo | F | 3 |
 | H-411 | Adjunto con arrastrar y soltar (sube a la Biblioteca de Medios y valida antes de guardar) | B+F | 5 |
 
@@ -477,3 +478,4 @@ Con la velocidad del Sprint 1 (27), el PO aprobó pasar H-206 (dashboard) al Spr
 | 2.25 | 2026-10-09 | H-206, H-401 a H-404 aprobadas e integradas: resumen en «Eventos», caché del feed (la integración detectó QA-061), «Ajustes» con conservar datos al desinstalar, auditoría con axe de wp-admin (QA-063) y paquete `.zip` verificado en el CI. Cierre del Sprint 4 (17/17, [informe](../qa/2026-10-09-cierre-sprint-4.md)); la v1 queda lista para la aceptación del PO |
 | 2.26 | 2026-10-09 | PR #5 del Sprint 4 fusionado en `main` (`160cdd5`). D-18: sin staging, la aceptación se hace en producción en una página de pruebas; `.zip` 2.0.0 entregado al PO |
 | 2.27 | 2026-10-09 | Observaciones del PO en la aceptación (producción): EP-4b, H-405 a H-411 ([plan](ajustes-aceptacion.md)); lote 1 (H-405, H-407, H-408, H-409) en curso |
+| 2.28 | 2026-10-13 | Lote 1 de los ajustes (H-405, H-407, H-408, H-409) aprobado e integrado; D-19 (adjunto opcional en H-410); QA-065 abierto (límite de Docker Hub en el CI) |
