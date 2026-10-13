@@ -390,6 +390,7 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 		expect( drawer().querySelector( 'fieldset legend' ).textContent ).toBe( 'Cuándo' );
 		expect( [ ...field( 'type_id' ).options ].map( ( option ) => option.textContent ) ).toEqual( [ 'Selecciona un tipo', 'Cumpleaños', 'Reuniones laborales' ] );
 		expect( field( 'description' ).tagName ).toBe( 'TEXTAREA' );
+		expect( field( 'description' ).placeholder ).toBe( 'Ej.: Nos reunimos en la sala de juntas del segundo piso. Habrá torta y café.' );
 	} );
 
 	it( 'no envía si faltan datos: tipo, título corto y adjunto que el tipo exige', () => {

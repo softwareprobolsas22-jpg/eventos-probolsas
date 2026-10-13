@@ -1,10 +1,10 @@
 // Pantalla «Ajustes» (H-402): una tarjeta por grupo de ajustes y la guía de los shortcodes (H-406).
 @use "../tools/mixins" as m;
 
+// Las tarjetas ocupan todo el ancho del área de contenido, como las demás pantallas.
 .ep-settings-screen {
 	display: grid;
 	gap: var(--ep-space-5);
-	max-width: 48rem;
 }
 
 .ep-settings {
