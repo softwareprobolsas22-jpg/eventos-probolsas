@@ -9,7 +9,6 @@ declare( strict_types=1 );
 
 namespace Probolsas\Eventos\Domains\Media\Infrastructure;
 
-use finfo;
 use Probolsas\Eventos\Domains\Media\Domain\Attachment;
 use Probolsas\Eventos\Domains\Media\Domain\AttachmentGateway;
 use WP_Post;
@@ -43,7 +42,7 @@ final class WpAttachmentGateway implements AttachmentGateway {
 
 		$path      = get_attached_file( $id );
 		$path      = is_string( $path ) && '' !== $path && is_readable( $path ) ? $path : null;
-		$mime      = $this->real_mime( $path ) ?? strtolower( (string) $post->post_mime_type );
+		$mime      = RealMime::of( $path ) ?? strtolower( (string) $post->post_mime_type );
 		$thumbnail = str_starts_with( $mime, 'image/' ) ? wp_get_attachment_image_src( $id, 'thumbnail' ) : false;
 
 		return new Attachment(
@@ -55,20 +54,5 @@ final class WpAttachmentGateway implements AttachmentGateway {
 			wp_basename( $path ?? $url ),
 			null !== $path ? (int) filesize( $path ) : 0
 		);
-	}
-
-	/**
-	 * Tipo MIME según el contenido del archivo, o null si no se puede determinar.
-	 *
-	 * @param string|null $path Ruta del archivo.
-	 */
-	private function real_mime( ?string $path ): ?string {
-		if ( null === $path || ! class_exists( finfo::class ) ) {
-			return null;
-		}
-
-		$mime = ( new finfo( FILEINFO_MIME_TYPE ) )->file( $path );
-
-		return is_string( $mime ) && '' !== $mime ? strtolower( $mime ) : null;
 	}
 }
