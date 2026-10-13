@@ -140,6 +140,8 @@ jobs:
 
   integration:
     name: Integración (wp-env)
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     runs-on: ubuntu-24.04
     needs: [ php ]
     steps:
@@ -160,12 +162,15 @@ jobs:
       - run: npm ci --no-audit --no-fund
 
       # Las imágenes de wp-env (MariaDB, phpMyAdmin, WordPress) vienen de Docker Hub, que limita las
-      # descargas anónimas por IP y los runners comparten IP (QA-065). El espejo público de Google sirve
-      # las mismas imágenes oficiales sin ese límite; si no tiene una, Docker la pide a Docker Hub.
-      - name: Docker con el espejo de Docker Hub
-        run: |
-          echo '{ "registry-mirrors": [ "https://mirror.gcr.io" ] }' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
+      # descargas anónimas por IP, y los runners comparten IP (QA-065). Con la sesión iniciada cuentan
+      # contra la cuenta del equipo (token de solo lectura en los secretos del repositorio). Sin los
+      # secretos (por ejemplo, en un fork) el paso se salta y la descarga sigue siendo anónima.
+      - name: Iniciar sesión en Docker Hub
+        if: env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Iniciar WordPress (wp-env)
         run: npx wp-env start
@@ -182,6 +187,8 @@ jobs:
 
   e2e:
     name: Navegador (Playwright)
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     runs-on: ubuntu-24.04
     needs: [ js ]
     steps:
@@ -199,12 +206,15 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       # Las imágenes de wp-env (MariaDB, phpMyAdmin, WordPress) vienen de Docker Hub, que limita las
-      # descargas anónimas por IP y los runners comparten IP (QA-065). El espejo público de Google sirve
-      # las mismas imágenes oficiales sin ese límite; si no tiene una, Docker la pide a Docker Hub.
-      - name: Docker con el espejo de Docker Hub
-        run: |
-          echo '{ "registry-mirrors": [ "https://mirror.gcr.io" ] }' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
+      # descargas anónimas por IP, y los runners comparten IP (QA-065). Con la sesión iniciada cuentan
+      # contra la cuenta del equipo (token de solo lectura en los secretos del repositorio). Sin los
+      # secretos (por ejemplo, en un fork) el paso se salta y la descarga sigue siendo anónima.
+      - name: Iniciar sesión en Docker Hub
+        if: env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Iniciar WordPress (wp-env)
         run: npx wp-env start
