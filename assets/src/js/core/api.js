@@ -82,12 +82,14 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 	 * Sube un archivo (campo `file`) informando el progreso. Usa XMLHttpRequest porque fetch no
 	 * informa el progreso de subida.
 	 *
-	 * @param {string} path Ruta relativa al namespace.
+	 * @param {string} path Ruta relativa al namespace, o una dirección completa (por ejemplo, `wp/v2/media`
+	 *   de `epConfig.media.upload_url`).
 	 * @param {File} file Archivo.
-	 * @param {{ onProgress?: (percent: number) => void, silent?: boolean }} options Opciones.
-	 * @returns {Promise<unknown>} Valor de `data` de la respuesta.
+	 * @param {{ onProgress?: (percent: number) => void, silent?: boolean, headers?: Record<string, string>, envelope?: boolean }} options Opciones.
+	 *   headers: cabeceras adicionales. envelope: false si la respuesta no viene en `{ data }` (API de WordPress).
+	 * @returns {Promise<unknown>} Valor de `data` de la respuesta (o la respuesta completa sin `envelope`).
 	 */
-	function upload( path, file, { onProgress, silent = false } = {} ) {
+	function upload( path, file, { onProgress, silent = false, headers = {}, envelope = true } = {} ) {
 		return new Promise( ( resolve, reject ) => {
 			const xhr = new XMLHttpRequest();
 			const fail = ( error ) => {
@@ -97,9 +99,10 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 				reject( error );
 			};
 
-			xhr.open( 'POST', restUrl + path.replace( /^\//, '' ) );
+			xhr.open( 'POST', /^https?:\/\//.test( path ) ? path : restUrl + path.replace( /^\//, '' ) );
 			xhr.setRequestHeader( 'X-WP-Nonce', restNonce );
 			xhr.setRequestHeader( 'Accept', 'application/json' );
+			Object.entries( headers ).forEach( ( [ name, value ] ) => xhr.setRequestHeader( name, value ) );
 			xhr.upload.addEventListener( 'progress', ( event ) => {
 				if ( event.lengthComputable ) {
 					onProgress?.( Math.round( ( event.loaded / event.total ) * 100 ) );
@@ -108,7 +111,7 @@ export function createApi( { restUrl, restNonce }, { notify, fetch: fetchImpl = 
 			xhr.addEventListener( 'load', () => {
 				const payload = parseJson( xhr.responseText );
 				if ( xhr.status >= 200 && xhr.status < 300 ) {
-					resolve( payload?.data );
+					resolve( envelope ? payload?.data : payload );
 				} else {
 					fail( toApiError( xhr.status, payload ) );
 				}

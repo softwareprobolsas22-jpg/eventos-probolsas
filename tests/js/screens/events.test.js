@@ -138,7 +138,7 @@ function dashboard() {
 	};
 }
 
-async function mountWith( events, overrides = {} ) {
+async function mountWith( events, overrides = {}, configOverrides = {} ) {
 	document.body.innerHTML = `
 		<div class="wrap ep-app" data-ep-screen="eventos-probolsas">
 			<div data-ep-header-actions></div>
@@ -148,7 +148,7 @@ async function mountWith( events, overrides = {} ) {
 	api = { ...fakeApi( events ), ...overrides };
 	download = vi.fn();
 	openLibrary = vi.fn( async () => ( { id: 400, mime: 'application/pdf', url: 'https://intranet.test/uploads/acta.pdf', thumbnail_url: null, filename: 'acta.pdf' } ) );
-	await mount( screen, config, { api, download, openLibrary } );
+	await mount( screen, { ...config, ...configOverrides }, { api, download, openLibrary } );
 }
 
 beforeEach( async () => {
@@ -442,6 +442,41 @@ describe( 'pantalla Eventos: formulario (H-204)', () => {
 		type( 'type_id', '1', 'change' );
 		expect( shown( '.ep-field__optional' ) ).toBe( false );
 		expect( shown( '.ep-field__required' ) ).toBe( true );
+	} );
+
+	it( 'soltar un archivo lo sube a wp/v2/media con la marca y lo usa como adjunto (H-411)', async () => {
+		const upload = vi.fn( async () => ( { id: 501, mime_type: 'application/pdf', source_url: 'https://intranet.test/uploads/acta.pdf', media_details: {} } ) );
+		await mountWith( [], { upload }, { can: { manage: true, upload: true }, media: { ...config.media, upload_url: 'https://intranet.test/wp-json/wp/v2/media', upload_header: 'X-Eventos-Upload', upload_context: 'event-attachment', max_upload_bytes: 10485760 } } );
+		header( 'Añadir evento' ).click();
+		type( 'type_id', '1', 'change' );
+		type( 'title', 'Cumpleaños de Luis' );
+
+		const file = new File( [ '%PDF-1.4' ], 'acta.pdf', { type: 'application/pdf' } );
+		const drop = new Event( 'drop', { bubbles: true, cancelable: true } );
+		Object.defineProperty( drop, 'dataTransfer', { value: { types: [ 'Files' ], files: [ file ] } } );
+		drawer().querySelector( '.ep-media-field__dropzone' ).dispatchEvent( drop );
+		await flush();
+
+		expect( upload ).toHaveBeenCalledWith( 'https://intranet.test/wp-json/wp/v2/media', file, expect.objectContaining( { silent: true, envelope: false, headers: { 'X-Eventos-Upload': 'event-attachment' } } ) );
+		submit();
+		await flush();
+		expect( api.post ).toHaveBeenCalledWith( 'events', expect.objectContaining( { attachment_id: '501' } ), { silent: true } );
+	} );
+
+	it( 'sin permiso para subir archivos, el adjunto no acepta archivos soltados', () => {
+		header( 'Añadir evento' ).click();
+
+		expect( drawer().querySelector( '.ep-media-field__dropzone' ) ).toBeNull();
+	} );
+
+	it( 'un archivo soltado fuera de la zona del adjunto no abre la pestaña', () => {
+		header( 'Añadir evento' ).click();
+		const drop = new Event( 'drop', { bubbles: true, cancelable: true } );
+		Object.defineProperty( drop, 'dataTransfer', { value: { types: [ 'Files' ], files: [], dropEffect: 'copy' } } );
+
+		drawer().querySelector( '.ep-drawer__body' ).dispatchEvent( drop );
+
+		expect( drop.defaultPrevented ).toBe( true );
 	} );
 
 	it( 'el aviso de fecha pasada no bloquea (D-3) y compara con «hoy» del servidor', () => {

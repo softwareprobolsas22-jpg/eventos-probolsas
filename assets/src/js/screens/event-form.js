@@ -17,7 +17,7 @@ import { button } from '../ui/button.js';
 import { confirmDialog } from '../ui/confirm-dialog.js';
 import { openDrawer } from '../ui/drawer.js';
 import { createField, createForm, ruleOptions } from '../ui/form.js';
-import { createMediaField, openMediaLibrary } from '../ui/media-field.js';
+import { createMediaField, fromRestAttachment, openMediaLibrary } from '../ui/media-field.js';
 import { toast } from '../ui/toast.js';
 
 /**
@@ -97,14 +97,30 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 		hint: __( 'Opcional.', 'eventos-probolsas' ),
 	} );
 
+	// H-411: soltar el archivo en el campo lo sube a la Biblioteca de Medios (docs/api/media.md). Solo si el
+	// usuario puede subir archivos (`upload_files`); si no, queda «Elegir archivo».
+	const media = config.media ?? {};
+	const canUpload = Boolean( config.can?.upload && media.upload_url && 'function' === typeof api.upload );
 	const mediaField = createMediaField( {
 		name: 'attachment_id',
 		label: __( 'Adjunto', 'eventos-probolsas' ),
 		value: event?.attachment ?? null,
 		required: Boolean( initialType?.requires_attachment ),
-		allowedMimes: config.media?.allowed_mimes ?? [],
-		libraryTypes: config.media?.library_types,
+		allowedMimes: media.allowed_mimes ?? [],
+		libraryTypes: media.library_types,
 		openLibrary,
+		maxUploadBytes: Number( media.max_upload_bytes ) || 0,
+		uploadFile: canUpload
+			? async ( file, onProgress ) =>
+					fromRestAttachment(
+						await api.upload( media.upload_url, file, {
+							onProgress,
+							silent: true,
+							envelope: false,
+							headers: { [ media.upload_header ?? 'X-Eventos-Upload' ]: media.upload_context ?? 'event-attachment' },
+						} )
+					)
+			: null,
 	} );
 
 	const pastNotice = h(
@@ -196,6 +212,17 @@ export function openEventForm( { event = null, types, config, api, onSaved, onMi
 				cancelLabel: __( 'Seguir editando', 'eventos-probolsas' ),
 			} ),
 	} );
+
+	// Un archivo soltado fuera de la zona del adjunto no debe abrirse en la pestaña: se perdería el formulario.
+	const keepFileDrops = ( dragEvent ) => {
+		// La zona del adjunto ya lo atendió (y marcó «copiar»); aquí solo el resto del panel.
+		if ( ! dragEvent.defaultPrevented && [ ...( dragEvent.dataTransfer?.types ?? [] ) ].includes( 'Files' ) ) {
+			dragEvent.preventDefault();
+			dragEvent.dataTransfer.dropEffect = 'none';
+		}
+	};
+	drawer.element.addEventListener( 'dragover', keepFileDrops );
+	drawer.element.addEventListener( 'drop', keepFileDrops );
 
 	return drawer;
 }
