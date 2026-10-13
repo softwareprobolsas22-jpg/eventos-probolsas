@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Rama | `feature/ajustes-aceptacion-2` (`73fa684` API, `451bd7c` interfaz) |
-| CI | Pendiente: la rama no se ha subido |
+| CI | Run `38411360474` (`a196371`, intento 1): ❌ solo «Navegador», por QA-066 (la integración con wp-env pasó: no fue Docker Hub) · Pendiente el run del arreglo |
 | Fecha | 2026-10-13 |
 | Revisó | QA |
 | Veredicto | ⏳ **Aprobado en local, pendiente del CI** |
@@ -24,6 +24,7 @@
 
 | ID | Sev. | Observación | Acción |
 |---|---|---|---|
+| QA-066 | Baja | La auditoría R-17 (`audit.spec.js`) esperaba que «Ajustes» pidiera solo `settings`; con H-406 pide además `settings/shortcodes` y `event-types`, una vez cada una. Además, la prueba cortaba la ruta en el primer segmento y contaba `settings/shortcodes` como `settings`. | ✅ Corregido en la rama: la prueba reconoce las subrutas y espera las tres llamadas |
 | QA-065 | Media | Sigue abierto (límite de Docker Hub en el CI) | Si falla la integración o el navegador por Docker Hub, reejecutar los trabajos fallidos |
 
 **Veredicto:** ⏳ aprobado en local; se integra en `develop` cuando el CI de la rama esté en verde.

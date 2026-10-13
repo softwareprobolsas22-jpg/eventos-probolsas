@@ -75,7 +75,7 @@ test.describe( 'Auditoría de wp-admin (H-403)', () => {
 		page.on( 'request', ( request ) => {
 			const url = new URL( request.url() );
 			const route = url.searchParams.get( 'rest_route' ) ?? url.pathname;
-			const match = /\/eventos\/v1\/([a-z-]+)/.exec( route );
+			const match = /\/eventos\/v1\/([a-z-]+(?:\/[a-z-]+)?)/.exec( route );
 			if ( match ) {
 				calls.push( match[ 1 ] );
 			}
@@ -92,6 +92,8 @@ test.describe( 'Auditoría de wp-admin (H-403)', () => {
 		calls.length = 0;
 		await openScreen( page, 'eventos-probolsas-ajustes' );
 		await expect( page.getByRole( 'switch' ) ).toBeVisible();
-		expect( calls ).toEqual( [ 'settings' ] );
+		await expect( page.locator( '.ep-shortcode' ).first() ).toBeVisible();
+		// La guía de los shortcodes y los slugs de los tipos para el atributo 	ipos (H-406).
+		expect( calls.sort() ).toEqual( [ 'event-types', 'settings', 'settings/shortcodes' ] );
 	} );
 } );
